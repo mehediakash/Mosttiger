@@ -2,8 +2,8 @@ import axios from "axios";
 import store from "../store";
 import { logout } from "../store/authSlice";
 
-// const API_BASE = "https://server.mosttiger.com";
-const API_BASE = "http://localhost:5000" || "";
+const API_BASE = "https://server.mosttiger.com";
+// const API_BASE = "http://localhost:5000" || "";
 const AUTH_STORAGE_KEY = "betting_app_auth_v1";
 // const API_BASE =
 //   "https://node-api-server-123-f5gsegd3ahcqhtgs.southeastasia-01.azurewebsites.net";
