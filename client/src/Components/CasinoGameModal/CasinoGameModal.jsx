@@ -181,12 +181,13 @@ const CasinoGameModal = React.memo(() => {
   }, [extractBalance, isOpen, user]);
 
   const displayBalance = useMemo(() => {
-    if (typeof walletBalance === "number") {
-      return walletBalance.toLocaleString();
-    }
-
-    if (user?.balance && typeof user.balance === "number") {
-      return user.balance.toLocaleString();
+    const raw =
+      typeof walletBalance === "number" ? walletBalance : user?.balance;
+    if (typeof raw === "number" && Number.isFinite(raw)) {
+      return raw.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
 
     return balanceLoading ? "..." : "--";
@@ -197,12 +198,15 @@ const CasinoGameModal = React.memo(() => {
   const requiresDeposit =
     launchError &&
     typeof launchError === "object" &&
-    (launchError.requiresDeposit || launchError.code === "INSUFFICIENT_BALANCE");
+    (launchError.requiresDeposit ||
+      launchError.code === "INSUFFICIENT_BALANCE");
   const launchErrorMessage =
     typeof launchError === "string"
       ? launchError
       : launchError?.message || "Failed to launch game. Please try again.";
-  const launchErrorTitle = requiresDeposit ? "Insufficient Balance" : "Game Error";
+  const launchErrorTitle = requiresDeposit
+    ? "Insufficient Balance"
+    : "Game Error";
   const launchErrorCopy = requiresDeposit
     ? "Your account balance is currently 0. Please deposit funds to start playing."
     : launchErrorMessage;

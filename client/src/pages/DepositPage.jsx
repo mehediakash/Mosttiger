@@ -314,6 +314,20 @@ const DepositPage = () => {
     }
   };
 
+  // Increment deposit amount when preset button is clicked
+  const handlePresetAmountClick = (amountToAdd) => {
+    const rawCurrent =
+      typeof depositAmount === "string"
+        ? depositAmount.replace(/,/g, "").trim()
+        : String(depositAmount || "");
+    const parsedCurrent = parseFloat(rawCurrent);
+    const currentNum =
+      Number.isFinite(parsedCurrent) && parsedCurrent > 0 ? parsedCurrent : 0;
+    const presetNum = Number(amountToAdd) || 0;
+    const nextAmount = currentNum + presetNum;
+    handleDepositAmountChange(nextAmount.toString());
+  };
+
   // Calculate total bonus amount
   const calculateBonusAmount = () => {
     if (!promoData || !depositAmount) return 0;
@@ -532,9 +546,7 @@ const DepositPage = () => {
                             <button
                               type="button"
                               key={amount}
-                              onClick={() =>
-                                setDepositAmount(amount.toString())
-                              }
+                              onClick={() => handlePresetAmountClick(amount)}
                               className={`py-2 px-3 rounded-md font-semibold text-sm transition-all duration-200 ${
                                 depositAmount === amount.toString()
                                   ? "bg-primary text-[#050912] font-bold shadow-[0_0_12px_rgba(0,229,255,0.4)]"

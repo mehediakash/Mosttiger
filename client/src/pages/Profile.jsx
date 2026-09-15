@@ -97,9 +97,9 @@ export default function Profile() {
   }, [user]);
 
   const formatMoney = (v) =>
-    v === null || v === undefined
+    v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
       ? "--"
-      : Number(v).toLocaleString(undefined, {
+      : Number(v).toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });

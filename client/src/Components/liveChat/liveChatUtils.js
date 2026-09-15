@@ -74,3 +74,10 @@ export const highlightText = (text, query) => {
 
   return String(text).split(regex);
 };
+
+export const openLiveChat = () => {
+  if (typeof window !== "undefined") {
+    window.__openLiveChatPending = true;
+    window.dispatchEvent(new CustomEvent("open-live-chat"));
+  }
+};

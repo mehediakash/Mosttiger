@@ -111,7 +111,7 @@ async function getNextUserId() {
   return counter.seq;
 }
 // Send response with token
-const sendTokenResponse = async (user, statusCode, res) => {
+const sendTokenResponse = async (user, statusCode, res, extraData = {}) => {
   const token = generateToken(user._id);
 
   const userObj = {
@@ -136,7 +136,9 @@ const sendTokenResponse = async (user, statusCode, res) => {
     permissions: [],
   };
 
-  const affiliateDashboard = affiliateService.getAffiliateAccess(user.affiliate);
+  const affiliateDashboard = affiliateService.getAffiliateAccess(
+    user.affiliate,
+  );
 
   // Fetch agent permissions if user is an agent
   if (user.role && ["master_agent", "agent", "sub_agent"].includes(user.role)) {
@@ -220,6 +222,7 @@ const sendTokenResponse = async (user, statusCode, res) => {
     token,
     user: userObj,
     affiliateDashboard,
+    ...extraData,
   });
 };
 
@@ -315,7 +318,10 @@ exports.register = async (req, res) => {
       if (!user || !affiliateCode) return;
 
       try {
-        await affiliateTrackingService.trackRegistration(user._id, affiliateCode);
+        await affiliateTrackingService.trackRegistration(
+          user._id,
+          affiliateCode,
+        );
       } catch (error) {
         console.error("Affiliate registration tracking error:", error);
       }
@@ -377,9 +383,8 @@ exports.register = async (req, res) => {
         await trackAffiliateRegistration();
         await trackReferralRegistration();
 
-        res.status(201).json({
-          success: true,
-          message: "Registration successful. You can now login.",
+        return await sendTokenResponse(user, 201, res, {
+          message: "Registration successful.",
         });
       } else {
         // Invalid referral code - give 10 Taka bonus
@@ -401,10 +406,9 @@ exports.register = async (req, res) => {
         await trackAffiliateRegistration();
         await trackReferralRegistration();
 
-        res.status(201).json({
-          success: true,
+        return await sendTokenResponse(user, 201, res, {
           message:
-            "Registration successful. Invalid referral code - 10 Taka bonus added! You can now login.",
+            "Registration successful. Invalid referral code - 10 Taka bonus added!",
           bonus: 10,
         });
       }
@@ -426,9 +430,8 @@ exports.register = async (req, res) => {
       await trackAffiliateRegistration();
       await trackReferralRegistration();
 
-      res.status(201).json({
-        success: true,
-        message: "Registration successful. You can now login.",
+      return await sendTokenResponse(user, 201, res, {
+        message: "Registration successful.",
       });
     }
   } catch (error) {
@@ -803,7 +806,9 @@ exports.getMe = async (req, res) => {
         return res.status(200).json({
           success: true,
           user: userObj,
-          affiliateDashboard: affiliateService.getAffiliateAccess(user.affiliate),
+          affiliateDashboard: affiliateService.getAffiliateAccess(
+            user.affiliate,
+          ),
         });
       }
     }

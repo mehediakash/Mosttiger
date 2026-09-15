@@ -168,11 +168,12 @@ const DesktopLayout = () => {
   }, [user]);
 
   const formatMoney = (v) =>
-    v === null || v === undefined
+    v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
       ? "--"
-      : Math.floor(Number(v)).toLocaleString(
-          i18n.language === "bn" ? "bn-BD" : "en-US",
-        );
+      : Number(v).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
 
   const refreshBalance = async () => {
     if (!user) {
@@ -368,21 +369,21 @@ const DesktopLayout = () => {
         ...(affiliateCode ? { aff: affiliateCode } : {}),
         ...(referralCode ? { ref: referralCode, referralCode } : {}),
       };
-      await dispatch(registerUser(registrationData)).unwrap();
+      const result = await dispatch(registerUser(registrationData)).unwrap();
       clearStoredAffiliateCode();
       clearStoredReferralCode();
-      alert("Registration successful! You can now login.");
-      setAuthMode("login");
-      setRegisterForm({
-        username: "",
-        phone: "",
-        password: "",
-        confirmPassword: "",
-        agreedToTerms: true,
-      });
-      setPromoCode("");
-      setPromoValidation(null);
-      setShowPromo(false);
+      if (!result?.token || !result?.user) {
+        try {
+          await dispatch(
+            loginUser({
+              username: registerForm.username.trim().toLowerCase(),
+              password: registerForm.password,
+              rememberMe: true,
+            }),
+          ).unwrap();
+        } catch (e) {}
+      }
+      closeAuthModal();
     } catch (err) {
       console.error(err);
     }

@@ -40,31 +40,43 @@ const formatDateForInput = (value) => {
 };
 
 const getPhoneRowsFromUser = (profile) => {
+  const signupPhone =
+    (typeof profile?.phone === "string" ? profile.phone.trim() : "") ||
+    (Array.isArray(profile?.phones)
+      ? profile.phones.find((p) => p.isPrimary)?.number?.trim()
+      : "") ||
+    "";
+
   const phones =
     Array.isArray(profile?.phones) && profile.phones.length
       ? profile.phones
-      : profile?.phone
-        ? [{ number: profile.phone, isPrimary: true }]
+      : signupPhone
+        ? [{ number: signupPhone, isPrimary: true }]
         : [];
 
   const normalized = phones
     .map((entry) => ({
-      number: typeof entry?.number === "string" ? entry.number : "",
+      number: typeof entry?.number === "string" ? entry.number.trim() : "",
       isPrimary: Boolean(entry?.isPrimary),
     }))
     .filter((entry) => entry.number);
 
   if (!normalized.length) {
-    return [createPhoneRow("", true)];
+    return [createPhoneRow(signupPhone, true)];
   }
 
-  const primaryIndex = normalized.findIndex((entry) => entry.isPrimary);
+  let primaryIndex = normalized.findIndex((entry) => entry.isPrimary);
+  if (primaryIndex === -1 && signupPhone) {
+    primaryIndex = normalized.findIndex(
+      (entry) => entry.number === signupPhone,
+    );
+  }
+  if (primaryIndex === -1) {
+    primaryIndex = 0;
+  }
 
   return normalized.map((entry, index) =>
-    createPhoneRow(
-      entry.number,
-      primaryIndex === -1 ? index === 0 : index === primaryIndex,
-    ),
+    createPhoneRow(entry.number, index === primaryIndex),
   );
 };
 
@@ -195,14 +207,16 @@ const PersonalInfoModal = ({ open, onClose }) => {
 
   const removePhoneRow = (rowId) => {
     setForm((current) => {
+      const targetRow = current.phones.find((row) => row.id === rowId);
+      // Never allow removing the primary signup phone number
+      if (targetRow?.isPrimary) {
+        return current;
+      }
+
       const nextPhones = current.phones.filter((row) => row.id !== rowId);
 
       if (!nextPhones.length) {
-        return { ...current, phones: [createPhoneRow("", true)] };
-      }
-
-      if (!nextPhones.some((row) => row.isPrimary)) {
-        nextPhones[0] = { ...nextPhones[0], isPrimary: true };
+        return current;
       }
 
       return { ...current, phones: nextPhones };
@@ -210,21 +224,16 @@ const PersonalInfoModal = ({ open, onClose }) => {
     setErrors((current) => ({ ...current, phones: "" }));
   };
 
-  const setPrimaryPhone = (rowId) => {
-    setForm((current) => ({
-      ...current,
-      phones: current.phones.map((row) => ({
-        ...row,
-        isPrimary: row.id === rowId,
-      })),
-    }));
-  };
-
   const handleSave = async () => {
     const nextErrors = {};
     const trimmedFullName = form.fullName.trim();
     const normalizedEmail = form.email.trim().toLowerCase();
     const birthday = form.birthday ? new Date(form.birthday) : null;
+
+    const primaryPhoneRow = form.phones.find((row) => row.isPrimary);
+    if (!primaryPhoneRow || !primaryPhoneRow.number.trim()) {
+      nextErrors.phones = "Primary phone number cannot be removed or empty";
+    }
 
     const phoneRows = form.phones
       .map((row) => ({
@@ -551,7 +560,7 @@ const PersonalInfoModal = ({ open, onClose }) => {
                           <div
                             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${
                               isPrimary
-                                ? "border-[#ffcc33]/25 primary/10 text-[#ffcc33]"
+                                ? "border-[#ffcc33]/25 bg-primary/10 text-[#ffcc33]"
                                 : "border-[#ffffff10] bg-[#151515] text-[#ffcc33]"
                             }`}
                           >
@@ -569,13 +578,22 @@ const PersonalInfoModal = ({ open, onClose }) => {
                                     e.target.value.replace(/[^0-9]/g, ""),
                                   )
                                 }
+                                onBlur={(e) => {
+                                  if (isPrimary && !e.target.value.trim()) {
+                                    updatePhoneRow(
+                                      phoneRow.id,
+                                      "number",
+                                      user?.phone || "",
+                                    );
+                                  }
+                                }}
                                 inputMode="numeric"
                                 maxLength={11}
                                 className="w-full min-w-0 bg-transparent text-sm font-semibold tracking-wide text-white outline-none placeholder:text-[#7f7f7f]"
                                 placeholder="01XXXXXXXXX"
                               />
                               {isPrimary && (
-                                <span className="shrink-0 rounded-full primary px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
+                                <span className="shrink-0 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
                                   {t("primary")}
                                 </span>
                               )}
@@ -592,24 +610,14 @@ const PersonalInfoModal = ({ open, onClose }) => {
                           {!isPrimary && (
                             <button
                               type="button"
-                              onClick={() => setPrimaryPhone(phoneRow.id)}
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#ffcc33]/15 bg-[#171717] text-[#ffcc33] transition-all duration-200 hover:border-[#ffcc33]/35 hover:bg-[#1f1f1f]"
-                              aria-label={t("setAsPrimary")}
-                              title={t("setAsPrimary")}
+                              onClick={() => removePhoneRow(phoneRow.id)}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-500/15 bg-red-500/10 text-red-400 transition-all duration-200 hover:bg-red-500/20"
+                              aria-label="Remove phone number"
+                              title="Remove"
                             >
-                              <Star size={15} />
+                              <Trash2 size={15} />
                             </button>
                           )}
-
-                          <button
-                            type="button"
-                            onClick={() => removePhoneRow(phoneRow.id)}
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-500/15 bg-red-500/10 text-red-400 transition-all duration-200 hover:bg-red-500/20"
-                            aria-label="Remove phone number"
-                            title="Remove"
-                          >
-                            <Trash2 size={15} />
-                          </button>
                         </div>
                       </div>
                     );

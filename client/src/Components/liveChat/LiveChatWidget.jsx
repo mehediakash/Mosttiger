@@ -290,6 +290,25 @@ const LiveChatWidget = () => {
     }
   }, [authenticated, ensureConversation, joinConversation, showLogin]);
 
+  useEffect(() => {
+    const handleOpenLiveChat = () => {
+      if (typeof window !== "undefined") {
+        window.__openLiveChatPending = false;
+      }
+      openWidget();
+    };
+
+    if (typeof window !== "undefined" && window.__openLiveChatPending) {
+      window.__openLiveChatPending = false;
+      openWidget();
+    }
+
+    window.addEventListener("open-live-chat", handleOpenLiveChat);
+    return () => {
+      window.removeEventListener("open-live-chat", handleOpenLiveChat);
+    };
+  }, [openWidget]);
+
   const minimizeWidget = () => {
     setOpen(false);
     setExpanded(false);

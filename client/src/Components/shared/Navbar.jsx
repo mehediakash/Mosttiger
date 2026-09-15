@@ -120,9 +120,7 @@ const NavbarSidebar = () => {
   const { user } = useSelector((state) => state.auth); // get login state
   const affiliateStatus = user?.affiliate?.status;
   const affiliatePath =
-    affiliateStatus === "approved"
-      ? "/affiliate/dashboard"
-      : "/affiliate/signup";
+    affiliateStatus === "approved" ? "/affiliate/dashboard" : "/affiliate";
   const [walletBalance, setWalletBalance] = useState(null);
   const [refreshingBalance, setRefreshingBalance] = useState(false);
   const [showWalletActions, setShowWalletActions] = useState(false);
@@ -394,11 +392,12 @@ const NavbarSidebar = () => {
   }, [user]);
 
   const formatMoney = (v) =>
-    v === null || v === undefined
+    v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
       ? "--"
-      : Math.floor(Number(v)).toLocaleString(
-          i18n.language === "bn" ? "bn-BD" : "en-US",
-        );
+      : Number(v).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
 
   // Auth Modal States and Logic
   const { status: authStatus, error: authError } = useSelector((s) => s.auth);
@@ -492,21 +491,21 @@ const NavbarSidebar = () => {
         ...(affiliateCode ? { aff: affiliateCode } : {}),
         ...(referralCode ? { ref: referralCode, referralCode } : {}),
       };
-      await dispatch(registerUser(registrationData)).unwrap();
+      const result = await dispatch(registerUser(registrationData)).unwrap();
       clearStoredAffiliateCode();
       clearStoredReferralCode();
-      alert("Registration successful! You can now login.");
-      setAuthMode("login");
-      setRegisterForm({
-        username: "",
-        phone: "",
-        password: "",
-        agreedToTerms: false,
-      });
-      setPromoCode("");
-      setPromoValidation(null);
-      setShowPromo(false);
-      setTermsError("");
+      if (!result?.token || !result?.user) {
+        try {
+          await dispatch(
+            loginUser({
+              username: registerForm.username.trim().toLowerCase(),
+              password: registerForm.password,
+              rememberMe: true,
+            }),
+          ).unwrap();
+        } catch (e) {}
+      }
+      closeAuthModal();
     } catch (err) {
       console.error(err);
     }

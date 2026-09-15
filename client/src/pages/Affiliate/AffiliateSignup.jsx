@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { affiliateAPI } from "../../Components/services/affiliateService";
@@ -37,6 +37,18 @@ export default function AffiliateSignup() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    if (user?.username && !form.username) {
+      setForm((prev) => ({
+        ...prev,
+        username: user.username,
+        fullName: prev.fullName || user.fullName || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || "",
+      }));
+    }
+  }, [user]);
+
   const setField = (key, value) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -53,7 +65,7 @@ export default function AffiliateSignup() {
     try {
       await affiliateAPI.apply({
         fullName: form.fullName,
-        username: form.username,
+        username: form.username || user?.username || "",
         email: form.email,
         phone: form.phone,
         country: form.country,
@@ -79,19 +91,26 @@ export default function AffiliateSignup() {
     }
   };
 
-  const input = (key, label, props = {}) => (
-    <div>
-      <label className="mb-2 block text-sm font-semibold text-slate-700 ">
-        {label}
-      </label>
-      <input
-        className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
-        value={form[key]}
-        onChange={(e) => setField(key, e.target.value)}
-        {...props}
-      />
-    </div>
-  );
+  const input = (key, label, props = {}) => {
+    const isDisabled = Boolean(props.disabled || props.readOnly);
+    return (
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-slate-700 ">
+          {label}
+        </label>
+        <input
+          className={`w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 ${
+            isDisabled
+              ? "cursor-not-allowed bg-slate-100 text-slate-500 select-none opacity-85"
+              : "bg-white text-slate-900"
+          }`}
+          value={form[key]}
+          onChange={(e) => setField(key, e.target.value)}
+          {...props}
+        />
+      </div>
+    );
+  };
 
   return (
     <div className="bg-slate-50 px-4 py-10 mb-10">
@@ -114,7 +133,7 @@ export default function AffiliateSignup() {
 
         <Section title="Basic Information">
           {input("fullName", "Full Name", { required: true })}
-          {input("username", "Username", { required: true })}
+          {input("username", "Username", { disabled: true, readOnly: true })}
           {input("email", "Email", { required: true, type: "email" })}
           {input("phone", "Phone", { required: true })}
           {input("country", "Country", { required: true })}

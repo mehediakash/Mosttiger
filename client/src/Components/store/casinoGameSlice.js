@@ -15,35 +15,6 @@ const emptyState = {
   lastOpenedAt: null,
 };
 
-const extractMainBalance = (payload) => {
-  if (!payload) return 0;
-  if (typeof payload.main === "number") return payload.main;
-  if (typeof payload.balance === "number") return payload.balance;
-  if (payload.wallet && typeof payload.wallet === "object") {
-    return (
-      payload.wallet.main ??
-      payload.wallet.balance ??
-      Object.values(payload.wallet).find(
-        (value) => typeof value === "number",
-      ) ??
-      Object.values(payload.wallet).find(
-        (value) => typeof value === "number",
-      ) ??
-      0
-    );
-  }
-  if (typeof payload === "number") return payload;
-  return 0;
-};
-
-const insufficientBalancePayload = (message) => ({
-  code: "INSUFFICIENT_BALANCE",
-  message:
-    message ||
-    "Your account balance is currently 0. Please deposit funds to start playing.",
-  requiresDeposit: true,
-});
-
 const normalizeLaunchError = (payload) => {
   if (!payload) return null;
 
@@ -154,18 +125,6 @@ export const launchCasinoGame = createAsyncThunk(
       // Add a timeout/abort so a hanging network request doesn't leave `loading` stuck.
       const controller = new AbortController();
       timeout = setTimeout(() => controller.abort(), 15000);
-
-      const balanceResponse = await api.get("/api/wallet/balance", {
-        signal: controller.signal,
-      });
-      const balanceBody = balanceResponse?.data ?? {};
-      const balancePayload = balanceBody.data ?? balanceBody;
-      const availableBalance = extractMainBalance(balancePayload);
-
-      if (availableBalance <= 0) {
-        clearTimeout(timeout);
-        return rejectWithValue(insufficientBalancePayload());
-      }
 
       const launchUrl = isNineWicketGame(game)
         ? "/api/9wicket/launch"
