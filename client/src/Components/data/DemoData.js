@@ -1,0 +1,226 @@
+// data/DemoData.js
+const DemoData = {
+  getAllMatches: () => {
+    return [
+      // Cricket matches
+      {
+        id: 1,
+        sport: 'cricket',
+        category: 'International',
+        tournament: 'ICC World Cup 2023',
+        team1: 'India',
+        team2: 'Australia',
+        score1: '287/4',
+        score2: '210/7',
+        overs1: '45.2',
+        overs2: '40.0',
+        time: '14:30',
+        status: 'Live',
+        live: true,
+        odds1: 1.85,
+        odds2: 2.10,
+        oddsDraw: 4.50,
+        totalOver: 1.71,
+        totalUnder: 2.05
+      },
+      {
+        id: 2,
+        sport: 'cricket',
+        category: 'Domestic',
+        tournament: 'Bangladesh Premier League',
+        team1: 'Comilla Victorians',
+        team2: 'Fortune Barishal',
+        score1: '182/5',
+        score2: '0/0',
+        overs1: '20.0',
+        overs2: '0.0',
+        time: '19:00',
+        status: 'Upcoming',
+        live: false,
+        odds1: 1.65,
+        odds2: 2.35,
+        oddsDraw: 5.20,
+        totalOver: 1.82,
+        totalUnder: 1.95
+      },
+      {
+        id: 3,
+        sport: 'cricket',
+        category: 'International',
+        tournament: 'Pakistan vs England',
+        team1: 'Pakistan',
+        team2: 'England',
+        score1: '325/8',
+        score2: '280/6',
+        overs1: '50.0',
+        overs2: '45.3',
+        time: '11:15',
+        status: 'Live',
+        live: true,
+        odds1: 2.25,
+        odds2: 1.75,
+        oddsDraw: 3.90,
+        totalOver: 1.67,
+        totalUnder: 2.15
+      },
+      // Football matches
+      {
+        id: 4,
+        sport: 'football',
+        category: 'Champions League',
+        tournament: 'UEFA Champions League',
+        team1: 'Real Madrid',
+        team2: 'Manchester City',
+        score1: '1',
+        score2: '1',
+        overs1: '67\'',
+        overs2: '67\'',
+        time: '21:00',
+        status: 'Live',
+        live: true,
+        odds1: 2.40,
+        odds2: 2.90,
+        oddsDraw: 3.30,
+        totalOver: 1.85,
+        totalUnder: 1.95
+      },
+      {
+        id: 5,
+        sport: 'football',
+        category: 'Premier League',
+        tournament: 'English Premier League',
+        team1: 'Liverpool',
+        team2: 'Arsenal',
+        score1: '2',
+        score2: '0',
+        overs1: '45\'',
+        overs2: '45\'',
+        time: '16:30',
+        status: 'HT',
+        live: true,
+        odds1: 2.10,
+        odds2: 3.50,
+        oddsDraw: 3.40,
+        totalOver: 1.75,
+        totalUnder: 2.10
+      },
+      // Tennis matches
+      {
+        id: 6,
+        sport: 'tennis',
+        category: 'ATP Tour',
+        tournament: 'Wimbledon 2023',
+        team1: 'Novak Djokovic',
+        team2: 'Carlos Alcaraz',
+        score1: '2',
+        score2: '1',
+        overs1: '6-4, 4-6, 7-5',
+        overs2: 'Sets',
+        time: '15:45',
+        status: 'Live',
+        live: true,
+        odds1: 1.90,
+        odds2: 2.00,
+        oddsDraw: null,
+        totalOver: 1.82,
+        totalUnder: 1.95
+      },
+      // Basketball matches
+      {
+        id: 7,
+        sport: 'basketball',
+        category: 'NBA',
+        tournament: 'NBA Playoffs',
+        team1: 'LA Lakers',
+        team2: 'Golden State',
+        score1: '102',
+        score2: '98',
+        overs1: 'Q4 8:32',
+        overs2: 'Q4 8:32',
+        time: '03:30',
+        status: 'Live',
+        live: true,
+        odds1: 1.95,
+        odds2: 1.90,
+        oddsDraw: 12.00,
+        totalOver: 1.80,
+        totalUnder: 1.95
+      },
+      // Ice Hockey
+      {
+        id: 8,
+        sport: 'icehockey',
+        category: 'NHL',
+        tournament: 'NHL Regular Season',
+        team1: 'Toronto Maple Leafs',
+        team2: 'Boston Bruins',
+        score1: '2',
+        score2: '3',
+        overs1: 'P3 12:45',
+        overs2: 'P3 12:45',
+        time: '01:20',
+        status: 'Live',
+        live: true,
+        odds1: 2.30,
+        odds2: 1.70,
+        oddsDraw: 4.50,
+        totalOver: 1.88,
+        totalUnder: 1.90
+      },
+      // More cricket from your example
+      {
+        id: 9,
+        sport: 'cricket',
+        category: 'Domestic',
+        tournament: 'Syed Mushtaq Ali Trophy',
+        team1: 'Hyderabad',
+        team2: 'Haryana',
+        score1: '0/0',
+        score2: '246/7',
+        overs1: '0.0',
+        overs2: '20.0',
+        time: '09:30',
+        status: 'Upcoming',
+        live: false,
+        odds1: 3.20,
+        odds2: 1.40,
+        oddsDraw: 8.50,
+        totalOver: 1.65,
+        totalUnder: 2.20
+      },
+      {
+        id: 10,
+        sport: 'cricket',
+        category: 'Women\'s Cricket',
+        tournament: 'Gulf Championship Women',
+        team1: 'UAE Women',
+        team2: 'Saudi Arabia Women',
+        score1: '251/2',
+        score2: '63',
+        overs1: '50.0',
+        overs2: '34.0',
+        time: '13:00',
+        status: 'Finished',
+        live: false,
+        odds1: 1.10,
+        odds2: 7.50,
+        oddsDraw: 15.00,
+        totalOver: 1.30,
+        totalUnder: 3.50
+      },
+    ];
+  },
+  
+  getMatchesBySport: (sport) => {
+    const allMatches = DemoData.getAllMatches();
+    if (sport === 'all') return allMatches;
+    return allMatches.filter(match => match.sport === sport);
+  },
+  
+  getLiveMatches: () => {
+    const allMatches = DemoData.getAllMatches();
+    return allMatches.filter(match => match.live).slice(0, 5);
+  }
+};
+
+export default DemoData;

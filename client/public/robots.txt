@@ -1,0 +1,31 @@
+# robots.txt for mosttiger Live
+# Updated: 2026-02-03
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow private/admin routes
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /login
+Disallow: /verify-otp
+Disallow: /reset-password
+Disallow: /profile/settings
+
+# Allow specific pages for SEO
+Allow: /
+Allow: /register
+Allow: /promotions
+Allow: /sports
+Allow: /casino
+Allow: /deposit
+Allow: /about
+Allow: /contact
+
+# Sitemap location
+Sitemap: https://mosttiger.com/sitemap.xml
+
+# Crawl-delay (optional - helps prevent server overload)
+Crawl-delay: 1

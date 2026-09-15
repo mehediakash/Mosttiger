@@ -1,0 +1,4160 @@
+{
+  "info": {
+    "_postman_id": "87be9e73-3e46-4453-9129-70074042c17b",
+    "name": "myeco",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "40735701",
+    "_collection_link": "https://planetary-spaceship-280023.postman.co/workspace/My-Workspace~58d44dc9-ceda-4ded-8cbe-0b459344c448/collection/40735701-87be9e73-3e46-4453-9129-70074042c17b?action=share&source=collection_link&creator=40735701"
+  },
+  "item": [
+    {
+      "name": "Authentication Endpoints",
+      "item": [
+        {
+          "name": "User Registration",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fullName\": \"John Doe\",\r\n  \"email\": \"agent@gmail.com\",\r\n  \"phone\": \"+8801712345670\",\r\n  \"password\": \"123456\",\r\n  \"confirmPassword\": \"123456\",\r\n  \"referenceCode\": \"\",\r\n  \"agreedToTerms\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auth/register",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"userId\": \"64f1a2b3c4d5e6f7a8b9c0d1\",\r\n  \"otp\": \"123456\",\r\n  \"purpose\": \"signup\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auth/verify-otp",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auth", "verify-otp"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse JSON safely\r",
+                  "let json;\r",
+                  "try {\r",
+                  "    json = pm.response.json();\r",
+                  "} catch (err) {\r",
+                  "    console.error(\"❌ Response is not valid JSON:\", pm.response.text());\r",
+                  "    pm.test(\"Response must be JSON\", () => pm.expect.fail(\"Response is not JSON\"));\r",
+                  "    return;\r",
+                  "}\r",
+                  "\r",
+                  "console.log(\"🔍 Auth Response:\", json);\r",
+                  "\r",
+                  "// Token from your API response\r",
+                  "const accessToken = json.token;       // ✔ your API returns \"token\"\r",
+                  "const refreshToken = json.refreshToken || null;\r",
+                  "const tokenType = \"Bearer\";           // ✔ fixed type\r",
+                  "const expiresIn = 3600;               // ✔ adjust if your backend uses different TTL\r",
+                  "\r",
+                  "// Save token if found\r",
+                  "if (accessToken) {\r",
+                  "    pm.environment.set(\"bearerToken\", accessToken);\r",
+                  "    pm.environment.set(\"tokenType\", tokenType);\r",
+                  "\r",
+                  "    if (refreshToken) {\r",
+                  "        pm.environment.set(\"refreshToken\", refreshToken);\r",
+                  "    }\r",
+                  "\r",
+                  "    // Optional: set expiry timestamp\r",
+                  "    const expiryTimestamp = Date.now() + expiresIn * 1000;\r",
+                  "    pm.environment.set(\"tokenExpiresAt\", expiryTimestamp.toString());\r",
+                  "\r",
+                  "    console.log(\"✅ Saved bearerToken:\", accessToken);\r",
+                  "\r",
+                  "    pm.test(\"Token saved successfully\", () => {\r",
+                  "        pm.expect(accessToken).to.be.ok;\r",
+                  "    });\r",
+                  "} else {\r",
+                  "    console.error(\"❌ No token found in response\");\r",
+                  "    pm.test(\"Token missing\", () => pm.expect.fail(\"Token missing in response\"));\r",
+                  "}\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n//   \"email\": \"dev.mhakash1@gmail.com\",\r\n//   \"email\": \"agent@gmail.com\",\r\n  \"email\": \"admin@gmail.com\",\r\n  \"password\": \"123456\",\r\n  \"rememberMe\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auth/login",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse JSON safely\r",
+                  "let json;\r",
+                  "try {\r",
+                  "    json = pm.response.json();\r",
+                  "} catch (err) {\r",
+                  "    console.error(\"❌ Response is not valid JSON:\", pm.response.text());\r",
+                  "    pm.test(\"Response must be JSON\", () => pm.expect.fail(\"Response is not JSON\"));\r",
+                  "    return;\r",
+                  "}\r",
+                  "\r",
+                  "console.log(\"🔍 Auth Response:\", json);\r",
+                  "\r",
+                  "// Token from your API response\r",
+                  "const accessToken = json.token;       // ✔ your API returns \"token\"\r",
+                  "const refreshToken = json.refreshToken || null;\r",
+                  "const tokenType = \"Bearer\";           // ✔ fixed type\r",
+                  "const expiresIn = 3600;               // ✔ adjust if your backend uses different TTL\r",
+                  "\r",
+                  "// Save token if found\r",
+                  "if (accessToken) {\r",
+                  "    pm.environment.set(\"bearerToken\", accessToken);\r",
+                  "    pm.environment.set(\"tokenType\", tokenType);\r",
+                  "\r",
+                  "    if (refreshToken) {\r",
+                  "        pm.environment.set(\"refreshToken\", refreshToken);\r",
+                  "    }\r",
+                  "\r",
+                  "    // Optional: set expiry timestamp\r",
+                  "    const expiryTimestamp = Date.now() + expiresIn * 1000;\r",
+                  "    pm.environment.set(\"tokenExpiresAt\", expiryTimestamp.toString());\r",
+                  "\r",
+                  "    console.log(\"✅ Saved bearerToken:\", accessToken);\r",
+                  "\r",
+                  "    pm.test(\"Token saved successfully\", () => {\r",
+                  "        pm.expect(accessToken).to.be.ok;\r",
+                  "    });\r",
+                  "} else {\r",
+                  "    console.error(\"❌ No token found in response\");\r",
+                  "    pm.test(\"Token missing\", () => pm.expect.fail(\"Token missing in response\"));\r",
+                  "}\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"dev.mhakash@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auth/forgot-password",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auth", "forgot-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse JSON safely\r",
+                  "let json;\r",
+                  "try {\r",
+                  "    json = pm.response.json();\r",
+                  "} catch (err) {\r",
+                  "    console.error(\"❌ Response is not valid JSON:\", pm.response.text());\r",
+                  "    pm.test(\"Response must be JSON\", () => pm.expect.fail(\"Response is not JSON\"));\r",
+                  "    return;\r",
+                  "}\r",
+                  "\r",
+                  "console.log(\"🔍 Auth Response:\", json);\r",
+                  "\r",
+                  "// Token from your API response\r",
+                  "const accessToken = json.token;       // ✔ your API returns \"token\"\r",
+                  "const refreshToken = json.refreshToken || null;\r",
+                  "const tokenType = \"Bearer\";           // ✔ fixed type\r",
+                  "const expiresIn = 3600;               // ✔ adjust if your backend uses different TTL\r",
+                  "\r",
+                  "// Save token if found\r",
+                  "if (accessToken) {\r",
+                  "    pm.environment.set(\"bearerToken\", accessToken);\r",
+                  "    pm.environment.set(\"tokenType\", tokenType);\r",
+                  "\r",
+                  "    if (refreshToken) {\r",
+                  "        pm.environment.set(\"refreshToken\", refreshToken);\r",
+                  "    }\r",
+                  "\r",
+                  "    // Optional: set expiry timestamp\r",
+                  "    const expiryTimestamp = Date.now() + expiresIn * 1000;\r",
+                  "    pm.environment.set(\"tokenExpiresAt\", expiryTimestamp.toString());\r",
+                  "\r",
+                  "    console.log(\"✅ Saved bearerToken:\", accessToken);\r",
+                  "\r",
+                  "    pm.test(\"Token saved successfully\", () => {\r",
+                  "        pm.expect(accessToken).to.be.ok;\r",
+                  "    });\r",
+                  "} else {\r",
+                  "    console.error(\"❌ No token found in response\");\r",
+                  "    pm.test(\"Token missing\", () => pm.expect.fail(\"Token missing in response\"));\r",
+                  "}\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"userId\": \"692432f05459759ace6fdd21\",\r\n  \"otp\": \"450314\",\r\n  \"newPassword\": \"123456789\",\r\n  \"confirmPassword\": \"123456789\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auth/reset-password",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auth", "reset-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/api/auth/me",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Endpoints",
+      "item": [
+        {
+          "name": "Get Deposit Methods",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/payments/deposit-methods",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "payments", "deposit-methods"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Deposit Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "Content-Type: multipart/form-data",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "amount",
+                  "value": "1000",
+                  "type": "text"
+                },
+                {
+                  "key": "paymentMethod",
+                  "value": "bkash",
+                  "type": "text"
+                },
+                {
+                  "key": "fromNumber",
+                  "value": "01787654321",
+                  "type": "text"
+                },
+                {
+                  "key": "toNumber",
+                  "value": "01712345678",
+                  "type": "text"
+                },
+                {
+                  "key": "transactionId",
+                  "value": "TRX123456789",
+                  "type": "text"
+                },
+                {
+                  "key": "proofImage",
+                  "type": "file",
+                  "src": "/C:/Users/devmh/OneDrive/Pictures/133994940821175182.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/payments/deposit-methods",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "payments", "deposit-methods"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Deposit History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/payments/deposits?page=1&limit=10&status=pending",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "payments", "deposits"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Withdrawal Methods",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/payments/withdrawal-methods",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "payments", "withdrawal-methods"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Withdrawal Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 2000,\r\n  \"paymentMethod\": \"bkash\",\r\n  \"toNumber\": \"01787654321\",\r\n  \"accountName\": \"John Doe\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/payments/withdraw",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "payments", "withdraw"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Wallet Endpoints",
+      "item": [
+        {
+          "name": "Get Wallet Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/wallet/balance",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "wallet", "balance"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/wallet/transactions?page=1&limit=10&type=withdrawal",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "wallet", "transactions"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "type",
+                  "value": "withdrawal",
+                  "description": "filter will be = 'deposit', 'withdrawal', 'bet', 'win', 'bonus', 'refund', 'commission', 'transfer'"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer Between Wallets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fromWallet\": \"main\",\r\n  \"toWallet\": \"bonus\",\r\n  \"amount\": 100\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/wallet/transfer",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "wallet", "transfer"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Game Endpoints",
+      "item": [
+        {
+          "name": "Get All Games",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fromWallet\": \"main\",\r\n  \"toWallet\": \"bonus\",\r\n  \"amount\": 100\r\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/games?page=1&limit=20&category=flash&brand=InOut&search=Avia",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "games"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "category",
+                  "value": "flash"
+                },
+                {
+                  "key": "brand",
+                  "value": "InOut"
+                },
+                {
+                  "key": "search",
+                  "value": "Avia"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Launch Casino Game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"currency\": \"BDT\",\r\n  \"language\": \"en\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/games/launch/692448e260eefd515a0d7f4b",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "games", "launch", "692448e260eefd515a0d7f4b"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Launch Casino Game Copy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"currency\": \"BDT\",\r\n  \"language\": \"en\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/games/launch/692448e260eefd515a0d7f36",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "games", "launch", "692448e260eefd515a0d7f36"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Game History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"currency\": \"BDT\",\r\n  \"language\": \"en\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/games/launch/692448e260eefd515a0d7f36",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "games", "launch", "692448e260eefd515a0d7f36"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sports Betting Endpoints",
+      "item": [
+        {
+          "name": "Get Available Sports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/sports",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "sports"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Events by Sport",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/sports/events/soccer?markets=h2h&regions=us&page=1&limit=20&regions&markets&date",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "sports", "events", "soccer"],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "h2h"
+                },
+                {
+                  "key": "regions",
+                  "value": "us"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "regions",
+                  "value": null
+                },
+                {
+                  "key": "markets",
+                  "value": null
+                },
+                {
+                  "key": "date",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Place Sports Bet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matches\": [\r\n    {\r\n      \"matchId\": \"soccer_event_123\",\r\n      \"matchName\": \"Manchester United vs Liverpool\",\r\n      \"sport\": \"soccer\",\r\n      \"market\": \"h2h\",\r\n      \"selection\": \"Manchester United\",\r\n      \"odds\": 2.5\r\n    }\r\n  ],\r\n  \"totalStake\": 100,\r\n  \"walletType\": \"main\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/sports/bet",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "sports", "bet"],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "h2h",
+                  "disabled": true
+                },
+                {
+                  "key": "regions",
+                  "value": "us",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Bet History",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matches\": [\r\n    {\r\n      \"matchId\": \"soccer_event_123\",\r\n      \"matchName\": \"Manchester United vs Liverpool\",\r\n      \"sport\": \"soccer\",\r\n      \"market\": \"h2h\",\r\n      \"selection\": \"Manchester United\",\r\n      \"odds\": 2.5\r\n    }\r\n  ],\r\n  \"totalStake\": 100,\r\n  \"walletType\": \"main\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/sports/bet-history?page=1&limit=10&status=won",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "sports", "bet-history"],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "h2h",
+                  "disabled": true
+                },
+                {
+                  "key": "regions",
+                  "value": "us",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "won"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Bet History Copy",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"matches\": [\r\n    {\r\n      \"matchId\": \"soccer_event_123\",\r\n      \"matchName\": \"Manchester United vs Liverpool\",\r\n      \"sport\": \"soccer\",\r\n      \"market\": \"h2h\",\r\n      \"selection\": \"Manchester United\",\r\n      \"odds\": 2.5\r\n    }\r\n  ],\r\n  \"totalStake\": 100,\r\n  \"walletType\": \"main\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/sports/bet/:betSlipId",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "sports", "bet", ":betSlipId"],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "h2h",
+                  "disabled": true
+                },
+                {
+                  "key": "regions",
+                  "value": "us",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "betSlipId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"sport\":\"\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/sports/refresh-events",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "sports", "refresh-events"],
+              "query": [
+                {
+                  "key": "markets",
+                  "value": "h2h",
+                  "disabled": true
+                },
+                {
+                  "key": "regions",
+                  "value": "us",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AGENT ROUTES (All Agent Levels)",
+      "item": [
+        {
+          "name": "Get Agent Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/agents/dashboard",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agents", "dashboard"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get agent hierarchy",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/agents/hierarchy",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agents", "hierarchy"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get downline users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/agents/downline",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agents", "downline"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Commission Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/agents/commission-summary?period=month",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agents", "commission-summary"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "month"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Withdraw commission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"amount\":100}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agents/withdraw-commission",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agents", "withdraw-commission"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get agent permissions",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agents/permissions",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agents", "permissions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer balance to user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-financial/transfer-to-user",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-financial", "transfer-to-user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get transfer history",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-financial/transfer-history",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-financial", "transfer-history"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get wallet summary",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-financial/wallet-summary",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-financial", "wallet-summary"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "none",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create user under agent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"fullName\":\"Hasan\",\r\n \"email\":\"hasan@gmail.com\",\r\n  \"phone\":\"+880160837166\",\r\n   \"password\":\"123456\"\r\n   }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/user-management/create-user",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "user-management", "create-user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset user password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\":\"\",\r\n \"newPassword\":\"12345678\"\r\n \r\n }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/user-management/reset-password",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "user-management", "reset-password"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get user activity logs",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\":\"\",\r\n \"newPassword\":\"12345678\"\r\n \r\n }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/user-management/activity-logs?userId&page&limit&startDate&endDate",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "user-management", "activity-logs"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": null
+                },
+                {
+                  "key": "page",
+                  "value": null
+                },
+                {
+                  "key": "limit",
+                  "value": null
+                },
+                {
+                  "key": "startDate",
+                  "value": null
+                },
+                {
+                  "key": "endDate",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get pending transactions for downline",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\":\"\",\r\n \"newPassword\":\"12345678\"\r\n \r\n }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-transactions/pending?type=deposit",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-transactions", "pending"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "deposit"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve deposit for Agents*",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"depositId\":\"\",\r\n \"notes\":\"12345678\"\r\n \r\n }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-transactions/deposits/:depositId/approve",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "agent-transactions",
+                "deposits",
+                ":depositId",
+                "approve"
+              ],
+              "variable": [
+                {
+                  "key": "depositId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve withdrawal for Agents**",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n \"notes\":\"12345678\"\r\n \r\n }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-transactions/withdrawals/:withdrawalId/approve",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "agent-transactions",
+                "withdrawals",
+                ":withdrawalId",
+                "approve"
+              ],
+              "variable": [
+                {
+                  "key": "withdrawalId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get detailed agent report",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n \"notes\":\"12345678\"\r\n \r\n }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-reports/detailed",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-reports", "detailed"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get comprehensive agent dashboard",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-dashboard/overview",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-dashboard", "overview"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deduct balance from user\tfor Agents*",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"userId\": \"692454c6c471577796da567c\",\r\n  \"amount\": 100,\r\n  \"walletType\": \"main\",\r\n  \"notes\": \"Admin manual balance credit for promotion\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-balance/deduct-user",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-balance", "deduct-user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer to sub-agent\tfor Master, Agent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"subAgentId\": \"6924a1c7b9234a519f8e7742\",\r\n  \"amount\": 1200,\r\n  \"notes\": \"Weekly commission payout to sub-agent\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-balance/transfer-sub-agent",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-balance", "transfer-sub-agent"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve withdrawal Agents*",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{notes?}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-withdrawals/:withdrawalId/approve",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-withdrawals", ":withdrawalId", "approve"],
+              "variable": [
+                {
+                  "key": "withdrawalId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject withdrawal Agents*",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{rejectionReason, notes?}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-withdrawals/:withdrawalId/reject",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-withdrawals", ":withdrawalId", "reject"],
+              "variable": [
+                {
+                  "key": "withdrawalId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get withdrawal statistics Agents",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{rejectionReason, notes?}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-withdrawals/stats?period",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-withdrawals", "stats"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ADMIN ROUTES (Super Admin Only)",
+      "item": [
+        {
+          "name": "Get admin dashboard",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/dashboard",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "dashboard"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get financial report",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/reports/financial",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "reports", "financial"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get sports analytics",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/analytics/sports",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "analytics", "sports"],
+              "query": [
+                {
+                  "key": null,
+                  "value": null,
+                  "description": "{startDate?, endDate?, sport?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all users",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": 1000\r\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/users",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "users"],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {page?, limit?, search?, role?, status?, startDate?, endDate?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update user status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"isActive\": \"false\",\r\n   \"isBlocked\": \"true\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/users/69244ee9317514c2275e135c/status",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "69244ee9317514c2275e135c",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {page?, limit?, search?, role?, status?, startDate?, endDate?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Adjust user balance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": \"2000\",\r\n   \"walletType\": \"main\", //  enum: ['main', 'bonus', 'freeBets']\r\n   \r\n   \"reason\": \"diposit users for payments\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/users/692454c6c471577796da567c/adjust-balance",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "692454c6c471577796da567c",
+                "adjust-balance"
+              ],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {page?, limit?, search?, role?, status?, startDate?, endDate?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get pending transactions",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"amount\": \"2000\",\r\n   \"walletType\": \"main\", //  enum: ['main', 'bonus', 'freeBets']\r\n   \r\n   \"reason\": \"diposit users for payments\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/transactions/pending",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "transactions", "pending"],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {type?, page?, limit?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"adminNote\":\"hellowrold\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/transactions/withdrawal/69244576c4fabbf1ce7ec51c/approve",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "admin",
+                "transactions",
+                "withdrawal",
+                "69244576c4fabbf1ce7ec51c",
+                "approve"
+              ],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {type?, page?, limit?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rejectionReason\":\"\", \"adminNote\":\"\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/transactions/:type/:id/reject",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "admin",
+                "transactions",
+                ":type",
+                ":id",
+                "reject"
+              ],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {type?, page?, limit?}",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "type",
+                  "value": ""
+                },
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all agents",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rejectionReason\":\"\", \"adminNote\":\"\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/agents",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "agents"],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {type?, page?, limit?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create master agent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \r\n    \"fullName\":\"Master Agen\", \r\n    \"email\":\"master@gmail.com\", \r\n    \"phone\":\"+8801608371611\", \r\n    \"password\":\"123456\",\r\n    \"commissionRates\": { \"loss_commission\": 20 },\r\n    \"limits\": { \"maxDeposit\": 50000 },\r\n    \"permissions\": { \"addUser\": true, \"editUser\": true }\r\n       \r\n }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-management/agents/master",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin-management", "agents", "master"],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {type?, page?, limit?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update agent permissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"permissions\": { \"addUser\": true,\r\n                \"editUser\": true,\r\n                \"viewUsers\": true,\r\n                \"resetUserPassword\": false,\r\n                \"addBalance\": false,\r\n                \"deductBalance\": true,\r\n                \"adjustBalance\": true,\r\n                \"approveDeposit\": false,\r\n                \"approveWithdrawal\": false,\r\n                \"viewTransactions\": true,\r\n                \"viewUserBets\": true,\r\n                \"cancelBets\": false,\r\n                \"createSubAgents\": true,\r\n                \"viewSubAgents\": true,\r\n                \"setSubAgentCommission\": false,\r\n                \"viewCommission\": true,\r\n                \"withdrawCommission\": true,\r\n                \"viewReports\": true },\r\n \"limits\":\"60000\", \r\n \"isActive\":true, \r\n \"isSuspended\": false\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-management/agents/6925b27b72128964541e73bb/permissions",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "admin-management",
+                "agents",
+                "6925b27b72128964541e73bb",
+                "permissions"
+              ],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {type?, page?, limit?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get agent hierarchy tree",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"permissions\": { \"addUser\": true,\r\n                \"editUser\": true,\r\n                \"viewUsers\": true,\r\n                \"resetUserPassword\": false,\r\n                \"addBalance\": false,\r\n                \"deductBalance\": true,\r\n                \"adjustBalance\": true,\r\n                \"approveDeposit\": false,\r\n                \"approveWithdrawal\": false,\r\n                \"viewTransactions\": true,\r\n                \"viewUserBets\": true,\r\n                \"cancelBets\": false,\r\n                \"createSubAgents\": true,\r\n                \"viewSubAgents\": true,\r\n                \"setSubAgentCommission\": false,\r\n                \"viewCommission\": true,\r\n                \"withdrawCommission\": true,\r\n                \"viewReports\": true },\r\n \"limits\":\"60000\", \r\n \"isActive\":true, \r\n \"isSuspended\": false\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-management/agents/6925b27b72128964541e73bb/hierarchy",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "admin-management",
+                "agents",
+                "6925b27b72128964541e73bb",
+                "hierarchy"
+              ],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {type?, page?, limit?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get commission report",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"permissions\": { \"addUser\": true,\r\n                \"editUser\": true,\r\n                \"viewUsers\": true,\r\n                \"resetUserPassword\": false,\r\n                \"addBalance\": false,\r\n                \"deductBalance\": true,\r\n                \"adjustBalance\": true,\r\n                \"approveDeposit\": false,\r\n                \"approveWithdrawal\": false,\r\n                \"viewTransactions\": true,\r\n                \"viewUserBets\": true,\r\n                \"cancelBets\": false,\r\n                \"createSubAgents\": true,\r\n                \"viewSubAgents\": true,\r\n                \"setSubAgentCommission\": false,\r\n                \"viewCommission\": true,\r\n                \"withdrawCommission\": true,\r\n                \"viewReports\": true },\r\n \"limits\":\"60000\", \r\n \"isActive\":true, \r\n \"isSuspended\": false\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-management/reports/commission",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin-management", "reports", "commission"],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {startDate?, endDate?, agentId?, type?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle agent status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"isSuspended\":false, \"reason\":\"nothing\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-management/agents/6925b27b72128964541e73bb/status",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "admin-management",
+                "agents",
+                "6925b27b72128964541e73bb",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {startDate?, endDate?, agentId?, type?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get system health",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"isSuspended\":false, \"reason\":\"nothing\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/system-health",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "system-health"],
+              "query": [
+                {
+                  "key": null,
+                  "value": "",
+                  "description": "Query: {startDate?, endDate?, agentId?, type?}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all promo codes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"code\": \"DDSDFSDF\", \r\n\"depositAmount\":\"1000\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/promo-codes",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "promo-codes"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create promo code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"code\": \"WELCOME100\",\r\n  \"name\": \"Welcome Bonus 100%\",\r\n  \"description\": \"New users get a 100% bonus on their first deposit.\",\r\n  \"type\": \"deposit_bonus\",\r\n  \"bonusAmount\": 100,\r\n  \"percentage\": 100,\r\n  \"minDeposit\": 500,\r\n  \"maxBonus\": 5000,\r\n  \"walletType\": \"main\",\r\n  \"turnoverRequirement\": 5,\r\n  \"maxUses\": 1,\r\n  \"isSingleUse\": true,\r\n  \"validFrom\": \"2025-01-01T00:00:00Z\",\r\n  \"validUntil\": \"2025-12-31T23:59:59Z\",\r\n//   \"allowedUsers\": [\"user123\", \"user456\"],\r\n//   \"excludedUsers\": [\"user789\"],\r\n  \"newUsersOnly\": true\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/promo-codes",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "promo-codes"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update promo code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"code\": \"WELCOME100\",\r\n  \"name\": \"Welcome Bonus 100%\",\r\n  \"description\": \"New users get a 100% bonus on their first deposit.\",\r\n  \"type\": \"deposit_bonus\",\r\n  \"bonusAmount\": 100,\r\n  \"percentage\": 100,\r\n  \"minDeposit\": 500,\r\n  \"maxBonus\": 5000,\r\n  \"walletType\": \"main\",\r\n  \"turnoverRequirement\": 5,\r\n  \"maxUses\": 1,\r\n  \"isSingleUse\": true,\r\n  \"validFrom\": \"2025-01-01T00:00:00Z\",\r\n  \"validUntil\": \"2025-12-31T23:59:59Z\",\r\n//   \"allowedUsers\": [\"user123\", \"user456\"],\r\n//   \"excludedUsers\": [\"user789\"],\r\n  \"newUsersOnly\": true\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin/promo-codes",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin", "promo-codes"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get promo analytics",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"code\": \"WELCOME100\",\r\n  \"name\": \"Welcome Bonus 100%\",\r\n  \"description\": \"New users get a 100% bonus on their first deposit.\",\r\n  \"type\": \"deposit_bonus\",\r\n  \"bonusAmount\": 100,\r\n  \"percentage\": 100,\r\n  \"minDeposit\": 500,\r\n  \"maxBonus\": 5000,\r\n  \"walletType\": \"main\",\r\n  \"turnoverRequirement\": 5,\r\n  \"maxUses\": 1,\r\n  \"isSingleUse\": true,\r\n  \"validFrom\": \"2025-01-01T00:00:00Z\",\r\n  \"validUntil\": \"2025-12-31T23:59:59Z\",\r\n//   \"allowedUsers\": [\"user123\", \"user456\"],\r\n//   \"excludedUsers\": [\"user789\"],\r\n  \"newUsersOnly\": true\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/promo-codes/6925ed4c1a4a094593d5382f/analytics",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "promo-codes",
+                "6925ed4c1a4a094593d5382f",
+                "analytics"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "non test",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"code\": \"WELCOME100\",\r\n  \"name\": \"Welcome Bonus 100%\",\r\n  \"description\": \"New users get a 100% bonus on their first deposit.\",\r\n  \"type\": \"deposit_bonus\",\r\n  \"bonusAmount\": 100,\r\n  \"percentage\": 100,\r\n  \"minDeposit\": 500,\r\n  \"maxBonus\": 5000,\r\n  \"walletType\": \"main\",\r\n  \"turnoverRequirement\": 5,\r\n  \"maxUses\": 1,\r\n  \"isSingleUse\": true,\r\n  \"validFrom\": \"2025-01-01T00:00:00Z\",\r\n  \"validUntil\": \"2025-12-31T23:59:59Z\",\r\n//   \"allowedUsers\": [\"user123\", \"user456\"],\r\n//   \"excludedUsers\": [\"user789\"],\r\n  \"newUsersOnly\": true\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/promo-codes/6925ed4c1a4a094593d5382f/analytics",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "promo-codes",
+                "6925ed4c1a4a094593d5382f",
+                "analytics"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add funds to agent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\"agentId\":\"692570b713d64e88557d7b68\",\r\n\"amount\":\"1000\",\r\n\"notes\":\"Hello\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-financial/add-funds-to-agent",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin-financial", "add-funds-to-agent"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deduct funds from agent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"agentId\":\"\",\r\n \"amount\":\"\",\r\n  \"notes\":\"\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-financial/deduct-funds-from-agent",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin-financial", "deduct-funds-from-agent"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get admin wallet overview",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"agentId\":\"\",\r\n \"amount\":\"\",\r\n  \"notes\":\"\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-financial/wallet-overview",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin-financial", "wallet-overview"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get platform financial summary",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"agentId\":\"\",\r\n \"amount\":\"\",\r\n  \"notes\":\"\"\r\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/admin-financial/platform-summary",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "admin-financial", "platform-summary"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update game config",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"isActive\":\"false\",\r\n    \"minBet\":\"100\",\r\n    \"maxBet\":\"30000\",\r\n    \"rtp\":\"40\", \r\n    \"commission\":\"10\", \r\n    \"featured\":\"asdfasdf\"\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/game-config/games/692448e260eefd515a0d7f36",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "game-config",
+                "games",
+                "692448e260eefd515a0d7f36"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get game configs",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "page",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "limit",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "provider",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/game-config/games",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "game-config", "games"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle maintenance mode",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "page",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "limit",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "provider",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/game-config/games/692448e260eefd515a0d7f36/maintenance",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "game-config",
+                "games",
+                "692448e260eefd515a0d7f36",
+                "maintenance"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update global fees",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"processingFee\":\"20\",\r\n    \"processingFeeType\":\"\",\r\n    \"minWithdrawal\":\"1000\",\r\n    \"maxWithdrawal\":\"50000\"\r\n   \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/withdrawal-fees/global",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "withdrawal-fees", "global"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Set custom user fees",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"processingFee\":\"20\",\r\n    \"processingFeeType\":\"\",\r\n    \"minWithdrawal\":\"1000\",\r\n    \"maxWithdrawal\":\"50000\"\r\n   \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/withdrawal-fees/users/:userId/custom",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "withdrawal-fees", "users", ":userId", "custom"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get fee settings overview",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"processingFee\":\"20\",\r\n    \"processingFeeType\":\"\",\r\n    \"minWithdrawal\":\"1000\",\r\n    \"maxWithdrawal\":\"50000\"\r\n   \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/withdrawal-fees/settings",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "withdrawal-fees", "settings"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update auto-approval settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n\"autoApprove\":\"\",\r\n\"autoApproveLimit\":\"\",\r\n\"minDeposit\":\"\", \r\n\"maxDeposit\":\"\"\r\n      \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auto-deposit/gateways/:gatewayId/settings",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "auto-deposit",
+                "gateways",
+                ":gatewayId",
+                "settings"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "gatewayId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update auto-approval settings",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n\"autoApprove\":\"\",\r\n\"autoApproveLimit\":\"\",\r\n\"minDeposit\":\"\", \r\n\"maxDeposit\":\"\"\r\n      \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auto-deposit/gateways",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auto-deposit", "gateways"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Process auto-approval (manual trigger)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n\"autoApprove\":\"\",\r\n\"autoApproveLimit\":\"\",\r\n\"minDeposit\":\"\", \r\n\"maxDeposit\":\"\"\r\n      \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auto-deposit/process",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auto-deposit", "process"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get fraud alerts",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n\r\n\"autoApprove\":\"\",\r\n\"autoApproveLimit\":\"\",\r\n\"minDeposit\":\"\", \r\n\"maxDeposit\":\"\"\r\n      \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/fraud-detection/alerts",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "fraud-detection", "alerts"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve fraud alert",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"resolutionNotes\":\"fixed porblem\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/fraud-detection/alerts/:alertId/resolve",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "fraud-detection",
+                "alerts",
+                ":alertId",
+                "resolve"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "alertId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create CMS content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sale Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/cms/content",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "cms", "content"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get content by type\tfor public",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sale Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/cms/content/banner?activeOnly=isActive",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "cms", "content", "banner"],
+              "query": [
+                {
+                  "key": "activeOnly",
+                  "value": "isActive"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update CMS content",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/cms/content/6927155d55e74d09bf467202",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "cms", "content", "6927155d55e74d09bf467202"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete CMS content",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/cms/content/6927159f55e74d09bf467205",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "cms", "content", "6927159f55e74d09bf467205"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all content (admin)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/cms/content?page=1&limit=10&type=banner",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "cms", "content"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "type",
+                  "value": "banner",
+                  "description": "enum: ['banner', 'promotion', 'footer', 'faq', 'terms', 'privacy', 'about']"
+                },
+                {
+                  "key": "isActive",
+                  "value": "isActive",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get detailed agent report",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-reports/admin/agent-reports/692570b713d64e88557d7b68",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "agent-reports",
+                "admin",
+                "agent-reports",
+                "692570b713d64e88557d7b68"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get suspicious logins",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/login-logs/suspicious",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "login-logs", "suspicious"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get provider health status",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/provider-health/status",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "provider-health", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Manual health check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"banner\",\r\n  \"title\": \"Winter Sales Offer\",\r\n  \"content\": \"Get up to 50% discount on all casino games this winter!\",\r\n  \"image\": \"https://img.freepik.com/premium-psd/gaming-youtube-banner_584197-754.jpg\",\r\n  \"isActive\": true,\r\n  \"order\": 1,\r\n  \"metadata\": {\r\n    \"buttonText\": \"Play Now\",\r\n    \"redirectUrl\": \"https://yourwebsite.com/promotions/winter-sale\",\r\n    \"theme\": \"dark\"\r\n  },\r\n  \"startDate\": \"2025-12-01T00:00:00Z\",\r\n  \"endDate\": \"2025-12-31T23:59:59Z\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/provider-health/check",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "provider-health", "check"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update agent commission rates",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"loss_commission\": 5, \r\n  \"turnover_commission\": 2,\r\n  \"profit_share\": 10\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/commission/agents/692570b713d64e88557d7b68/rates",
+              "host": ["{{baseurl}}"],
+              "path": [
+                "api",
+                "commission",
+                "agents",
+                "692570b713d64e88557d7b68",
+                "rates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get auto-apply promo rules",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"loss_commission\": 5, \r\n  \"turnover_commission\": 2,\r\n  \"profit_share\": 10\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auto-promo/rules",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auto-promo", "rules"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update auto-apply rule",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"autoApply\": true,\r\n  \"minDeposit\": 500,\r\n  \"conditions\": \"Bonus applies automatically for deposits above 500 BDT. Turnover requirement x3 before withdrawal.\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auto-promo/rules/:promoCodeId\t",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auto-promo", "rules", ":promoCodeId\t"],
+              "variable": [
+                {
+                  "key": "promoCodeId\t",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Manually trigger auto-apply for deposit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"autoApply\": true,\r\n  \"minDeposit\": 500,\r\n  \"conditions\": \"Bonus applies automatically for deposits above 500 BDT. Turnover requirement x3 before withdrawal.\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/auto-promo/apply-deposit/:depositId",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "auto-promo", "apply-deposit", ":depositId"],
+              "variable": [
+                {
+                  "key": "depositId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get global SEO settings",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"autoApply\": true,\r\n  \"minDeposit\": 500,\r\n  \"conditions\": \"Bonus applies automatically for deposits above 500 BDT. Turnover requirement x3 before withdrawal.\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/seo-settings",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "seo-settings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update global SEO settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"siteTitle\": \"mosttigerbd Casino\",\r\n  \"siteDescription\": \"mosttigerbd is a modern online gaming platform offering casino, slots, live games, and sports. Fast payouts, secure gameplay, and 24/7 support.\",\r\n  \"keywords\": [\r\n    \"online casino\",\r\n    \"slots\",\r\n    \"live casino\",\r\n    \"sports betting\",\r\n    \"PlayZone\",\r\n    \"real money games\"\r\n  ],\r\n  \"metaTags\": {\r\n    \"author\": \"mosttigerbd Team\",\r\n    \"robots\": \"index, follow\",\r\n    \"theme-color\": \"#121212\",\r\n    \"og:title\": \"mosttigerbd Casino - Play & Win\",\r\n    \"og:description\": \"Experience online gaming with live casino, slots, and sports.\",\r\n    \"og:image\": \"https://example.com/og-image.jpg\"\r\n  },\r\n  \"socialMedia\": {\r\n    \"facebook\": \"https://facebook.com/mosttigerbd\",\r\n    \"instagram\": \"https://instagram.com/mosttigerbd\",\r\n    \"twitter\": \"https://twitter.com/mosttigerbd\",\r\n    \"youtube\": \"https://youtube.com/@mosttigerbd\",\r\n    \"telegram\": \"https://t.me/mosttigerbd\"\r\n  },\r\n  \"analytics\": {\r\n    \"googleAnalyticsId\": \"G-ABC123XYZ\",\r\n    \"facebookPixelId\": \"123456789012345\",\r\n    \"tiktokPixelId\": \"TT-987654321\",\r\n    \"customTracking\": \"console.log('Tracking initialized');\"\r\n  }\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/seo-settings",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "seo-settings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get page-specific SEO settings",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"siteTitle\": \"mosttigerbd Casino\",\r\n  \"siteDescription\": \"mosttigerbd is a modern online gaming platform offering casino, slots, live games, and sports. Fast payouts, secure gameplay, and 24/7 support.\",\r\n  \"keywords\": [\r\n    \"online casino\",\r\n    \"slots\",\r\n    \"live casino\",\r\n    \"sports betting\",\r\n    \"PlayZone\",\r\n    \"real money games\"\r\n  ],\r\n  \"metaTags\": {\r\n    \"author\": \"mosttigerbd Team\",\r\n    \"robots\": \"index, follow\",\r\n    \"theme-color\": \"#121212\",\r\n    \"og:title\": \"mosttigerbd Casino - Play & Win\",\r\n    \"og:description\": \"Experience online gaming with live casino, slots, and sports.\",\r\n    \"og:image\": \"https://example.com/og-image.jpg\"\r\n  },\r\n  \"socialMedia\": {\r\n    \"facebook\": \"https://facebook.com/mosttigerbd\",\r\n    \"instagram\": \"https://instagram.com/mosttigerbd\",\r\n    \"twitter\": \"https://twitter.com/mosttigerbd\",\r\n    \"youtube\": \"https://youtube.com/@mosttigerbd\",\r\n    \"telegram\": \"https://t.me/mosttigerbd\"\r\n  },\r\n  \"analytics\": {\r\n    \"googleAnalyticsId\": \"G-ABC123XYZ\",\r\n    \"facebookPixelId\": \"123456789012345\",\r\n    \"tiktokPixelId\": \"TT-987654321\",\r\n    \"customTracking\": \"console.log('Tracking initialized');\"\r\n  }\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/seo-settings/pages/:page",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "seo-settings", "pages", ":page"],
+              "variable": [
+                {
+                  "key": "page",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update page SEO settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"About mosttigerbd\",\r\n  \"description\": \"mosttigerbd is the leading online gaming platform offering casino, slots, and live games.\",\r\n  \"keywords\": [\"casino\", \"online gaming\", \"slots\", \"live games\"],\r\n  \"metaTags\": {\r\n    \"og:title\": \"About mosttigerbd\",\r\n    \"og:description\": \"Learn more about mosttigerbd online casino platform.\",\r\n    \"og:image\": \"https://example.com/about-og.jpg\",\r\n    \"robots\": \"index, follow\"\r\n  }\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/seo-settings/pages/1",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "seo-settings", "pages", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create agent with permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fullName\": \"Rakib Hasan\",\r\n  \"email\": \"rakib.agent@example.com\",\r\n  \"phone\": \"+8801765432100\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"agent\",\r\n\r\n  \"customPermissions\": {\r\n    \"canCreateUser\": true,\r\n    \"canManageDeposits\": false,\r\n    \"canManageWithdrawals\": true,\r\n    \"canViewReports\": true,\r\n    \"canCreateSubAgent\": true,\r\n    \"canAdjustBalance\": false\r\n  },\r\n\r\n  \"customLimits\": {\r\n    \"maxDailyDeposit\": 50000,\r\n    \"maxDailyWithdraw\": 30000,\r\n    \"maxUsers\": 150,\r\n    \"maxSubAgents\": 3\r\n  }\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-permissions/create",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-permissions", "create"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update agent permissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fullName\": \"Rakib Hasan\",\r\n  \"email\": \"rakib.agent@example.com\",\r\n  \"phone\": \"+8801765432100\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"agent\",\r\n\r\n  \"customPermissions\": {\r\n    \"canCreateUser\": true,\r\n    \"canManageDeposits\": false,\r\n    \"canManageWithdrawals\": true,\r\n    \"canViewReports\": true,\r\n    \"canCreateSubAgent\": true,\r\n    \"canAdjustBalance\": false\r\n  },\r\n\r\n  \"customLimits\": {\r\n    \"maxDailyDeposit\": 50000,\r\n    \"maxDailyWithdraw\": 30000,\r\n    \"maxUsers\": 150,\r\n    \"maxSubAgents\": 3\r\n  }\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-permissions/:agentId",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-permissions", ":agentId"],
+              "variable": [
+                {
+                  "key": "agentId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get permission templates",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fullName\": \"Rakib Hasan\",\r\n  \"email\": \"rakib.agent@example.com\",\r\n  \"phone\": \"+8801765432100\",\r\n  \"password\": \"123456\",\r\n  \"role\": \"agent\",\r\n\r\n  \"customPermissions\": {\r\n    \"canCreateUser\": true,\r\n    \"canManageDeposits\": false,\r\n    \"canManageWithdrawals\": true,\r\n    \"canViewReports\": true,\r\n    \"canCreateSubAgent\": true,\r\n    \"canAdjustBalance\": false\r\n  },\r\n\r\n  \"customLimits\": {\r\n    \"maxDailyDeposit\": 50000,\r\n    \"maxDailyWithdraw\": 30000,\r\n    \"maxUsers\": 150,\r\n    \"maxSubAgents\": 3\r\n  }\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/api/agent-permissions/templates",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "agent-permissions", "templates"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "NOTIFICATION ROUTES",
+      "item": [
+        {
+          "name": "Get notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/api/notifications",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "notifications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get notification stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/notifications/stats",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "notifications", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark as read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/notifications/:id/read",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "notifications", ":id", "read"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark all as read",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/notifications/read-all",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "notifications", "read-all"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete notification",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/notifications/:id",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "notifications", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Clear all notifications",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/notifications",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "notifications"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "REAL-TIME ROUTES (sports,live-events sportKey, connection-status)",
+      "item": [
+        {
+          "name": "Get available sports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/realtime/sports",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "realtime", "sports"],
+              "query": [
+                {
+                  "key": null,
+                  "value": null,
+                  "description": "Get available sports",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get live events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/realtime/live-events/soccer_epl",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "realtime", "live-events", "soccer_epl"],
+              "query": [
+                {
+                  "key": null,
+                  "value": null,
+                  "description": "Get available sports",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get connection status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/api/realtime/connection-status",
+              "host": ["{{baseurl}}"],
+              "path": ["api", "realtime", "connection-status"],
+              "query": [
+                {
+                  "key": null,
+                  "value": null,
+                  "description": "Get available sports",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Apply promo code for all users",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{bearerToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"code\": \"DDSDFSDF\", \r\n\"depositAmount\":\"1000\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/api/promo-codes/apply",
+          "host": ["{{baseurl}}"],
+          "path": ["api", "promo-codes", "apply"],
+          "query": [
+            {
+              "key": null,
+              "value": "",
+              "description": "Query: {startDate?, endDate?, agentId?, type?}",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get my promo codes\tfor All Users",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{bearerToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"code\": \"DDSDFSDF\", \r\n\"depositAmount\":\"1000\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/api/promo-codes/my-codes",
+          "host": ["{{baseurl}}"],
+          "path": ["api", "promo-codes", "my-codes"],
+          "query": [
+            {
+              "key": null,
+              "value": "",
+              "description": "Query: {startDate?, endDate?, agentId?, type?}",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get promo code details\t for All Users",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{bearerToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"code\": \"DDSDFSDF\", \r\n\"depositAmount\":\"1000\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/api/promo-codes/?code=asdfasdf",
+          "host": ["{{baseurl}}"],
+          "path": ["api", "promo-codes", ""],
+          "query": [
+            {
+              "key": "code",
+              "value": "asdfasdf"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get login logs\tfor all users",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{bearerToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"code\": \"DDSDFSDF\", \r\n\"depositAmount\":\"1000\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseurl}}/api/promo-codes/?code=asdfasdf",
+          "host": ["{{baseurl}}"],
+          "path": ["api", "promo-codes", ""],
+          "query": [
+            {
+              "key": "code",
+              "value": "asdfasdf"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

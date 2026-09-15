@@ -1,0 +1,400 @@
+{
+  "welcome": "Welcome to our gaming website",
+  "play_now": "Play Now",
+  "login": "Login",
+  "signup": "Sign Up",
+  "Hot": "Hot",
+  "favourites": "Favourites",
+  "FeaturedGames": "Featured Games",
+  "aboutUs": "About Us",
+  "brandAmbassador": "Brand Ambassador",
+  "officialPartner": "Official Partner",
+  "communityWebsites": "Community Websites",
+  "paymentMethods": "Payment Methods",
+  "© 2026 10xbet Copyrights. All Rights Reserved": "© 2026 10xbet Copyrights. All Rights Reserved",
+
+  "welcomeBack": "Welcome Back!",
+  "loginToYourAccount": "Login to your account",
+  "userName": "User Name",
+  "username": "Username",
+  "password": "Password",
+  "Confirme": "Sign Up",
+  "forgotPassword": "Forgot Password?",
+
+  "rememberMe": "Remember Me",
+
+  "loggingIn": "Logging in...",
+
+  "loginFailed": "Login failed",
+
+  "createAccount": "Create Account",
+  "joinAndStartWinning": "Join and Start Winning!",
+
+  "phoneNumber": "Phone Number",
+
+  "iAgreeToTermsAndConditions": "I agree to the Terms & Conditions",
+
+  "havePromoCode": "Have a Promo Code?",
+  "hidePromoCode": "Hide Promo Code",
+
+  "enterPromoCode": "Enter Promo Code",
+
+  "apply": "Apply",
+
+  "promoApplied": "Promo Applied!",
+
+  "bonus": "Bonus",
+
+  "creating": "Creating Account...",
+
+  "registrationFailed": "Registration failed",
+
+  "termsError": "You must agree to the Terms & Conditions",
+
+  "southAfricanCricketer": "South African Cricketer",
+  "filmTelevisionSuperstar": "Film & Television Superstar",
+  "spanishProfessionalFootballer": "Spanish Professional Footballer",
+  "actress": "Actress",
+  "copyright": "© 2026 GameBetX. Developed, Secured & Maintained by GameBetX.",
+  "aboutUsLink": "About Us",
+  "privacyPolicy": "Privacy Policy",
+  "termsConditions": "Terms & Conditions",
+  "rulesRegulation": "Rules & Regulation",
+  "responsibleGaming": "Responsible Gaming",
+  "faq": "Frequently Asked Questions",
+
+  "home": "Home",
+  "promo": "Promo",
+  "deposit": "Deposit",
+  "account": "Account",
+
+  "categories": {
+    "Hot": "Hot",
+    "Slot": "Slot",
+    "Flash": "Flash",
+    "MiniGames": "Mini Games",
+    "Casino": "Casino",
+    "Sports": "Sports",
+    "Table": "Table",
+    "Crash": "Crash",
+    "Chess": "Chess",
+    "Fishing": "Fishing",
+    "XGames": "X Games",
+    "Arcade": "Arcade",
+    "CockFight": "Cock Fight",
+    "Cricket": "Cricket"
+  },
+
+  "enterDepositDetails": "Enter Deposit Details",
+
+  "depositAmount": "Deposit Amount *",
+
+  "gentleReminder": "Important Notice",
+
+  "depositReminder": "Please ensure that you have sufficient balance in your account before making a deposit. The minimum deposit amount is ৳100.",
+
+  "selectPromotion": "Select Promotion",
+
+  "promotionHelpText": "Choose an active promotion, confirm your selection, and apply it to your deposit.",
+
+  "pleaseSelectPromotion": "Please Select a Promotion",
+
+  "loadingPromotions": "Loading Promotions...",
+
+  "noActivePromotions": "No Active Promotions Available",
+
+  "category": "Category",
+
+  "all": "All",
+
+  "activePromotion": "Active Promotion",
+
+  "start": "Start",
+
+  "end": "End",
+
+  "minimum": "Minimum",
+
+  "selected": "Selected",
+
+  "selectPromotionToContinue": "Please Select a Promotion to Continue",
+
+  "cancel": "Cancel",
+
+  "confirmSelection": "Confirm Selection",
+
+  "agreeTerms": "I agree to the terms and conditions. I confirm that I am over 18 years old and that I am depositing for entertainment purposes only.",
+
+  "processing": "Processing...",
+
+  "submit": "Submit",
+
+  "securePayment": "Secure Payment",
+
+  "sslEncryption": "256-bit SSL Encryption",
+
+  "support247": "24/7 Support",
+
+  "liveChatPhone": "Live Chat & Phone Support",
+
+  "licensedRegulated": "Licensed & Regulated",
+
+  "responsibleGambling": "Responsible Gambling",
+
+  "adultsOnly": "18+ Only",
+
+  "funds": "Funds",
+
+  "withdraw": "Withdraw",
+
+  "withdrawable": "Withdrawable",
+  "amount": "Amount",
+
+  "withdrawalLocked": "Withdrawal Locked",
+  "completeTurnoverRequirement": "Complete the turnover requirement to withdraw funds",
+
+  "lockedBonus": "Locked Bonus",
+  "remainingTurnover": "Remaining Turnover",
+  "totalRequired": "Total Required",
+
+  "withdrawAmount": "Withdraw Amount",
+
+  "provider": "Provider",
+
+  "noPhoneNumberSaved": "No Phone Number Saved",
+
+  "pleaseAddPhoneNumber": "Please add a phone number to your profile before withdrawing funds.",
+
+  "goToProfile": "Go to Profile",
+
+  "selectPhoneNumber": "Select Phone Number",
+
+  "selectPhonePlaceholder": "Select a Phone Number",
+
+  "primaryPhoneSelected": "Primary Phone Selected",
+
+  "phoneNumbersAvailable": "Phone Number(s) Available",
+
+  "completeTurnoverFirst": "Please complete the turnover requirement first",
+
+  "submitting": "Submitting...",
+
+  "playerId": "Player ID",
+  "mainWallet": "Main Wallet",
+  "bonusWallet": "Bonus Wallet",
+  "BDT": "BDT",
+  "withdrawal": "Withdrawal",
+  "freeSpin": "Free Spin",
+  "history": "History",
+  "bettingRecords": "Betting Records",
+  "turnover": "Turnover",
+  "transaction": "Transaction",
+  "records": "Records",
+  "transactionRecords": "Transaction Records",
+  "myAccount": "My Account",
+  "personalInfo": "Personal Info",
+  "changePassword": "Change Password",
+  "referBonus": "Refer Bonus",
+  "contactUs": "Contact Us",
+  "liveChat": "Live Chat",
+  "email": "Email",
+  "telegram": "Telegram",
+  "messenger": "Messenger",
+  "user": "User",
+  "notAvailable": "N/A",
+  "failedToLoadTransactions": "Failed to load transactions",
+  "appDownload": "App Download",
+  "affiliate": "Affiliate",
+  "contact": "Contact Us",
+  "promotions": "Promotions",
+  "allCategories": "All Categories",
+  "settled": "Settled",
+  "unsettled": "Unsettled",
+
+  "last7Days": "Last 7 Days",
+
+  "platform": "Platform",
+  "gameType": "Game Type",
+
+  "profitLoss": "Profit/Loss",
+
+  "noBettingRecordsFound": "No Betting Records Found",
+
+  "noRecordsForSelectedPeriod": "There are no {{status}} records for the selected period.",
+
+  "loadingBettingRecords": "Loading Betting Records...",
+
+  "error": "Error",
+
+  "filterBettingRecords": "Filter Betting Records",
+
+  "closeBettingRecords": "Close Betting Records",
+
+  "gmt6": "GMT+6",
+  "bettingDetails": "Betting Details",
+
+  "backToBettingRecords": "Back to Betting Records",
+
+  "txnDate": "Txn Date",
+  "game": "Game",
+
+  "loadingDetails": "Loading Details...",
+
+  "noBetDetails": "No Bet Details",
+
+  "noBetDetailsDescription": "This provider has no detailed bets in the selected record.",
+
+  "loadingBonuses": "Loading Bonuses...",
+
+  "noBonusesAvailable": "No Bonuses Available",
+
+  "completePromotionsToEarnBonuses": "Complete Promotions to Earn Bonuses",
+
+  "turnoverProgress": "Turnover Progress",
+
+  "bonusClaimedStillSubjectToTurnover": "✓ Bonus Claimed - Still Subject to Turnover",
+
+  "bonusLockedUntilTurnoverCompleted": "Bonus Locked Until Turnover Completed",
+
+  "claimed": "✓ Claimed",
+
+  "claiming": "Claiming...",
+
+  "inactive": "Inactive",
+
+  "claimBonus": "Claim Bonus",
+
+  "active": "Active",
+  "pending": "Pending",
+
+  "success": "Success",
+
+  "freeSpins": "Free Spins",
+
+  "loadingFreeSpins": "Loading Free Spins...",
+
+  "noFreeSpinsAvailable": "No Free Spins Available",
+
+  "available": "Available",
+
+  "remainingSpins": "Remaining Spins",
+
+  "spinValue": "Spin Value",
+
+  "freeSpinsTurnoverNotice": "Claimed free spins are still subject to turnover requirements.",
+
+  "claimSpins": "Claim Spins",
+
+  "completed": "Completed",
+
+  "loading": "Loading...",
+
+  "noTurnoverFound": "No Turnover Found",
+
+  "eventEndsIn": "Event Ends In",
+
+  "detail": "Detail",
+
+  "status": "Status",
+
+  "transactionAmount": "Transaction Amount",
+
+  "turnoverRequirement": "Turnover Requirement",
+
+  "turnoverCompleted": "Turnover Completed",
+
+  "completedRatio": "Completed Ratio",
+
+  "expiryDate": "Expiry Date",
+
+  "turnoverCreateTime": "Turnover Create Time",
+
+  "today": "Today",
+  "yesterday": "Yesterday",
+
+  "type": "Type",
+
+  "noRecordsFound": "No Records Found",
+
+  "failed": "Failed",
+  "rejected": "Rejected",
+
+  "adjustment": "Adjustment",
+  "transfer": "Transfer",
+  "transactionRecordDetails": "Transaction Record Details",
+
+  "transactionProgress": "Transaction Progress",
+
+  "close": "Close",
+
+  "referenceNumber": "No.",
+  "transactions": "Transactions",
+
+  "registered": "Registered",
+
+  "fullName": "Full Name",
+  "addFullName": "Add Full Name",
+
+  "addEmail": "Add Email",
+
+  "birthday": "Birthday",
+  "setBirthday": "Set Birthday",
+
+  "phoneNumbers": "Phone Numbers",
+  "saved": "Saved",
+
+  "addNumber": "Add Number",
+
+  "save": "Save",
+
+  "primary": "Primary",
+
+  "usedForLoginAndNotifications": "Used for login and notifications",
+
+  "optionalAdditionalNumber": "Optional additional number",
+
+  "setPrimary": "Set Primary",
+
+  "remove": "Remove",
+
+  "noAdditionalPhoneNumbersAdded": "No Additional Phone Numbers Added",
+
+  "saving": "Saving...",
+
+  "saveChanges": "Save Changes",
+
+  "manageProfileSecurely": "Manage your profile details securely. Changes are saved instantly to your account and synced across the app.",
+
+  "errorLoadingPromotions": "Error Loading Promotions",
+
+  "promotion": "Promotion",
+
+  "applyNow": "Apply Now",
+
+  "viewDetails": "View Details",
+
+  "noPromotionsAvailable": "No Promotions Available",
+
+  "newUserOnly": "NEW USER ONLY",
+
+  "turnoverMultiplier": "Turnover Multiplier",
+
+  "expiry": "Expiry",
+
+  "minMaxDeposit": "Min / Max Deposit",
+
+  "min": "Min",
+
+  "max": "Max",
+
+  "lifetime": "Lifetime",
+
+  "noExpiry": "No Expiry",
+
+  "none": "None",
+
+  "casino": "Casino",
+  "sports": "Sports",
+
+  "welcomeBonus": "Welcome Bonus"
+}

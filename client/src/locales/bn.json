@@ -1,0 +1,422 @@
+{
+  "welcome": "আমাদের গেমিং ওয়েবসাইটে স্বাগতম",
+  "play_now": "এখনই খেলুন",
+  "login": "লগইন করুন",
+  "signup": "নিবন্ধন করুন",
+  "favourites": "প্রিয়",
+  "FeaturedGames": "বৈশিষ্ট্যযুক্ত গেমস",
+  "aboutUs": "আমাদের সম্পর্কে",
+  "brandAmbassador": "ব্র্যান্ড অ্যাম্বাসেডর",
+  "officialPartner": "অফিসিয়াল পার্টনার",
+  "communityWebsites": "কমিউনিটি ওয়েবসাইট",
+  "paymentMethods": "পেমেন্ট মেথড",
+  "© 2026 10xbet Copyrights. All Rights Reserved": "© 2026 10xbet কপিরাইটস। সর্বস্বত্ব সংরক্ষিত",
+  "southAfricanCricketer": "দক্ষিণ আফ্রিকার ক্রিকেটার",
+  "filmTelevisionSuperstar": "চলচ্চিত্র ও টেলিভিশন সুপারস্টার",
+  "spanishProfessionalFootballer": "স্প্যানিশ পেশাদার ফুটবলার",
+  "actress": "অভিনেত্রী",
+
+  "welcomeBack": "আবারও স্বাগতম",
+  "loginToYourAccount": "আপনার অ্যাকাউন্টে লগইন করুন",
+  "userName": "ব্যবহারকারীর নাম",
+  "username": " ব্যবহারকারীর নাম 4-15 অক্ষর এবং সংখ্যা",
+  "password": "পাসওয়ার্ড",
+  "Confirme": "নিশ্চিত করুন",
+
+  "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+
+  "rememberMe": "আমাকে মনে রাখুন",
+
+  "loggingIn": "লগইন হচ্ছে...",
+
+  "loginFailed": "লগইন ব্যর্থ হয়েছে",
+
+  "createAccount": "নতুন অ্যাকাউন্ট খুলুন",
+  "joinAndStartWinning": "আজই যোগ দিন এবং জয় শুরু করুন",
+
+  "phoneNumber": "মোবাইল নম্বর",
+
+  "iAgreeToTermsAndConditions": "আমি শর্তাবলী ও নিয়মাবলীতে সম্মত",
+
+  "havePromoCode": "প্রোমো কোড আছে?",
+  "hidePromoCode": "প্রোমো কোড লুকান",
+
+  "enterPromoCode": "প্রোমো কোড লিখুন",
+
+  "apply": "প্রয়োগ করুন",
+
+  "promoApplied": "প্রোমো কোড সফলভাবে প্রয়োগ হয়েছে",
+
+  "bonus": "বোনাস",
+
+  "creating": "অ্যাকাউন্ট তৈরি হচ্ছে...",
+
+  "registrationFailed": "নিবন্ধন ব্যর্থ হয়েছে",
+
+  "termsError": "শর্তাবলীতে সম্মতি দেওয়া আবশ্যক",
+
+  "aboutUsLink": "আমাদের সম্পর্কে",
+  "privacyPolicy": "গোপনীয়তা নীতি",
+  "termsConditions": "শর্তাবলী",
+  "rulesRegulation": "নিয়ম ও বিধিমালা",
+  "responsibleGaming": "দায়িত্বশীল গেমিং",
+  "faq": "সচরাচর জিজ্ঞাসিত প্রশ্ন",
+  "copyright": "© ২০২৬ GameBetX। ডেভেলপমেন্ট, নিরাপত্তা ও রক্ষণাবেক্ষণে GameBetX।",
+
+  "home": "হোম",
+  "promo": "প্রচার",
+  "deposit": "জমা",
+  "account": "একাউন্ট",
+
+  "categories": {
+    "Hot": "হট",
+    "Slot": "স্লট",
+    "Flash": "ফ্ল্যাশ",
+    "MiniGames": "মিনি গেম",
+    "Casino": "ক্যাসিনো",
+    "Sports": "স্পোর্টস",
+    "Table": "টেবিল",
+    "Crash": "ক্র্যাশ",
+    "Chess": "চেস",
+    "Fishing": "ফিশিং",
+    "XGames": "এক্স গেমস",
+    "Arcade": "আর্কেড",
+    "CockFight": "মোরগ লড়াই",
+    "Cricket": "খেলা"
+  },
+  "enterDepositDetails": "ডিপোজিটের তথ্য প্রদান করুন",
+
+  "depositAmount": "ডিপোজিটের পরিমাণ *",
+
+  "gentleReminder": "গুরুত্বপূর্ণ নির্দেশনা",
+
+  "depositReminder": "ডিপোজিট করার আগে আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স আছে কিনা নিশ্চিত করুন। সর্বনিম্ন ডিপোজিট পরিমাণ ৳১০০।",
+
+  "selectPromotion": "প্রচার নির্বাচন করুন ",
+
+  "promotionHelpText": "সক্রিয় প্রোমোশন নির্বাচন করুন, নিশ্চিত করুন এবং তারপর আপনার ডিপোজিটে প্রয়োগ করুন।",
+
+  "pleaseSelectPromotion": "অনুগ্রহ করে একটি প্রোমোশন নির্বাচন করুন",
+
+  "loadingPromotions": "প্রোমোশন লোড হচ্ছে...",
+
+  "noActivePromotions": "বর্তমানে কোনো সক্রিয় প্রোমোশন উপলব্ধ নেই",
+
+  "category": "ক্যাটাগরি",
+
+  "all": "সকল",
+
+  "activePromotion": "সক্রিয় প্রোমোশন",
+
+  "start": "শুরু",
+
+  "end": "শেষ",
+
+  "minimum": "সর্বনিম্ন",
+
+  "selected": "নির্বাচিত",
+
+  "selectPromotionToContinue": "এগিয়ে যেতে একটি প্রোমোশন নির্বাচন করুন",
+
+  "cancel": "বাতিল করুন",
+
+  "confirmSelection": "নির্বাচন নিশ্চিত করুন",
+
+  "agreeTerms": "আমি শর্তাবলী মেনে নিচ্ছি। আমি নিশ্চিত করছি যে আমার বয়স ১৮ বছরের বেশি এবং আমি শুধুমাত্র বিনোদনের উদ্দেশ্যে ডিপোজিট করছি।",
+
+  "processing": "প্রক্রিয়াকরণ চলছে...",
+
+  "submit": "জমা দিন",
+
+  "securePayment": "নিরাপদ পেমেন্ট",
+
+  "sslEncryption": "২৫৬-বিট SSL এনক্রিপশন",
+
+  "support247": "২৪/৭ সহায়তা",
+
+  "liveChatPhone": "লাইভ চ্যাট ও ফোন সাপোর্ট",
+
+  "licensedRegulated": "লাইসেন্সপ্রাপ্ত ও নিয়ন্ত্রিত",
+
+  "responsibleGambling": "দায়িত্বশীল গেমিং",
+
+  "adultsOnly": "শুধুমাত্র ১৮+",
+
+  "funds": "ফান্ড",
+
+  "withdraw": "উত্তোলন",
+
+  "withdrawable": "উত্তোলনযোগ্য",
+  "amount": "পরিমাণ",
+
+  "withdrawalLocked": "উত্তোলন সাময়িকভাবে বন্ধ",
+  "completeTurnoverRequirement": "উত্তোলনের জন্য টার্নওভার শর্ত পূরণ করুন",
+
+  "lockedBonus": "লক করা বোনাস",
+  "remainingTurnover": "বাকি টার্নওভার",
+  "totalRequired": "মোট প্রয়োজন",
+
+  "withdrawAmount": "উত্তোলনের পরিমাণ",
+
+  "provider": "পেমেন্ট মাধ্যম",
+
+  "noPhoneNumberSaved": "কোনো মোবাইল নম্বর সংরক্ষিত নেই",
+
+  "pleaseAddPhoneNumber": "টাকা উত্তোলনের জন্য আপনার প্রোফাইলে একটি মোবাইল নম্বর যোগ করুন।",
+
+  "goToProfile": "প্রোফাইলে যান",
+
+  "selectPhoneNumber": "মোবাইল নম্বর নির্বাচন করুন",
+
+  "selectPhonePlaceholder": "একটি মোবাইল নম্বর নির্বাচন করুন",
+
+  "primaryPhoneSelected": "প্রধান নম্বর নির্বাচন করা হয়েছে",
+
+  "phoneNumbersAvailable": "টি মোবাইল নম্বর উপলব্ধ",
+
+  "completeTurnoverFirst": "প্রথমে টার্নওভার শর্ত পূরণ করুন",
+
+  "submitting": "অনুরোধ পাঠানো হচ্ছে...",
+  "withdrawing": "উত্তোলন হচ্ছে...",
+
+  "playerId": "প্লেয়ার আইডি",
+
+  "mainWallet": "মূল ওয়ালেট",
+  "bonusWallet": "বোনাস ওয়ালেট",
+
+  "withdrawal": "উত্তোলন",
+
+  "freeSpin": "ফ্রি স্পিন",
+
+  "history": "ইতিহাস",
+
+  "bettingRecords": "বেটিং রেকর্ড",
+
+  "turnover": "টার্নওভার",
+
+  "transaction": "লেনদেন",
+  "records": "রেকর্ড",
+
+  "transactionRecords": "লেনদেনের রেকর্ড",
+
+  "myAccount": "আমার অ্যাকাউন্ট",
+
+  "personalInfo": "ব্যক্তিগত তথ্য",
+
+  "changePassword": "পাসওয়ার্ড পরিবর্তন",
+
+  "referBonus": "রেফার বোনাস",
+
+  "contactUs": "যোগাযোগ করুন",
+
+  "liveChat": "লাইভ চ্যাট",
+
+  "email": "ইমেইল",
+
+  "telegram": "টেলিগ্রাম",
+
+  "messenger": "মেসেঞ্জার",
+
+  "user": "ব্যবহারকারী",
+
+  "notAvailable": "প্রযোজ্য নয়",
+
+  "failedToLoadTransactions": "লেনদেনের তথ্য লোড করা যায়নি",
+  "promotions": "প্রচার",
+  "affiliate": "অ্যাফিলিয়েট",
+  "appDownload": "অ্যাপ ডাউনলোড",
+  "hiWelcome": "হাই, স্বাগতম",
+  "pleaseLoginOrCreateAccount": "অনুগ্রহ করে লগইন করুন অথবা অ্যাকাউন্ট তৈরি করুন",
+  "logout": "লগ আউট",
+  "BDT": "টাকা",
+
+  "settled": "নিষ্পত্তিকৃত",
+  "unsettled": "অমীমাংসিত",
+
+  "last7Days": "গত ৭ দিন",
+
+  "platform": "প্ল্যাটফর্ম",
+  "gameType": "গেমের ধরন",
+
+  "profitLoss": "লাভ/ক্ষতি",
+
+  "noBettingRecordsFound": "কোনো বেটিং রেকর্ড পাওয়া যায়নি",
+
+  "noRecordsForSelectedPeriod": "নির্বাচিত সময়ের জন্য কোনো {{status}} রেকর্ড নেই।",
+
+  "loadingBettingRecords": "বেটিং রেকর্ড লোড হচ্ছে...",
+
+  "error": "ত্রুটি",
+
+  "filterBettingRecords": "বেটিং রেকর্ড ফিল্টার করুন",
+
+  "closeBettingRecords": "বেটিং রেকর্ড বন্ধ করুন",
+
+  "gmt6": "জিএমটি+৬",
+  "bettingDetails": "বেটিং বিস্তারিত",
+
+  "backToBettingRecords": "বেটিং রেকর্ডে ফিরে যান",
+
+  "txnDate": "লেনদেনের তারিখ",
+  "game": "গেম",
+
+  "loadingDetails": "বিস্তারিত তথ্য লোড হচ্ছে...",
+
+  "noBetDetails": "কোনো বেটের বিস্তারিত তথ্য পাওয়া যায়নি",
+
+  "noBetDetailsDescription": "নির্বাচিত রেকর্ডে এই প্রোভাইডারের কোনো বিস্তারিত বেট তথ্য নেই।",
+  "transactions": "লেনদেন",
+
+  "loadingBonuses": "বোনাস লোড হচ্ছে...",
+
+  "noBonusesAvailable": "কোনো বোনাস উপলব্ধ নেই",
+
+  "completePromotionsToEarnBonuses": "বোনাস পেতে প্রোমোশন সম্পন্ন করুন",
+
+  "turnoverProgress": "টার্নওভার অগ্রগতি",
+
+  "bonusClaimedStillSubjectToTurnover": "✓ বোনাস গ্রহণ করা হয়েছে - টার্নওভার শর্ত এখনও প্রযোজ্য",
+
+  "bonusLockedUntilTurnoverCompleted": "টার্নওভার সম্পূর্ণ না হওয়া পর্যন্ত বোনাস লক থাকবে",
+
+  "claimed": "✓ গ্রহণ করা হয়েছে",
+
+  "claiming": "গ্রহণ করা হচ্ছে...",
+
+  "inactive": "নিষ্ক্রিয়",
+
+  "claimBonus": "বোনাস গ্রহণ করুন",
+
+  "active": "সক্রিয়",
+  "pending": "অপেক্ষমাণ",
+
+  "success": "সফল",
+
+  "freeSpins": "ফ্রি স্পিন",
+
+  "loadingFreeSpins": "ফ্রি স্পিন লোড হচ্ছে...",
+
+  "noFreeSpinsAvailable": "কোনো ফ্রি স্পিন উপলব্ধ নেই",
+
+  "available": "উপলব্ধ",
+
+  "remainingSpins": "বাকি স্পিন",
+
+  "spinValue": "প্রতি স্পিনের মূল্য",
+
+  "freeSpinsTurnoverNotice": "গ্রহণ করা ফ্রি স্পিন এখনও টার্নওভার শর্তের আওতাভুক্ত।",
+
+  "claimSpins": "স্পিন গ্রহণ করুন",
+
+  "completed": "সম্পন্ন",
+
+  "loading": "লোড হচ্ছে...",
+
+  "noTurnoverFound": "কোনো টার্নওভার পাওয়া যায়নি",
+
+  "eventEndsIn": "ইভেন্ট শেষ হবে",
+
+  "detail": "বিস্তারিত",
+
+  "status": "অবস্থা",
+
+  "transactionAmount": "লেনদেনের পরিমাণ",
+
+  "turnoverRequirement": "টার্নওভার শর্ত",
+
+  "turnoverCompleted": "সম্পন্ন টার্নওভার",
+
+  "completedRatio": "সম্পন্নের হার",
+
+  "expiryDate": "মেয়াদ শেষের তারিখ",
+
+  "turnoverCreateTime": "টার্নওভার তৈরির সময়",
+
+  "today": "আজ",
+  "yesterday": "গতকাল",
+
+  "type": "ধরণ",
+
+  "noRecordsFound": "কোনো রেকর্ড পাওয়া যায়নি",
+
+  "failed": "ব্যর্থ",
+  "rejected": "প্রত্যাখ্যাত",
+
+  "adjustment": "সমন্বয়",
+  "transfer": "ট্রান্সফার",
+  "transactionRecordDetails": "লেনদেনের বিস্তারিত",
+
+  "transactionProgress": "লেনদেনের অগ্রগতি",
+
+  "close": "বন্ধ করুন",
+
+  "referenceNumber": "নং",
+
+  "registered": "নিবন্ধিত",
+
+  "fullName": "পূর্ণ নাম",
+  "addFullName": "পূর্ণ নাম যোগ করুন",
+
+  "addEmail": "ইমেইল যোগ করুন",
+
+  "birthday": "জন্মদিন",
+  "setBirthday": "জন্মদিন সেট করুন",
+
+  "phoneNumbers": "মোবাইল নম্বর",
+  "saved": "সংরক্ষিত",
+
+  "addNumber": "নম্বর যোগ করুন",
+
+  "save": "সংরক্ষণ করুন",
+
+  "primary": "প্রধান",
+
+  "usedForLoginAndNotifications": "লগইন এবং নোটিফিকেশনের জন্য ব্যবহৃত",
+
+  "optionalAdditionalNumber": "ঐচ্ছিক অতিরিক্ত নম্বর",
+
+  "setPrimary": "প্রধান হিসেবে সেট করুন",
+
+  "remove": "মুছে ফেলুন",
+
+  "noAdditionalPhoneNumbersAdded": "কোনো অতিরিক্ত মোবাইল নম্বর যোগ করা হয়নি",
+
+  "saving": "সংরক্ষণ করা হচ্ছে...",
+
+  "saveChanges": "পরিবর্তন সংরক্ষণ করুন",
+
+  "manageProfileSecurely": "নিরাপদভাবে আপনার প্রোফাইল তথ্য পরিচালনা করুন। পরিবর্তনগুলো সঙ্গে সঙ্গে আপনার অ্যাকাউন্টে সংরক্ষণ হবে এবং পুরো অ্যাপে সিঙ্ক হবে।",
+
+  "errorLoadingPromotions": "প্রোমোশন লোড করতে সমস্যা হয়েছে",
+
+  "promotion": "প্রোমোশন",
+
+  "applyNow": "এখনই ব্যবহার করুন",
+
+  "viewDetails": "বিস্তারিত দেখুন",
+
+  "noPromotionsAvailable": "কোনো প্রোমোশন উপলব্ধ নেই",
+
+  "newUserOnly": "শুধুমাত্র নতুন ব্যবহারকারীদের জন্য",
+
+  "turnoverMultiplier": "টার্নওভার মাল্টিপ্লায়ার",
+
+  "expiry": "মেয়াদ",
+
+  "minMaxDeposit": "সর্বনিম্ন / সর্বোচ্চ ডিপোজিট",
+
+  "min": "সর্বনিম্ন",
+
+  "max": "সর্বোচ্চ",
+
+  "lifetime": "আজীবন",
+
+  "noExpiry": "কোনো মেয়াদ নেই",
+
+  "none": "নেই",
+
+  "casino": "ক্যাসিনো",
+  "sports": "স্পোর্টস",
+
+  "welcomeBonus": "ওয়েলকাম বোনাস"
+}

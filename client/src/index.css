@@ -1,0 +1,330 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #18c8ff;
+  --color-primary-hover: #48ddff;
+  --color-secondary: #147bff;
+  --color-accent: #00e5ff;
+  --color-glow: #00e5ff;
+  --color-main-bg: #050912;
+  --color-card-bg: #0b1220;
+  --color-border-brand: #16314d;
+  --color-brand-white: #f5faff;
+  --color-muted-text: #8fa6bc;
+}
+
+:root {
+  --brand-primary: #18c8ff;
+  --brand-primary-hover: #48ddff;
+  --brand-secondary: #147bff;
+  --brand-accent: #00e5ff;
+  --brand-glow: #00e5ff;
+  --brand-main-bg: #050912;
+  --brand-card-bg: #0b1220;
+  --brand-border: #16314d;
+  --brand-white: #f5faff;
+  --brand-muted: #8fa6bc;
+}
+
+/* ================= GLOBAL BACKGROUND & TEXT ================= */
+
+html,
+body,
+#root {
+  background: #050912;
+  color: #f5faff;
+}
+
+/* Selection highlight */
+::selection {
+  background-color: #18c8ff;
+  color: #050912;
+}
+
+/* Global link fix */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+option {
+  background-color: #0b1220;
+  color: #f5faff;
+}
+
+option:hover {
+  background-color: #16314d;
+}
+
+/* Custom styles matching the 1xBet/MelBet style */
+.betting-main {
+  @apply w-full max-w-[1920px] mx-auto;
+}
+
+.betting-content__main {
+  @apply p-4 md:p-6;
+}
+
+.betting-dashboard {
+  @apply bg-white rounded-lg shadow-sm;
+}
+
+.central-menu-header {
+  @apply flex flex-col md:flex-row justify-between items-start md:items-center p-4 border-b border-gray-200;
+}
+
+.ui-breadcrumbs {
+  @apply flex items-center space-x-2 mb-4 md:mb-0;
+}
+
+.ui-breadcrumbs-point {
+  @apply flex items-center text-gray-600 hover:text-blue-600 transition-colors;
+}
+
+.ui-breadcrumbs__chevron {
+  @apply text-gray-400;
+}
+
+.ui-switches {
+  @apply flex flex-wrap gap-2;
+}
+
+.ui-switches-item {
+  @apply flex-shrink-0;
+}
+
+.ui-switch {
+  @apply relative inline-flex items-center cursor-pointer px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors;
+}
+
+.ui-switch--is-active {
+  @apply bg-blue-50 border-blue-500 text-blue-600;
+}
+
+.ui-search-default {
+  @apply relative flex items-center;
+}
+
+.ui-search-default__input {
+  @apply w-full md:w-64 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.ui-search-button {
+  @apply px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-r-lg hover:bg-blue-700 transition-colors;
+}
+
+.central-menu-toolbar {
+  @apply flex flex-col md:flex-row justify-between items-start md:items-center p-4 border-b border-gray-200;
+}
+
+.nav-menu__list {
+  @apply flex flex-wrap gap-2 overflow-x-auto pb-2;
+}
+
+.dashboard {
+  @apply bg-gray-50 rounded-lg;
+}
+
+.dashboard__champs {
+  @apply divide-y divide-gray-200;
+}
+
+.dashboard-champ-body__head {
+  @apply flex flex-col md:flex-row items-start md:items-center justify-between p-4 bg-gray-100 border-b border-gray-200;
+}
+
+.dashboard-champ-name {
+  @apply flex items-center space-x-2 mb-4 md:mb-0;
+}
+
+.dashboard-market-group {
+  @apply flex items-center space-x-1 mb-2 md:mb-0;
+}
+
+.dashboard-market-group__label {
+  @apply px-2 py-1 text-xs font-medium bg-gray-200 rounded;
+}
+
+.dashboard-champ-body__games {
+  @apply divide-y divide-gray-100;
+}
+
+.dashboard-game {
+  @apply hover:bg-gray-50 transition-colors;
+}
+
+.dashboard-game-block {
+  @apply p-4;
+}
+
+.dashboard-game-block__row {
+  @apply flex justify-between items-center mb-2;
+}
+
+.dashboard-game-block-controls {
+  @apply flex space-x-2;
+}
+
+.ui-team-scores {
+  @apply flex-1 flex flex-col md:flex-row items-start md:items-center justify-between;
+}
+
+.ui-team-scores-teams {
+  @apply flex-1 flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4;
+}
+
+.ui-game-scores {
+  @apply flex items-center space-x-2 mt-2 md:mt-0;
+}
+
+.dashboard-markets {
+  @apply grid grid-cols-3 gap-2 px-4 py-3 bg-gray-50;
+}
+
+.dashboard-markets__group {
+  @apply flex space-x-2;
+}
+
+.ui-market {
+  @apply flex-1 px-3 py-2 bg-white border border-gray-300 rounded text-center hover:bg-gray-50 transition-colors;
+}
+
+.ui-market__value {
+  @apply font-semibold;
+}
+
+.dashboard-game-more {
+  @apply px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ui-switches {
+    @apply overflow-x-auto pb-2;
+  }
+
+  .dashboard-champ-body__head {
+    @apply space-y-4;
+  }
+
+  .dashboard-market-group {
+    @apply justify-center;
+  }
+
+  .ui-team-scores-teams {
+    @apply space-y-3;
+  }
+
+  .dashboard-markets {
+    @apply grid-cols-1 gap-3;
+  }
+
+  .dashboard-markets__group {
+    @apply justify-between;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .ui-switches {
+    @apply flex-wrap;
+  }
+
+  .dashboard-markets {
+    @apply grid-cols-2;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #16314d;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #18c8ff;
+}
+
+/* Animation for live indicator */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade in animation for promo success */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Shimmer animation for bonus progress bar */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Slide down animation for promo code section */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+/* Smooth transitions */
+* {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+input[type="text"] {
+  border: 1px solid black;
+}

@@ -1,0 +1,158 @@
+{
+    "games": [
+        {
+            "game_code": "1373",
+            "brand": "InOut",
+            "game_name": "AviaFly",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/avia-fly.jpg"
+        },
+        {
+            "game_code": "1407",
+            "brand": "InOut",
+            "game_name": "BalloniX",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/ballonix.png"
+        },
+        {
+            "game_code": "139",
+            "brand": "InOut",
+            "game_name": "Chicken Road",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/miniE_chicken-road.png"
+        },
+        {
+            "game_code": "392",
+            "brand": "InOut",
+            "game_name": "Chicken Road 2",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/miniE_chicken-road2.png"
+        },
+        {
+            "game_code": "1832",
+            "brand": "InOut",
+            "game_name": "Cryptos",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/cryptos.png"
+        },
+        {
+            "game_code": "1928",
+            "brand": "InOut",
+            "game_name": "Diver",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/diver-1024x654.jpg"
+        },
+        {
+            "game_code": "2258",
+            "brand": "InOut",
+            "game_name": "Forest Arrow",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/forrest-arrow.png"
+        },
+        {
+            "game_code": "2432",
+            "brand": "InOut",
+            "game_name": "Goblin-tower",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/goblin-tower.png"
+        },
+        {
+            "game_code": "2562",
+            "brand": "InOut",
+            "game_name": "Hamster Run",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/hamster-run.png"
+        },
+        {
+            "game_code": "2657",
+            "brand": "InOut",
+            "game_name": "Hot-mines",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/hot-mines.jpg"
+        },
+        {
+            "game_code": "2780",
+            "brand": "InOut",
+            "game_name": "Joker Poker",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/joker-poker.png"
+        },
+        {
+            "game_code": "3016",
+            "brand": "InOut",
+            "game_name": "Lucky mines",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/lucky-mines.png"
+        },
+        {
+            "game_code": "3320",
+            "brand": "InOut",
+            "game_name": "New Hilo",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/hilo-joker.png"
+        },
+        {
+            "game_code": "3407",
+            "brand": "InOut",
+            "game_name": "Penalty Unlimited",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/penalty-inlimited-game-inout-1.png"
+        },
+        {
+            "game_code": "3461",
+            "brand": "InOut",
+            "game_name": "Plinko 1000",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/plinko-1000.jpg"
+        },
+        {
+            "game_code": "3460",
+            "brand": "InOut",
+            "game_name": "Plinko Aztec",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/plinko-aztec.png"
+        },
+        {
+            "game_code": "3636",
+            "brand": "InOut",
+            "game_name": "Robo dice",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/robo-dice.png"
+        },
+        {
+            "game_code": "3895",
+            "brand": "InOut",
+            "game_name": "Squid$$$Game",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/squid-gamebler.png"
+        },
+        {
+            "game_code": "3898",
+            "brand": "InOut",
+            "game_name": "Stairs",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/stairs.png"
+        },
+        {
+            "game_code": "3939",
+            "brand": "InOut",
+            "game_name": "SugarDaddy",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/sugar-daddy.png"
+        },
+        {
+            "game_code": "3976",
+            "brand": "InOut",
+            "game_name": "Sweet Keno",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/sweet-keno.png"
+        },
+        {
+            "game_code": "4445",
+            "brand": "InOut",
+            "game_name": "Сoinflip",
+            "category": "flash",
+            "image_url": "https://softapi2.shop/uploads/games/coinflip.png"
+        }
+    ]
+}
