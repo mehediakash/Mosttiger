@@ -644,7 +644,94 @@ const DepositPage = () => {
                         </svg>
                       </summary>
                       <div className="mt-2 bg-[#050912] border border-[#16314D] rounded-lg p-4 text-[#8FA6BC] text-sm">
-                        <p>{t("depositReminder")}</p>
+                        <div className="space-y-3">
+                          {/* 1 */}
+                          <div className="flex gap-3">
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
+                              ১
+                            </span>
+                            <p className="leading-6">
+                              ক্যাশ আউট বা সেন্ডমানি করার আগে
+                              <span className="text-[#F5FAFF] font-medium">
+                                {" "}
+                                “ব্যক্তিগত তথ্য”{" "}
+                              </span>
+                              অংশে সর্বোচ্চ ৫টি মোবাইল নম্বর যোগ করে ভেরিফাই
+                              করুন।
+                            </p>
+                          </div>
+
+                          {/* 2 */}
+                          <div className="flex gap-3">
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
+                              ২
+                            </span>
+                            <p className="leading-6">
+                              অনুগ্রহ করে পেমেন্ট পাঠানোর জন্য ব্যবহৃত নম্বরটি
+                              নির্বাচন করুন, আপনার ট্রানজ্যাকশন আইডি প্রবেশ করান
+                              এবং সাবমিট করুন।
+                              <span className="text-[#F5FAFF] font-medium">
+                                {" "}
+                                ভুল নম্বর নির্বাচন করলে যাচাইকরণ ব্যর্থ হবে।
+                              </span>
+                            </p>
+                          </div>
+
+                          {/* 3 */}
+                          <div className="flex gap-3">
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
+                              ৩
+                            </span>
+                            <p className="leading-6">
+                              যেকোনো ডিপোজিট করার আগে সবসময় আমাদের
+                              <span className="text-[#F5FAFF] font-medium">
+                                {" "}
+                                ডিপোজিট পেইজে নাম্বার চেক করুন।
+                              </span>
+                            </p>
+                          </div>
+
+                          {/* 4 */}
+                          <div className="flex gap-3">
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
+                              ৪
+                            </span>
+                            <p className="leading-6">
+                              ডিপোজিট পেন্ডিং থাকা অবস্থায় আপনি সর্বোচ্চ
+                              <span className="text-[#F5FAFF] font-semibold">
+                                {" "}
+                                ২টি ডিপোজিট{" "}
+                              </span>
+                              ট্রাই করতে পারবেন। কোনো সমস্যা হলে অনুগ্রহ করে
+                              <span className="text-[#48DDFF] font-medium">
+                                {" "}
+                                লাইভচ্যাটের মাধ্যমে সহায়তা নিন।
+                              </span>
+                            </p>
+                          </div>
+
+                          {/* 5 */}
+                          <div className="flex gap-3">
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-red-500/15 text-red-400 flex items-center justify-center text-xs font-semibold">
+                              ৫
+                            </span>
+                            <p className="leading-6">
+                              বাজির{" "}
+                              <span className="text-red-400 font-semibold">
+                                ODDS
+                              </span>{" "}
+                              অবশ্যই{" "}
+                              <span className="text-[#F5FAFF] font-semibold">
+                                ১.৩০-এর উপরে
+                              </span>{" "}
+                              হতে হবে। এর নিচের অডসে রাখা বাজি
+                              <span className="text-red-400 font-medium">
+                                {" "}
+                                উইথড্র টার্নওভারের জন্য গণনা করা হবে না।
+                              </span>
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </details>
                   </div>
