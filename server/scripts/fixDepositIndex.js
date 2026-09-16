@@ -1,25 +1,32 @@
 const mongoose = require("mongoose");
+require("dotenv").config({
+  path: require("path").resolve(__dirname, "../.env"),
+});
 
 const fixDepositIndex = async () => {
   try {
     const db = mongoose.connection.db;
 
-    // Drop old non-sparse index
+    // Drop old index if exists
     try {
       await db.collection("deposits").dropIndex("propayDetails.orderNo_1");
-      console.log("✓ Dropped old non-sparse index");
+      console.log("✓ Dropped old index");
     } catch (err) {
       console.log("Index doesn't exist or already dropped");
     }
 
-    // Create new sparse unique index
-    await db
-      .collection("deposits")
-      .createIndex(
-        { "propayDetails.orderNo": 1 },
-        { unique: true, sparse: true },
-      );
-    console.log("✓ Created new sparse unique index");
+    // Create new partial unique index
+    await db.collection("deposits").createIndex(
+      { "propayDetails.orderNo": 1 },
+      {
+        name: "propayDetails.orderNo_1",
+        unique: true,
+        partialFilterExpression: {
+          "propayDetails.orderNo": { $type: "string" },
+        },
+      },
+    );
+    console.log("✓ Created new partial unique index");
   } catch (error) {
     console.error("Error fixing deposit index:", error);
   } finally {

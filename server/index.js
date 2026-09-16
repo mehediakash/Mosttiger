@@ -17,6 +17,7 @@ const logger = require("./utils/logger");
 const { validatePayment24x7Config } = require("./config/payment24x7");
 const { getNineWicketConfigStatus } = require("./config/nineWicket");
 const ensureUserPromotionIndexes = require("./utils/ensureUserPromotionIndexes");
+const ensureDepositIndexes = require("./utils/ensureDepositIndexes");
 
 try {
   validatePayment24x7Config();
@@ -110,6 +111,7 @@ const connectWithRetry = () => {
     .then(async () => {
       logger.info("MongoDB Connected");
       await ensureUserPromotionIndexes();
+      await ensureDepositIndexes();
     })
     .catch((err) => {
       logger.error("MongoDB connection error", { message: err.message });

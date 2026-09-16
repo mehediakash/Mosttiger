@@ -38,8 +38,6 @@ const depositSchema = new mongoose.Schema({
   propayDetails: {
     orderNo: {
       type: String,
-      unique: true,
-      sparse: true,
       trim: true,
       default: undefined,
     },
@@ -151,5 +149,14 @@ depositSchema.index({ status: 1 });
 depositSchema.index({ "paymentDetails.transactionId": 1 });
 depositSchema.index({ provider: 1, status: 1, createdAt: -1 });
 depositSchema.index({ referenceId: 1, provider: 1 });
+depositSchema.index(
+  { "propayDetails.orderNo": 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "propayDetails.orderNo": { $type: "string" },
+    },
+  },
+);
 
 module.exports = mongoose.model("Deposit", depositSchema);
