@@ -866,9 +866,7 @@ exports.createPaymentController = async (req, res) => {
 
       try {
         const clientBaseUrl =
-          process.env.CLIENT_URL ||
-          process.env.DOMAIN_NAME ||
-          "https://mosttiger.com";
+          process.env.DOMAIN_NAME || "https://mosttiger.com";
         const metadata = {
           user_id: user._id.toString(),
           userId: user._id.toString(),
