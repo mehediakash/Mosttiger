@@ -22,6 +22,7 @@ const DepositPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
   const [selectedProvider, setSelectedProvider] = useState("");
+  const [maxAmountModalOpen, setMaxAmountModalOpen] = useState(false);
   const token = useSelector((state) => state.auth?.token);
   const paymentProviders = [
     {
@@ -96,6 +97,17 @@ const DepositPage = () => {
   useEffect(() => {
     setPendingPromotion(selectedPromotion);
   }, [selectedPromotion]);
+
+  useEffect(() => {
+    if (maxAmountModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [maxAmountModalOpen]);
 
   // Read selected promotion from router state or sessionStorage
   useEffect(() => {
@@ -440,6 +452,18 @@ const DepositPage = () => {
         type: "error",
         text: "Please select a payment method",
       });
+      return;
+    }
+
+    // Frontend validation: Maximum deposit limit 30,000 BDT
+    const rawAmount =
+      typeof depositAmount === "string"
+        ? depositAmount.replace(/,/g, "").trim()
+        : String(depositAmount || "");
+    const numericAmount = parseFloat(rawAmount);
+
+    if (Number.isFinite(numericAmount) && numericAmount > 30000) {
+      setMaxAmountModalOpen(true);
       return;
     }
 
@@ -923,6 +947,36 @@ const DepositPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Maximum Deposit Warning Modal */}
+      {maxAmountModalOpen && (
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+          onClick={() => setMaxAmountModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl border border-[#16314D] bg-[#0B1220] p-6 text-center shadow-2xl shadow-black/80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold text-[#F5FAFF] mb-3">
+              নোটিফিকেশন
+            </h3>
+
+            <p className="text-sm text-[#8FA6BC] leading-relaxed mb-6">
+              দুঃখিত! সর্বোচ্চ ৩০,০০০ টাকা পর্যন্ত ডিপোজিট করা যাবে। অনুগ্রহ করে
+              ৩০,০০০ টাকা বা তার কম একটি এমাউন্ট দিন।
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setMaxAmountModalOpen(false)}
+              className="w-full h-11 rounded-xl bg-primary hover:bg-[#48DDFF] active:scale-95 text-[#050912] font-bold text-base transition-all duration-200 shadow-md shadow-[rgba(0,229,255,0.3)]"
+            >
+              ঠিক আছে
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

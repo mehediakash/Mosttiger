@@ -133,6 +133,7 @@ export default function AffiliateSignup() {
 
         <Section title="Basic Information">
           {input("fullName", "Full Name", { required: true })}
+          {input("username", "Username", { required: true })}
           {input("username", "Username", { disabled: true, readOnly: true })}
           {input("email", "Email", { required: true, type: "email" })}
           {input("phone", "Phone", { required: true })}

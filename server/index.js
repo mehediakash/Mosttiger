@@ -126,6 +126,10 @@ app.post(
   "/api/payment24x7/callback",
   require("./controllers/paymentController").handlePaymentWebhookController,
 );
+app.post(
+  "/api/uddoktapay/callback",
+  require("./controllers/paymentController").handleUddoktaPayWebhookController,
+);
 app.use("/api/wallet", require("./routes/wallet"));
 app.use("/api/wallet-transactions", require("./routes/walletTransactions"));
 app.use("/api/games", require("./routes/games"));
@@ -176,6 +180,7 @@ app.use("/api/withdrawal-validation", require("./routes/withdrawalValidation"));
 app.use("/api/free-spins", require("./routes/freeSpins"));
 app.use("/api/betting-records", require("./routes/bettingRecords"));
 app.use("/api/admin/promotions", require("./routes/promotions"));
+app.use("/api/announcements", require("./routes/announcements"));
 
 // Add auto-promo to deposit approval
 app.post("/api/deposits/:id/approve", async (req, res, next) => {

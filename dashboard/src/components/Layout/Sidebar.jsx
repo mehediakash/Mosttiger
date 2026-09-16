@@ -93,6 +93,12 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       disabled: user?.role !== "admin",
     },
     {
+      key: "/payment-gateways",
+      icon: <BankOutlined />,
+      label: "Payment Gateway & Routing Management",
+      disabled: user?.role !== "admin",
+    },
+    {
       key: "live-chat",
       icon: <MessageOutlined />,
       label: "Live Chat",
@@ -210,6 +216,10 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
         {
           key: "/cms/favorite-banner",
           label: "Favorite Banner",
+        },
+        {
+          key: "/cms/announcements",
+          label: "Announcements",
         },
       ],
     },

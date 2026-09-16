@@ -8,6 +8,8 @@ const affiliateTrackingService = require("../services/affiliateTrackingService")
 const referralService = require("../services/referralService");
 const promotionService = require("../services/promotionService");
 const logger = require("../utils/logger");
+const uddoktaPayService = require("../services/uddoktaPayService");
+const paymentGatewayRoutingService = require("../services/paymentGatewayRoutingService");
 const {
   createDeposit: createPayment24x7Deposit,
   getErrorMessage,
@@ -17,7 +19,12 @@ const {
 } = require("../services/payment24x7Service");
 
 const COMPLETED_DEPOSIT_STATUSES = ["completed", "approved"];
-const FINAL_WITHDRAWAL_STATUSES = ["approved", "completed", "rejected", "failed"];
+const FINAL_WITHDRAWAL_STATUSES = [
+  "approved",
+  "completed",
+  "rejected",
+  "failed",
+];
 
 const minorToAmount = (minor) =>
   Math.round((Number(minor || 0) / 100) * 100) / 100;
@@ -31,7 +38,9 @@ const resolveGatewayEmail = (user) => {
   const email = typeof user?.email === "string" ? user.email.trim() : "";
   if (isValidEmail(email)) return email.toLowerCase();
 
-  const phone = String(user?.phone || "").replace(/\D/g, "").trim();
+  const phone = String(user?.phone || "")
+    .replace(/\D/g, "")
+    .trim();
   if (phone) return `${phone}@dexwine.local`;
 
   return `${user?._id || "user"}@dexwine.local`;
@@ -132,7 +141,10 @@ const updateWithdrawalTransactionStatus = async (
   return operation;
 };
 
-const applySelectedPromotionIfNeeded = async (deposit, source = "payment24x7") => {
+const applySelectedPromotionIfNeeded = async (
+  deposit,
+  source = "payment24x7",
+) => {
   const resolvedPromotionId =
     deposit?.promotion ||
     deposit?.propayDetails?.gatewayResponse?.metadata?.selectedPromotionId ||
@@ -220,8 +232,10 @@ const sendWithdrawalNotificationIfAvailable = async (
 
 const approvePayment24x7Withdrawal = async (withdrawal, payload, req) => {
   const withdrawalId = withdrawal._id.toString();
-  const merchantReference = payload.merchant_reference || withdrawal.referenceId;
-  const payment24x7Reference = payload.reference || withdrawal.propayDetails?.orderNo;
+  const merchantReference =
+    payload.merchant_reference || withdrawal.referenceId;
+  const payment24x7Reference =
+    payload.reference || withdrawal.propayDetails?.orderNo;
   const session = await User.startSession();
   let updated = null;
 
@@ -312,8 +326,10 @@ const approvePayment24x7Withdrawal = async (withdrawal, payload, req) => {
 
 const rejectPayment24x7Withdrawal = async (withdrawal, payload, req) => {
   const withdrawalId = withdrawal._id.toString();
-  const merchantReference = payload.merchant_reference || withdrawal.referenceId;
-  const payment24x7Reference = payload.reference || withdrawal.propayDetails?.orderNo;
+  const merchantReference =
+    payload.merchant_reference || withdrawal.referenceId;
+  const payment24x7Reference =
+    payload.reference || withdrawal.propayDetails?.orderNo;
   const session = await User.startSession();
   let updated = null;
   let refunded = false;
@@ -429,7 +445,8 @@ const rejectPayment24x7Withdrawal = async (withdrawal, payload, req) => {
 const completePayment24x7Deposit = async (deposit, payload, req) => {
   const depositId = deposit._id.toString();
   const merchantReference = payload.merchant_reference || deposit.referenceId;
-  const payment24x7Reference = payload.reference || deposit.propayDetails?.orderNo;
+  const payment24x7Reference =
+    payload.reference || deposit.propayDetails?.orderNo;
   const session = await User.startSession();
   let updated = null;
   let existingTransaction = null;
@@ -462,7 +479,8 @@ const completePayment24x7Deposit = async (deposit, payload, req) => {
     throw new Error("Invalid Payment24x7 callback amount");
   }
 
-  const provider = normalizeMethod(payload.provider) || payload.provider || null;
+  const provider =
+    normalizeMethod(payload.provider) || payload.provider || null;
   const gatewayResponse = {
     ...(deposit.propayDetails?.gatewayResponse || {}),
     callbackResponse: payload,
@@ -537,7 +555,11 @@ const completePayment24x7Deposit = async (deposit, payload, req) => {
         );
       } else {
         walletSkipped = true;
-        await markDepositTransactionApproved(updated._id.toString(), null, session);
+        await markDepositTransactionApproved(
+          updated._id.toString(),
+          null,
+          session,
+        );
       }
     });
   } finally {
@@ -603,6 +625,168 @@ const completePayment24x7Deposit = async (deposit, payload, req) => {
   };
 };
 
+const completeUddoktaPayDeposit = async (deposit, payload, req) => {
+  const depositId = deposit._id.toString();
+  const invoiceId =
+    payload?.invoice_id || payload?.invoiceId || deposit.propayDetails?.orderNo;
+  const session = await User.startSession();
+  let updated = null;
+  let existingTransaction = null;
+  let walletSkipped = false;
+
+  if (COMPLETED_DEPOSIT_STATUSES.includes(deposit.status)) {
+    await markDepositTransactionApproved(depositId);
+    const promotionResult = await applySelectedPromotionIfNeeded(
+      deposit,
+      "uddoktapay-duplicate-callback",
+    );
+
+    logger.info("UddoktaPay duplicate deposit callback ignored", {
+      depositId,
+      invoiceId,
+      processingResult: "already_completed",
+      promotionApplied: !!promotionResult?.applied,
+    });
+    return { handled: true, alreadyProcessed: true };
+  }
+
+  const creditedAmount = Number(payload?.amount || deposit.amount);
+  if (!Number.isFinite(creditedAmount) || creditedAmount <= 0) {
+    throw new Error("Invalid UddoktaPay callback amount");
+  }
+
+  const provider =
+    payload?.payment_method ||
+    payload?.method ||
+    deposit.provider ||
+    "uddoktapay";
+  const gatewayResponse = {
+    ...(deposit.propayDetails?.gatewayResponse || {}),
+    callbackResponse: payload,
+  };
+
+  try {
+    await session.withTransaction(async () => {
+      updated = await Deposit.findOneAndUpdate(
+        {
+          _id: deposit._id,
+          status: { $nin: COMPLETED_DEPOSIT_STATUSES },
+        },
+        {
+          $set: {
+            amount: creditedAmount,
+            status: "completed",
+            completedAt: new Date(),
+            approvedAt: new Date(),
+            provider,
+            paymentMethod: "uddoktapay",
+            "paymentDetails.transactionId":
+              payload?.transaction_id || payload?.trx_id || null,
+            "propayDetails.orderNo": invoiceId,
+            "propayDetails.gatewayStatus": "completed",
+            "propayDetails.completedAt": new Date(),
+            "propayDetails.gatewayResponse": gatewayResponse,
+          },
+        },
+        { new: true, session },
+      );
+
+      if (!updated) return;
+
+      existingTransaction = await Transaction.findOne({
+        user: updated.user,
+        type: "deposit",
+        status: { $in: ["completed", "approved"] },
+        "metadata.depositId": updated._id.toString(),
+      })
+        .session(session)
+        .lean();
+
+      if (!existingTransaction) {
+        const walletUpdate = await WalletService.updateWallet(
+          updated.user,
+          creditedAmount,
+          "main",
+          "deposit",
+          {
+            description: `UddoktaPay Deposit - Invoice: ${invoiceId}`,
+            depositId: updated._id.toString(),
+            invoiceId,
+            paymentMethod: "uddoktapay",
+            provider,
+            trxId: payload?.transaction_id || payload?.trx_id || null,
+          },
+          session,
+        );
+
+        await markDepositTransactionApproved(
+          updated._id.toString(),
+          walletUpdate?.transactionId,
+          session,
+        );
+      } else {
+        walletSkipped = true;
+        await markDepositTransactionApproved(
+          updated._id.toString(),
+          null,
+          session,
+        );
+      }
+    });
+  } finally {
+    session.endSession();
+  }
+
+  if (!updated) {
+    await markDepositTransactionApproved(depositId);
+    return { handled: true, alreadyProcessed: true };
+  }
+
+  if (!existingTransaction) {
+    affiliateTrackingService.recordDepositCompleted(updated).catch((error) => {
+      logger.error("Affiliate UddoktaPay deposit tracking error", {
+        depositId: updated._id.toString(),
+        message: error.message,
+      });
+    });
+
+    referralService.recordFirstDepositCompleted(updated).catch((error) => {
+      logger.error("Referral UddoktaPay deposit tracking error", {
+        depositId: updated._id.toString(),
+        message: error.message,
+      });
+    });
+  }
+
+  const promotionResult = await applySelectedPromotionIfNeeded(
+    updated,
+    "uddoktapay-callback",
+  );
+
+  await sendDepositNotificationIfAvailable(req, updated, creditedAmount).catch(
+    (error) => {
+      logger.error("UddoktaPay deposit notification error", {
+        depositId: updated._id.toString(),
+        message: error.message,
+      });
+    },
+  );
+
+  logger.info("UddoktaPay deposit completed", {
+    depositId: updated._id.toString(),
+    invoiceId,
+    processingResult: "completed",
+    promotionApplied: !!promotionResult?.applied,
+    walletSkipped,
+  });
+
+  return {
+    handled: true,
+    alreadyProcessed: false,
+    promotionApplied: !!promotionResult?.applied,
+  };
+};
+
 exports.createPaymentController = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -656,6 +840,104 @@ exports.createPaymentController = async (req, res) => {
       }
     }
 
+    // Resolve active payment gateway routing
+    const activeGateway = await paymentGatewayRoutingService.getActiveGateway();
+    if (!activeGateway) {
+      return res.status(503).json({
+        success: false,
+        message: "Payment gateway is currently unavailable.",
+      });
+    }
+
+    // Route: UDDOKTAPAY
+    if (activeGateway === "uddoktapay") {
+      const deposit = await Deposit.create({
+        user: user._id,
+        amount: Number(amount),
+        paymentMethod: "uddoktapay",
+        provider: method,
+        promotion: selectedPromotionId || null,
+        status: "pending",
+        propayDetails: {
+          gatewayStatus: "initiated",
+          initiatedAt: new Date(),
+        },
+      });
+
+      try {
+        const clientBaseUrl =
+          process.env.CLIENT_URL ||
+          process.env.DOMAIN_NAME ||
+          "https://mosttiger.com";
+        const metadata = {
+          user_id: user._id.toString(),
+          userId: user._id.toString(),
+          depositId: deposit._id.toString(),
+          selectedPromotionId: selectedPromotionId
+            ? String(selectedPromotionId)
+            : null,
+        };
+
+        const payment = await uddoktaPayService.createPayment({
+          fullName: user.fullName || "User",
+          email: resolveGatewayEmail(user),
+          amount: Number(amount),
+          metadata,
+          redirectUrl: `${clientBaseUrl}/payment/success`,
+          cancelUrl: `${clientBaseUrl}/payment/cancel`,
+          webhookUrl: `${process.env.BASE_URL || "http://localhost:5000"}/api/payments/webhook`,
+        });
+
+        deposit.propayDetails.orderNo = payment.invoiceId;
+        deposit.propayDetails.gatewayStatus = "pending";
+        deposit.propayDetails.gatewayResponse = {
+          ...payment.raw,
+          metadata,
+        };
+        await deposit.save();
+
+        logger.info("UddoktaPay deposit initiated", {
+          depositId: deposit._id.toString(),
+          merchantReference: deposit.referenceId,
+          invoiceId: payment.invoiceId,
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: "Payment initiated successfully",
+          data: {
+            depositId: deposit._id,
+            paymentUrl: payment.paymentUrl,
+            payment_url: payment.paymentUrl,
+            invoiceId: payment.invoiceId,
+            reference: payment.invoiceId,
+            referenceId: deposit.referenceId,
+          },
+        });
+      } catch (paymentError) {
+        deposit.status = "rejected";
+        deposit.rejectionReason =
+          uddoktaPayService.getErrorMessage(paymentError);
+        deposit.propayDetails.gatewayStatus = "failed";
+        deposit.propayDetails.gatewayResponse = {
+          error: uddoktaPayService.getErrorMessage(paymentError),
+        };
+        await deposit.save();
+
+        logger.error("UddoktaPay deposit initiation failed", {
+          depositId: deposit._id.toString(),
+          merchantReference: deposit.referenceId,
+          message: uddoktaPayService.getErrorMessage(paymentError),
+        });
+
+        return res.status(502).json({
+          success: false,
+          message: uddoktaPayService.getErrorMessage(paymentError),
+        });
+      }
+    }
+
+    // Route: PAYMENT24X7 (Default)
     const deposit = await Deposit.create({
       user: user._id,
       amount: Number(amount),
@@ -783,7 +1065,73 @@ exports.verifyPaymentController = async (req, res) => {
       });
     }
 
-    const status = await getPaymentStatus(deposit.propayDetails?.orderNo || reference);
+    // Route verification based on deposit's stored paymentMethod
+    if (deposit.paymentMethod === "uddoktapay") {
+      try {
+        const invoiceId = deposit.propayDetails?.orderNo || reference;
+        const verifyResult = await uddoktaPayService.verifyPayment(invoiceId);
+        const verifyData = verifyResult?.raw || {};
+        const paymentStatus = String(verifyData.status || "").toUpperCase();
+
+        deposit.propayDetails = deposit.propayDetails || {};
+        deposit.propayDetails.gatewayResponse = {
+          ...(deposit.propayDetails.gatewayResponse || {}),
+          lastStatusResponse: verifyData,
+        };
+
+        if (paymentStatus === "COMPLETED") {
+          await completeUddoktaPayDeposit(deposit, verifyData, req);
+
+          return res.status(200).json({
+            success: true,
+            message: "Payment completed successfully",
+            data: {
+              depositId: deposit._id,
+              reference,
+              alreadyProcessed: true,
+              status: "completed",
+            },
+          });
+        }
+
+        if (paymentStatus === "FAILED" || paymentStatus === "CANCELLED") {
+          deposit.status = "rejected";
+          deposit.rejectionReason = `UddoktaPay payment ${paymentStatus.toLowerCase()}`;
+          deposit.propayDetails.gatewayStatus = "failed";
+          await deposit.save();
+
+          return res.status(400).json({
+            success: false,
+            message: deposit.rejectionReason,
+          });
+        }
+
+        await deposit.save();
+
+        return res.status(202).json({
+          success: false,
+          message: "Payment is awaiting completion from UddoktaPay.",
+          data: {
+            depositId: deposit._id,
+            reference,
+            status: deposit.status,
+          },
+        });
+      } catch (verifyErr) {
+        logger.error("UddoktaPay verify error", {
+          message: verifyErr.message,
+          reference,
+        });
+        return res.status(502).json({
+          success: false,
+          message: uddoktaPayService.getErrorMessage(verifyErr),
+        });
+      }
+    }
+
+    const status = await getPaymentStatus(
+      deposit.propayDetails?.orderNo || reference,
+    );
 
     deposit.propayDetails = deposit.propayDetails || {};
     deposit.propayDetails.gatewayResponse = {
@@ -827,9 +1175,83 @@ exports.verifyPaymentController = async (req, res) => {
   }
 };
 
+exports.handleUddoktaPayWebhookController = async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const invoiceId =
+      payload.invoice_id ||
+      payload.invoiceId ||
+      req.query?.invoice_id ||
+      req.query?.invoiceId;
+
+    logger.info("UddoktaPay webhook received", {
+      invoiceId,
+      status: payload.status,
+    });
+
+    if (!invoiceId) {
+      return res.status(400).json({
+        success: false,
+        message: "invoice_id is required",
+      });
+    }
+
+    const deposit = await Deposit.findOne({
+      $or: [
+        { "propayDetails.orderNo": String(invoiceId) },
+        { referenceId: String(invoiceId) },
+      ],
+    });
+
+    if (!deposit) {
+      logger.warn("UddoktaPay webhook deposit not found", { invoiceId });
+      return res.status(200).json({ ok: true, reason: "Deposit not found" });
+    }
+
+    // Verify directly with UddoktaPay API to guarantee security
+    const verifyResult = await uddoktaPayService.verifyPayment(invoiceId);
+    const verifyData = verifyResult?.raw || {};
+    const paymentStatus = String(
+      verifyData.status || payload.status || "",
+    ).toUpperCase();
+
+    if (paymentStatus === "COMPLETED") {
+      const result = await completeUddoktaPayDeposit(deposit, verifyData, req);
+      return res.status(200).json({
+        ok: true,
+        alreadyProcessed: !!result.alreadyProcessed,
+      });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      status: paymentStatus,
+    });
+  } catch (error) {
+    logger.error("UddoktaPay webhook error", {
+      message: error.message,
+    });
+    return res.status(500).json({
+      success: false,
+      message: "Server error while processing UddoktaPay webhook",
+    });
+  }
+};
+
 exports.handlePaymentWebhookController = async (req, res) => {
+  // Check if this callback belongs to UddoktaPay
+  const isUddoktaPayCallback =
+    Boolean(req.headers["rt-uddoktapay-api-key"]) ||
+    (Boolean(req.body?.invoice_id) && !req.headers["x-signature"]);
+
+  if (isUddoktaPayCallback) {
+    return exports.handleUddoktaPayWebhookController(req, res);
+  }
+
   const rawBody =
-    typeof req.rawBody === "string" ? req.rawBody : JSON.stringify(req.body || {});
+    typeof req.rawBody === "string"
+      ? req.rawBody
+      : JSON.stringify(req.body || {});
   const requestUri = req.originalUrl || req.url;
 
   const signature = verifyCallbackSignature({
