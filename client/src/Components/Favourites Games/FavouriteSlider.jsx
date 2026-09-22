@@ -1,11 +1,4 @@
-import React, {
-  lazy,
-  Suspense,
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { lazy, Suspense, useEffect, useState, useCallback, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import { Autoplay, Navigation } from "swiper/modules";
@@ -73,14 +66,14 @@ const FavouriteSlider = () => {
 
   return (
     <>
-      <div className="w-full bg-[#050912] py-3">
+      <div className="w-full bg-black py-3">
         {/* TITLE */}
         <div className="flex items-center gap-2 mb-3 px-1">
           <div className="w-[5px] h-5 bg-primary rounded-full" />
 
           <h2
             className="
-            text-[#F5FAFF]
+            text-white
             text-sm
             sm:text-base
             font-semibold
@@ -127,12 +120,10 @@ const FavouriteSlider = () => {
     overflow-hidden
     rounded-lg
 
-    bg-[#0B1220]
-    border
-    border-[#16314D]
-    hover:border-primary/50
+    bg-[#1a1a1a]
 
     w-full
+    border-0
     p-0
     appearance-none
 
@@ -178,7 +169,10 @@ const FavouriteSlider = () => {
 
       <Suspense fallback={null}>
         {showLoginModal ? (
-          <LazyLoginModal isOpen={showLoginModal} onClose={closeLoginModal} />
+          <LazyLoginModal
+            isOpen={showLoginModal}
+            onClose={closeLoginModal}
+          />
         ) : null}
       </Suspense>
     </>

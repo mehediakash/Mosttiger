@@ -21,7 +21,7 @@ export default function AffiliateMarketingTools() {
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <h2 className="text-lg font-bold">Logo</h2>
           <div className="mt-4 flex items-center justify-center rounded-xl bg-black p-8">
-            <img src={logo} alt="mosttiger" className="max-h-24" />
+            <img src={logo} alt="ck369" className="max-h-24" />
           </div>
         </div>
 

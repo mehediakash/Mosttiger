@@ -1,5 +1,5 @@
-const AFFILIATE_CODE_KEY = "mosttiger_affiliate_code";
-const REFERRAL_CODE_KEY = "mosttiger_referral_code";
+const AFFILIATE_CODE_KEY = "ck369_affiliate_code";
+const REFERRAL_CODE_KEY = "ck369_referral_code";
 
 const normalizeAffiliateCode = (value) =>
   typeof value === "string" ? value.trim().toUpperCase() : "";

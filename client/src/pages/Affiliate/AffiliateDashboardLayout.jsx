@@ -58,9 +58,7 @@ export default function AffiliateDashboardLayout() {
       <div className="flex h-16 items-center justify-between border-b border-slate-200 px-5">
         <div>
           <div className="text-lg font-bold text-primary">Affiliate Portal</div>
-          <div className="text-xs text-slate-500">
-            mosttiger partner console
-          </div>
+          <div className="text-xs text-slate-500">ck369 partner console</div>
         </div>
         <button className="lg:hidden" onClick={() => setOpen(false)}>
           <X size={20} />

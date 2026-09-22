@@ -661,7 +661,7 @@ See ADVANCED_EXAMPLES.jsx for 12 more examples!
 
 ## 🌟 PROFESSIONAL CASINO/BETTING UI
 
-Your mosttigere website now has:
+Your ck369e website now has:
 
 - 🎨 Professional dark theme matching industry leaders
 - 🎯 Beautiful collapsible sidebar navigation

@@ -27,8 +27,8 @@ const GameDetailPage = ({ gameId, gameName }) => {
   return (
     <>
       <SEO
-        title={`Play ${gameName} | mosttiger Live Casino`}
-        description={`Enjoy ${gameName} at mosttiger Live. Win big with exciting casino games. Safe, secure, instant play. Join now!`}
+        title={`Play ${gameName} | ck369 Live Casino`}
+        description={`Enjoy ${gameName} at ck369 Live. Win big with exciting casino games. Safe, secure, instant play. Join now!`}
         keywords={`${gameName}, online casino, play ${gameName}, casino games bangladesh`}
         canonical={`https://mosttiger.com/games/${gameId}`}
         ogImage={`https://mosttiger.com/games/${gameId}/thumbnail.jpg`}
@@ -68,8 +68,8 @@ const UserProfilePage = () => {
   return (
     <>
       <SEO
-        title="My Profile | mosttiger Live"
-        description="Manage your mosttiger Live account settings"
+        title="My Profile | ck369 Live"
+        description="Manage your ck369 Live account settings"
         canonical="https://mosttiger.com/profile"
         noindex={true} // Prevent search engines from indexing
       />
@@ -95,7 +95,7 @@ const ArticlePage = ({ title, excerpt, author, publishDate }) => {
     datePublished: publishDate,
     publisher: {
       "@type": "Organization",
-      name: "mosttiger Live",
+      name: "ck369 Live",
       logo: {
         "@type": "ImageObject",
         url: "https://mosttiger.com/logo.png",
@@ -106,7 +106,7 @@ const ArticlePage = ({ title, excerpt, author, publishDate }) => {
   return (
     <>
       <SEO
-        title={`${title} | mosttiger Live Blog`}
+        title={`${title} | ck369 Live Blog`}
         description={excerpt}
         keywords="betting tips, casino strategy, sports betting guide"
         canonical={`https://mosttiger.com/blog/${title.toLowerCase().replace(/ /g, "-")}`}

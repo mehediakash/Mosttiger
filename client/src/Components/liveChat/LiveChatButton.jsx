@@ -8,7 +8,7 @@ const LiveChatButton = ({ unreadCount, online, onClick, open }) => {
     <button
       type="button"
       onClick={onClick}
-      className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom)+var(--mosttiger-app-download-offset,0px))] right-5 z-[9998] flex h-16 w-16 items-center justify-center rounded-full bg-primary text-black shadow-[0_12px_36px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_16px_42px_rgba(255,184,0,0.28)] md:bottom-[max(1.5rem,env(safe-area-inset-bottom))] md:right-6"
+      className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom)+var(--ck369-app-download-offset,0px))] right-5 z-[9998] flex h-16 w-16 items-center justify-center rounded-full bg-primary text-black shadow-[0_12px_36px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_16px_42px_rgba(255,184,0,0.28)] md:bottom-[max(1.5rem,env(safe-area-inset-bottom))] md:right-6"
       aria-label="Open live chat"
     >
       <span className="absolute inset-0 animate-ping rounded-full bg-primary/25" />

@@ -62,12 +62,12 @@ const MobileBottomNav = () => {
 
     
 
-          bg-[#0B1220]/95
+          bg-[#151515]/95
 
-          border-t
-          border-[#16314D]
+          border
+          border-white/[0.04]
 
-          shadow-[0_12px_40px_rgba(0,0,0,0.65)]
+          shadow-[0_12px_40px_rgba(0,0,0,0.55)]
 
           flex
           items-center
@@ -118,7 +118,7 @@ const MobileBottomNav = () => {
 
                             bg-primary
 
-                            shadow-[0_8px_24px_rgba(0,229,255,0.45)]
+                            shadow-[0_8px_24px_rgba(255,225,0,0.35)]
 
                             scale-100
 
@@ -159,7 +159,7 @@ const MobileBottomNav = () => {
                               scale-110
                             `
                             : `
-                              text-[#8FA6BC]
+                              text-[#a8a8a8]
                               text-[20px]
                             `
                         }
@@ -172,6 +172,7 @@ const MobileBottomNav = () => {
                     className={`
                       relative
                       z-10
+                        text-white
                       mt-[6px]
 
                       text-[11px]
@@ -189,7 +190,7 @@ const MobileBottomNav = () => {
                             opacity-100
                           `
                           : `
-                            text-[#8FA6BC]
+                            
                             opacity-90
                           `
                       }

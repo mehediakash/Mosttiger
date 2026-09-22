@@ -168,10 +168,10 @@ const FeaturedGames = () => {
   }, []);
 
   return (
-    <div className="w-full bg-[#050912] py-2">
+    <div className="w-full bg-black py-2">
       <div className="flex items-center gap-2 mb-3 px-1">
         <div className="h-5 bg-primary rounded-full" style={{ width: 5 }} />
-        <h2 className="text-[#F5FAFF] text-sm sm:text-base font-semibold">
+        <h2 className="text-white text-sm sm:text-base font-semibold">
           {t("FeaturedGames")}
         </h2>
       </div>
@@ -202,7 +202,7 @@ const FeaturedGames = () => {
               key={game.id}
               onClick={() => launchGame(game)}
               disabled={gameLoading}
-              className="shrink-0 bg-[#0B1220] border border-[#16314D] hover:border-primary/50 rounded-md overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="shrink-0 bg-[#2a2a2a] rounded-md overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ width: 150 }}
             >
               <div className="relative">
@@ -212,13 +212,13 @@ const FeaturedGames = () => {
                   loading="lazy"
                   decoding="async"
                   draggable="false"
-                  className="w-full object-contain bg-[#050912] transition-all duration-300"
+                  className="w-full object-contain bg-[#1a1a1a] transition-all duration-300"
                   style={{ height: 95, padding: 2 }}
                 />
               </div>
 
               <div className="px-2 py-2">
-                <p className="text-[#F5FAFF] text-xs sm:text-sm font-medium truncate">
+                <p className="text-white text-xs sm:text-sm font-medium truncate">
                   {game.title}
                 </p>
               </div>
@@ -237,23 +237,23 @@ const FeaturedGames = () => {
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #0B1220;
+          background: rgba(255,255,255,0.04);
           border-radius: 999px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(24, 200, 255, 0.5);
+          background: rgba(255, 184, 12, 0.55);
           border-radius: 999px;
           transition: all 0.3s ease;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(0, 229, 255, 0.85);
+          background: rgba(255, 184, 12, 0.9);
         }
 
         .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: rgba(24, 200, 255, 0.5) #0B1220;
+          scrollbar-color: rgba(255,184,12,0.55) rgba(255,255,255,0.04);
         }
       `}</style>
 

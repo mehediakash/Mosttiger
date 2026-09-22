@@ -101,12 +101,12 @@ export default function ProviderFilterBar({
 
   return (
     <>
-      <div className="w-full bg-[#0B1220] border-b border-[#16314D] sticky top-0 z-40">
+      <div className="w-full bg-gradient-to-b from-[#1a1a1a] to-black border-b border-primary/20 sticky top-0 z-40">
         <div className="flex items-center gap-2 px-2 sm:px-4 py-3">
           {/* Left Scroll Button */}
           <button
             onClick={() => scroll("left")}
-            className="hidden sm:flex flex-shrink-0 w-9 h-9 items-center justify-center bg-[#050912] hover:bg-[#16314D] text-[#18C8FF] border border-[#16314D] rounded transition-colors"
+            className="hidden sm:flex flex-shrink-0 w-9 h-9 items-center justify-center bg-primary/10 hover:bg-primary/20 text-primary rounded transition-colors"
             title="Scroll left"
           >
             <MdChevronLeft className="w-5 h-5" />
@@ -140,8 +140,8 @@ export default function ProviderFilterBar({
                   onClick={() => onToggleProvider(provider)}
                   className={`shrink-0 px-3 sm:px-4 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
                     isProviderSelected(provider)
-                      ? "bg-primary text-[#050912] font-semibold shadow-[0_0_12px_rgba(0,229,255,0.4)]"
-                      : "bg-[#050912] text-[#8FA6BC] border border-[#16314D] hover:bg-[#16314D]/40 hover:text-[#F5FAFF]"
+                      ? "bg-primary text-black font-semibold"
+                      : "bg-[#2a2a2a] text-gray-400 hover:bg-[#3a3a3a] hover:text-gray-300"
                   }`}
                 >
                   {provider}
@@ -153,7 +153,7 @@ export default function ProviderFilterBar({
           {/* Right Scroll Button */}
           <button
             onClick={() => scroll("right")}
-            className="hidden sm:flex flex-shrink-0 w-9 h-9 items-center justify-center bg-[#050912] hover:bg-[#16314D] text-[#18C8FF] border border-[#16314D] rounded transition-colors"
+            className="hidden sm:flex flex-shrink-0 w-9 h-9 items-center justify-center bg-primary/10 hover:bg-primary/20 text-primary rounded transition-colors"
             title="Scroll right"
           >
             <MdChevronRight className="w-5 h-5" />
@@ -162,7 +162,7 @@ export default function ProviderFilterBar({
           {/* Search Button */}
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-primary hover:bg-[#48DDFF] text-[#050912] rounded-lg shadow-[0_0_15px_rgba(0,229,255,0.35)] transition-colors"
+            className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-primary hover:primary text-black rounded-lg transition-colors"
             title="Search games"
           >
             <MdSearch className="w-5 h-5" />
@@ -176,16 +176,16 @@ export default function ProviderFilterBar({
           }
 
           div::-webkit-scrollbar-track {
-            background: #0B1220;
+            background: rgba(255, 255, 255, 0.03);
           }
 
           div::-webkit-scrollbar-thumb {
-            background: #16314D;
+            background: rgba(255, 184, 12, 0.4);
             border-radius: 2px;
           }
 
           div::-webkit-scrollbar-thumb:hover {
-            background: #18C8FF;
+            background: rgba(255, 184, 12, 0.7);
           }
         `}</style>
       </div>

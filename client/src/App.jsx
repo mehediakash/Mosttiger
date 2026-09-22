@@ -1,11 +1,5 @@
 import React, { lazy, Suspense, useEffect } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./Components/store";
 import { LanguageProvider } from "./context/LanguageContext";
@@ -47,37 +41,34 @@ import CrispChat from "./Components/CrispChat";
 import AffiliateRequireAuth from "./pages/Affiliate/AffiliateRequireAuth";
 import { storeAffiliateCodeFromSearch } from "./utils/affiliateTracking";
 import { useAntiInspect } from "./hooks/useAntiInspect";
-import LogoIntro from "./Components/Common/LogoIntro";
 
 const AppDownloadBar = lazy(() => import("./Components/AppDownloadBar"));
-const AffiliateLanding = lazy(
-  () => import("./pages/Affiliate/AffiliateLanding"),
-);
+const AffiliateLanding = lazy(() => import("./pages/Affiliate/AffiliateLanding"));
 const AffiliateLogin = lazy(() => import("./pages/Affiliate/AffiliateLogin"));
 const AffiliateSignup = lazy(() => import("./pages/Affiliate/AffiliateSignup"));
-const AffiliateDashboardLayout = lazy(
-  () => import("./pages/Affiliate/AffiliateDashboardLayout"),
+const AffiliateDashboardLayout = lazy(() =>
+  import("./pages/Affiliate/AffiliateDashboardLayout"),
 );
-const AffiliateDashboardHome = lazy(
-  () => import("./pages/Affiliate/AffiliateDashboardHome"),
+const AffiliateDashboardHome = lazy(() =>
+  import("./pages/Affiliate/AffiliateDashboardHome"),
 );
-const AffiliatePlayersPage = lazy(
-  () => import("./pages/Affiliate/AffiliatePlayersPage"),
+const AffiliatePlayersPage = lazy(() =>
+  import("./pages/Affiliate/AffiliatePlayersPage"),
 );
-const AffiliateWithdrawPage = lazy(
-  () => import("./pages/Affiliate/AffiliateWithdrawPage"),
+const AffiliateWithdrawPage = lazy(() =>
+  import("./pages/Affiliate/AffiliateWithdrawPage"),
 );
-const AffiliateReferralLink = lazy(
-  () => import("./pages/Affiliate/AffiliateReferralLink"),
+const AffiliateReferralLink = lazy(() =>
+  import("./pages/Affiliate/AffiliateReferralLink"),
 );
-const AffiliateMarketingTools = lazy(
-  () => import("./pages/Affiliate/AffiliateMarketingTools"),
+const AffiliateMarketingTools = lazy(() =>
+  import("./pages/Affiliate/AffiliateMarketingTools"),
 );
-const AffiliateProfilePage = lazy(
-  () => import("./pages/Affiliate/AffiliateProfilePage"),
+const AffiliateProfilePage = lazy(() =>
+  import("./pages/Affiliate/AffiliateProfilePage"),
 );
-const AffiliateHistoryPages = lazy(
-  () => import("./pages/Affiliate/AffiliateHistoryPages"),
+const AffiliateHistoryPages = lazy(() =>
+  import("./pages/Affiliate/AffiliateHistoryPages"),
 );
 
 const AffiliateFallback = () => (
@@ -103,7 +94,6 @@ export default function App() {
     <Provider store={store}>
       <LanguageProvider>
         <BrowserRouter>
-          <LogoIntro />
           <AffiliateCodeCapture />
           <CrispChat />
           <Suspense fallback={null}>
@@ -218,21 +208,22 @@ export default function App() {
               <Route
                 path="revenue"
                 element={
-                  <AffiliateHistoryPages componentName="RevenueHistory" />
+                  <AffiliateHistoryPages
+                    componentName="RevenueHistory"
+                  />
                 }
               />
               <Route
                 path="settlements"
                 element={
-                  <AffiliateHistoryPages componentName="SettlementHistory" />
+                  <AffiliateHistoryPages
+                    componentName="SettlementHistory"
+                  />
                 }
               />
               <Route path="withdraw" element={<AffiliateWithdrawPage />} />
               <Route path="referral-link" element={<AffiliateReferralLink />} />
-              <Route
-                path="marketing-tools"
-                element={<AffiliateMarketingTools />}
-              />
+              <Route path="marketing-tools" element={<AffiliateMarketingTools />} />
               <Route path="profile" element={<AffiliateProfilePage />} />
             </Route>
             {[

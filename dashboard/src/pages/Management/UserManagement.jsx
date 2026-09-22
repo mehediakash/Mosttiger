@@ -644,10 +644,7 @@ const UserManagement = () => {
           <Form.Item
             name="email"
             label="Email"
-            rules={[
-              { required: true, message: "Please enter email" },
-              { type: "email", message: "Please enter valid email" },
-            ]}
+            rules={[{ type: "email", message: "Please enter valid email" }]}
           >
             <Input placeholder="Enter email" />
           </Form.Item>
@@ -817,7 +814,7 @@ const UserManagement = () => {
             label="New Password"
             rules={[
               { required: true, message: "Please enter new password" },
-              { min: 8, message: "Password must be at least 8 characters" }
+              { min: 8, message: "Password must be at least 8 characters" },
             ]}
           >
             <Input.Password placeholder="Enter new password" />
@@ -826,15 +823,15 @@ const UserManagement = () => {
           <Form.Item
             name="confirmPassword"
             label="Confirm Password"
-            dependencies={['newPassword']}
+            dependencies={["newPassword"]}
             rules={[
               { required: true, message: "Please confirm password" },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue('newPassword') === value) {
+                  if (!value || getFieldValue("newPassword") === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match'));
+                  return Promise.reject(new Error("Passwords do not match"));
                 },
               }),
             ]}
@@ -887,52 +884,131 @@ const UserManagement = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Card title="Basic Information" size="small">
-                  <p><strong>Full Name:</strong> {userDetails.fullName}</p>
-                  <p><strong>Email:</strong> {userDetails.email}</p>
-                  <p><strong>Phone:</strong> {userDetails.phone}</p>
-                  <p><strong>Role:</strong> {userDetails.role}</p>
-                  <p><strong>Status:</strong> <Tag color={userDetails.isActive ? "green" : "red"}>{userDetails.isActive ? "Active" : "Inactive"}</Tag></p>
-                  <p><strong>Blocked:</strong> <Tag color={userDetails.isBlocked ? "red" : "green"}>{userDetails.isBlocked ? "Yes" : "No"}</Tag></p>
-                  <p><strong>Created At:</strong> {formatDate(userDetails.createdAt)}</p>
-                  <p><strong>Updated At:</strong> {formatDate(userDetails.updatedAt)}</p>
+                  <p>
+                    <strong>Full Name:</strong> {userDetails.fullName}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {userDetails.email}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {userDetails.phone}
+                  </p>
+                  <p>
+                    <strong>Role:</strong> {userDetails.role}
+                  </p>
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    <Tag color={userDetails.isActive ? "green" : "red"}>
+                      {userDetails.isActive ? "Active" : "Inactive"}
+                    </Tag>
+                  </p>
+                  <p>
+                    <strong>Blocked:</strong>{" "}
+                    <Tag color={userDetails.isBlocked ? "red" : "green"}>
+                      {userDetails.isBlocked ? "Yes" : "No"}
+                    </Tag>
+                  </p>
+                  <p>
+                    <strong>Created At:</strong>{" "}
+                    {formatDate(userDetails.createdAt)}
+                  </p>
+                  <p>
+                    <strong>Updated At:</strong>{" "}
+                    {formatDate(userDetails.updatedAt)}
+                  </p>
                 </Card>
               </Col>
               <Col span={12}>
                 <Card title="Wallet Information" size="small">
-                  <p><strong>Main Balance:</strong> {formatCurrency(userDetails.wallet?.main || 0)}</p>
-                  <p><strong>Bonus Balance:</strong> {formatCurrency(userDetails.wallet?.bonus || 0)}</p>
-                  <p><strong>Free Bets:</strong> {formatCurrency(userDetails.wallet?.freeBets || 0)}</p>
+                  <p>
+                    <strong>Main Balance:</strong>{" "}
+                    {formatCurrency(userDetails.wallet?.main || 0)}
+                  </p>
+                  <p>
+                    <strong>Bonus Balance:</strong>{" "}
+                    {formatCurrency(userDetails.wallet?.bonus || 0)}
+                  </p>
+                  <p>
+                    <strong>Free Bets:</strong>{" "}
+                    {formatCurrency(userDetails.wallet?.freeBets || 0)}
+                  </p>
                 </Card>
-                <Card title="Security Information" size="small" style={{ marginTop: 16 }}>
-                  <p><strong>Password:</strong> {userDetails.password || "Not available"}</p>
-                  <p><strong>OTP Code:</strong> {userDetails.otp?.code || "Not available"}</p>
-                  <p><strong>OTP Expires:</strong> {userDetails.otp?.expiresAt ? formatDate(userDetails.otp.expiresAt) : "Not available"}</p>
-                  <p><strong>OTP Purpose:</strong> {userDetails.otp?.purpose || "Not available"}</p>
+                <Card
+                  title="Security Information"
+                  size="small"
+                  style={{ marginTop: 16 }}
+                >
+                  <p>
+                    <strong>Password:</strong>{" "}
+                    {userDetails.password || "Not available"}
+                  </p>
+                  <p>
+                    <strong>OTP Code:</strong>{" "}
+                    {userDetails.otp?.code || "Not available"}
+                  </p>
+                  <p>
+                    <strong>OTP Expires:</strong>{" "}
+                    {userDetails.otp?.expiresAt
+                      ? formatDate(userDetails.otp.expiresAt)
+                      : "Not available"}
+                  </p>
+                  <p>
+                    <strong>OTP Purpose:</strong>{" "}
+                    {userDetails.otp?.purpose || "Not available"}
+                  </p>
                 </Card>
               </Col>
             </Row>
             {userDetails.hierarchy && (
-              <Card title="Hierarchy Information" size="small" style={{ marginTop: 16 }}>
-                <p><strong>Master Agent:</strong> {userDetails.hierarchy.masterAgent?.fullName || "N/A"}</p>
-                <p><strong>Agent:</strong> {userDetails.hierarchy.agent?.fullName || "N/A"}</p>
-                <p><strong>Sub Agent:</strong> {userDetails.hierarchy.subAgent?.fullName || "N/A"}</p>
-                <p><strong>Referred By:</strong> {userDetails.referredBy || "N/A"}</p>
+              <Card
+                title="Hierarchy Information"
+                size="small"
+                style={{ marginTop: 16 }}
+              >
+                <p>
+                  <strong>Master Agent:</strong>{" "}
+                  {userDetails.hierarchy.masterAgent?.fullName || "N/A"}
+                </p>
+                <p>
+                  <strong>Agent:</strong>{" "}
+                  {userDetails.hierarchy.agent?.fullName || "N/A"}
+                </p>
+                <p>
+                  <strong>Sub Agent:</strong>{" "}
+                  {userDetails.hierarchy.subAgent?.fullName || "N/A"}
+                </p>
+                <p>
+                  <strong>Referred By:</strong>{" "}
+                  {userDetails.referredBy || "N/A"}
+                </p>
               </Card>
             )}
             {userDetails.stats && (
               <Card title="Statistics" size="small" style={{ marginTop: 16 }}>
                 <Row gutter={16}>
                   <Col span={6}>
-                    <Statistic title="Total Bets" value={userDetails.stats.totalBets || 0} />
+                    <Statistic
+                      title="Total Bets"
+                      value={userDetails.stats.totalBets || 0}
+                    />
                   </Col>
                   <Col span={6}>
-                    <Statistic title="Total Wins" value={userDetails.stats.totalWins || 0} />
+                    <Statistic
+                      title="Total Wins"
+                      value={userDetails.stats.totalWins || 0}
+                    />
                   </Col>
                   <Col span={6}>
-                    <Statistic title="Total Losses" value={userDetails.stats.totalLosses || 0} />
+                    <Statistic
+                      title="Total Losses"
+                      value={userDetails.stats.totalLosses || 0}
+                    />
                   </Col>
                   <Col span={6}>
-                    <Statistic title="Win Rate" value={`${userDetails.stats.winRate || 0}%`} />
+                    <Statistic
+                      title="Win Rate"
+                      value={`${userDetails.stats.winRate || 0}%`}
+                    />
                   </Col>
                 </Row>
               </Card>

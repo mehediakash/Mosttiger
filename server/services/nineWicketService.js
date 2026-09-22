@@ -226,7 +226,7 @@ class NineWicketService {
       options.amount === ""
         ? r2(wallet.main)
         : r2(options.amount);
-    if (!(amount > 0)) {
+    if (amount < 0) {
       throw new NineWicketInsufficientBalanceError(
         "Please deposit funds to start playing.",
         wallet.main,
@@ -435,7 +435,7 @@ class NineWicketService {
       "metadata.transferId": transferId,
     }).lean();
 
-    if (!existingRefund) {
+    if (!existingRefund && amount > 0) {
       await WalletService.updateWallet(userId, amount, "main", "refund", {
         description: "9Wicket launch rollback refund",
         provider: "9Wicket",
@@ -1167,6 +1167,42 @@ class NineWicketService {
       amount: remainingAmount,
       cashoutTransferId,
     });
+  }
+
+  async getActiveSession({ userId }) {
+    let session = null;
+    try {
+      const activeQuery = NineWicketSession.findOne({
+        user: userId,
+        status: { $in: ["active", "ending", "cashout_pending"] },
+      });
+      session =
+        typeof activeQuery?.sort === "function"
+          ? await activeQuery.sort({ createdAt: -1 })
+          : await activeQuery;
+    } catch (e) {
+      session = null;
+    }
+
+    if (!session) {
+      return {
+        success: true,
+        hasActiveSession: false,
+      };
+    }
+
+    return {
+      success: true,
+      hasActiveSession: true,
+      session: {
+        id: session._id ? String(session._id) : undefined,
+        sessionId: session.sessionId,
+        gameUid: session.gameUid,
+        symbol: session.symbol,
+        status: session.status,
+        cashoutStatus: session.cashoutStatus,
+      },
+    };
   }
 
   async settleActiveSession({ userId }) {

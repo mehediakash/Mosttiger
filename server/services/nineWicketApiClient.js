@@ -20,11 +20,7 @@ function pkcs7Unpad(buffer) {
     throw new Error("Invalid PKCS7 padding");
   }
 
-  for (
-    let index = buffer.length - padLength;
-    index < buffer.length;
-    index += 1
-  ) {
+  for (let index = buffer.length - padLength; index < buffer.length; index += 1) {
     if (buffer[index] !== padLength) {
       throw new Error("Invalid PKCS7 padding");
     }
@@ -55,7 +51,7 @@ class NineWicketApiClient {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          "User-Agent": "mosttiger-9Wicket/1.0",
+          "User-Agent": "CK369-9Wicket/1.0",
         },
       });
   }
@@ -132,29 +128,17 @@ class NineWicketApiClient {
     const games = extractGamesFromProviderResponse(data);
 
     const match = games.find((game) => {
-      const symbol = String(
-        game.symbol || game.game_symbol || "",
-      ).toUpperCase();
+      const symbol = String(game.symbol || game.game_symbol || "").toUpperCase();
       const uid = String(game.game_uid || game.gameUid || game.uid || "");
       const name = String(game.name || game.game_name || game.title || "");
-      return (
-        symbol === "9W" ||
-        uid.toUpperCase() === "9W" ||
-        /9\s*wicket/i.test(name)
-      );
+      return symbol === "9W" || uid.toUpperCase() === "9W" || /9\s*wicket/i.test(name);
     });
 
     const gameUid =
-      match?.game_uid ||
-      match?.gameUid ||
-      match?.uid ||
-      match?.game_code ||
-      null;
+      match?.game_uid || match?.gameUid || match?.uid || match?.game_code || null;
 
     if (!gameUid) {
-      throw new Error(
-        "9Wicket game_uid could not be resolved from provider games API",
-      );
+      throw new Error("9Wicket game_uid could not be resolved from provider games API");
     }
 
     await redis.setJSON(

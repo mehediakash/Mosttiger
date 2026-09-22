@@ -32,8 +32,8 @@ export const ProviderGrid = ({
   }
 
   return (
-    <div className="w-full bg-[#0B1220] border border-[#16314D] px-2 py-4 rounded-lg mb-4">
-      <h3 className="text-[#F5FAFF] font-bold text-sm mb-3 px-2">Providers</h3>
+    <div className="w-full bg-[#111111] px-2 py-4 rounded-lg mb-4">
+      <h3 className="text-white font-bold text-sm mb-3 px-2">Providers</h3>
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 lg:grid-cols-5 xl:grid-cols-8 gap-3">
         {uniqueProviders.map((provider, index) => {
           const providerName =
@@ -48,9 +48,9 @@ export const ProviderGrid = ({
                 navigate(`/games?provider=${encodeURIComponent(providerName)}`);
               }}
               className="group relative aspect-square rounded-lg overflow-hidden
-                bg-[#050912]
-                border border-[#16314D] hover:border-primary
-                shadow-lg hover:shadow-2xl hover:shadow-primary/20
+                bg-gradient-to-b from-gray-800/80 to-gray-950/90
+                border border-gray-700/50 hover:border-primary/50
+                shadow-lg hover:shadow-2xl hover:shadow-primary/10
                 transform transition-all duration-300
                 hover:scale-[1.05] active:scale-95"
               title={providerName}

@@ -22,7 +22,6 @@ const DepositPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
   const [selectedProvider, setSelectedProvider] = useState("");
-  const [maxAmountModalOpen, setMaxAmountModalOpen] = useState(false);
   const token = useSelector((state) => state.auth?.token);
   const paymentProviders = [
     {
@@ -97,17 +96,6 @@ const DepositPage = () => {
   useEffect(() => {
     setPendingPromotion(selectedPromotion);
   }, [selectedPromotion]);
-
-  useEffect(() => {
-    if (maxAmountModalOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [maxAmountModalOpen]);
 
   // Read selected promotion from router state or sessionStorage
   useEffect(() => {
@@ -326,20 +314,6 @@ const DepositPage = () => {
     }
   };
 
-  // Increment deposit amount when preset button is clicked
-  const handlePresetAmountClick = (amountToAdd) => {
-    const rawCurrent =
-      typeof depositAmount === "string"
-        ? depositAmount.replace(/,/g, "").trim()
-        : String(depositAmount || "");
-    const parsedCurrent = parseFloat(rawCurrent);
-    const currentNum =
-      Number.isFinite(parsedCurrent) && parsedCurrent > 0 ? parsedCurrent : 0;
-    const presetNum = Number(amountToAdd) || 0;
-    const nextAmount = currentNum + presetNum;
-    handleDepositAmountChange(nextAmount.toString());
-  };
-
   // Calculate total bonus amount
   const calculateBonusAmount = () => {
     if (!promoData || !depositAmount) return 0;
@@ -455,18 +429,6 @@ const DepositPage = () => {
       return;
     }
 
-    // Frontend validation: Maximum deposit limit 30,000 BDT
-    const rawAmount =
-      typeof depositAmount === "string"
-        ? depositAmount.replace(/,/g, "").trim()
-        : String(depositAmount || "");
-    const numericAmount = parseFloat(rawAmount);
-
-    if (Number.isFinite(numericAmount) && numericAmount > 30000) {
-      setMaxAmountModalOpen(true);
-      return;
-    }
-
     if (selectedPromotionRules) {
       const amount = Number(depositAmount);
       const minValue = Number(selectedPromotionRules.minDeposit || 0);
@@ -524,16 +486,16 @@ const DepositPage = () => {
       {/* SEO Meta Tags */}
       <SEO {...getSEO("deposit")} />
 
-      <div className="min-h-screen bg-[#050912] text-[#F5FAFF] p-4 md:p-8">
+      <div className="min-h-screen  text-white p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Panel: Deposit Form */}
             <div className="lg:w-2/3">
               {/* Deposit Form */}
-              <div className="bg-[#0B1220] rounded-2xl shadow-2xl p-6 border border-[#16314D]">
-                <h2 className="text-xl font-bold mb-6 pb-4 border-b border-[#16314D] flex items-center text-[#F5FAFF]">
+              <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700">
+                <h2 className="text-xl font-bold mb-6 pb-4 border-b border-gray-700 flex items-center">
                   <svg
-                    className="w-6 h-6 mr-3 text-primary"
+                    className="w-6 h-6 mr-3 text-green-400"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -548,7 +510,7 @@ const DepositPage = () => {
 
                 {formStatus && (
                   <div
-                    className={`mb-4 rounded-xl px-4 py-3 text-sm ${formStatus.type === "error" ? "bg-red-900/50 text-red-100 border border-red-700" : "bg-emerald-900/40 text-emerald-100 border border-emerald-700"}`}
+                    className={`mb-4 rounded-xl px-4 py-3 text-sm ${formStatus.type === "error" ? "bg-red-900/50 text-red-100 border border-red-700" : "bg-green-900/40 text-green-100 border border-green-700"}`}
                   >
                     {formStatus.text}
                   </div>
@@ -557,8 +519,8 @@ const DepositPage = () => {
                 <form onSubmit={handleDeposit}>
                   {/* Deposit Amount Section */}
                   <div className="mb-8">
-                    <label className="text-[#F5FAFF] font-bold mb-4 flex items-center">
-                      <span className="w-1 h-6 bg-primary rounded-full mr-3 shadow-[0_0_8px_#00E5FF]"></span>
+                    <label className="text-white font-bold mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-primary rounded-full mr-3"></span>
                       {t("depositAmount")}
                     </label>
 
@@ -570,11 +532,19 @@ const DepositPage = () => {
                             <button
                               type="button"
                               key={amount}
-                              onClick={() => handlePresetAmountClick(amount)}
+                              onClick={() =>
+                                setDepositAmount(
+                                  (
+                                    (Number(
+                                      String(depositAmount).replace(/,/g, ""),
+                                    ) || 0) + amount
+                                  ).toString(),
+                                )
+                              }
                               className={`py-2 px-3 rounded-md font-semibold text-sm transition-all duration-200 ${
                                 depositAmount === amount.toString()
-                                  ? "bg-primary text-[#050912] font-bold shadow-[0_0_12px_rgba(0,229,255,0.4)]"
-                                  : "bg-[#050912] text-[#18C8FF] border border-[#16314D] hover:bg-[#16314D]/40 hover:shadow-lg hover:shadow-primary/20 active:scale-95"
+                                  ? "bg-primary text-black shadow-lg shadow-primary/50"
+                                  : "bg-gray-700 text-primary hover:bg-gray-600 hover:shadow-lg hover:shadow-primary/20 active:scale-95"
                               }`}
                             >
                               +{amount.toLocaleString()}
@@ -597,7 +567,7 @@ const DepositPage = () => {
                         onChange={(e) =>
                           handleDepositAmountChange(e.target.value)
                         }
-                        className="w-full bg-[#050912] border-2 border-[#16314D] focus:border-primary rounded-xl pl-12 pr-4 py-4 text-2xl font-bold text-[#F5FAFF] focus:outline-none focus:shadow-[0_0_15px_rgba(0,229,255,0.25)] transition-all placeholder-[#8FA6BC]/40"
+                        className="w-full bg-gray-900 border-2 border-gray-600 focus:border-primary rounded-xl pl-12 pr-4 py-4 text-2xl font-bold text-white focus:outline-none focus:shadow-lg focus:shadow-primary/30 transition-all placeholder-gray-600"
                         placeholder="0"
                         min="10"
                         max="100000"
@@ -625,12 +595,12 @@ const DepositPage = () => {
 
                     {/* Gentle Reminder Dropdown */}
                     <details className="mb-6">
-                      <summary className="flex items-center justify-between bg-[#050912] px-4 py-3 rounded-lg cursor-pointer hover:bg-[#16314D]/30 transition-colors border border-[#16314D]">
-                        <span className="text-[#8FA6BC] font-medium">
+                      <summary className="flex items-center justify-between bg-gray-800 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-750 transition-colors border border-gray-700">
+                        <span className="text-gray-300 font-medium">
                           {t("gentleReminder")}
                         </span>
                         <svg
-                          className="w-5 h-5 text-[#8FA6BC] transition-transform"
+                          className="w-5 h-5 text-gray-400 transition-transform"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -643,102 +613,15 @@ const DepositPage = () => {
                           />
                         </svg>
                       </summary>
-                      <div className="mt-2 bg-[#050912] border border-[#16314D] rounded-lg p-4 text-[#8FA6BC] text-sm">
-                        <div className="space-y-3">
-                          {/* 1 */}
-                          <div className="flex gap-3">
-                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
-                              ১
-                            </span>
-                            <p className="leading-6">
-                              ক্যাশ আউট বা সেন্ডমানি করার আগে
-                              <span className="text-[#F5FAFF] font-medium">
-                                {" "}
-                                “ব্যক্তিগত তথ্য”{" "}
-                              </span>
-                              অংশে সর্বোচ্চ ৫টি মোবাইল নম্বর যোগ করে ভেরিফাই
-                              করুন।
-                            </p>
-                          </div>
-
-                          {/* 2 */}
-                          <div className="flex gap-3">
-                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
-                              ২
-                            </span>
-                            <p className="leading-6">
-                              অনুগ্রহ করে পেমেন্ট পাঠানোর জন্য ব্যবহৃত নম্বরটি
-                              নির্বাচন করুন, আপনার ট্রানজ্যাকশন আইডি প্রবেশ করান
-                              এবং সাবমিট করুন।
-                              <span className="text-[#F5FAFF] font-medium">
-                                {" "}
-                                ভুল নম্বর নির্বাচন করলে যাচাইকরণ ব্যর্থ হবে।
-                              </span>
-                            </p>
-                          </div>
-
-                          {/* 3 */}
-                          <div className="flex gap-3">
-                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
-                              ৩
-                            </span>
-                            <p className="leading-6">
-                              যেকোনো ডিপোজিট করার আগে সবসময় আমাদের
-                              <span className="text-[#F5FAFF] font-medium">
-                                {" "}
-                                ডিপোজিট পেইজে নাম্বার চেক করুন।
-                              </span>
-                            </p>
-                          </div>
-
-                          {/* 4 */}
-                          <div className="flex gap-3">
-                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#147BFF]/20 text-[#48DDFF] flex items-center justify-center text-xs font-semibold">
-                              ৪
-                            </span>
-                            <p className="leading-6">
-                              ডিপোজিট পেন্ডিং থাকা অবস্থায় আপনি সর্বোচ্চ
-                              <span className="text-[#F5FAFF] font-semibold">
-                                {" "}
-                                ২টি ডিপোজিট{" "}
-                              </span>
-                              ট্রাই করতে পারবেন। কোনো সমস্যা হলে অনুগ্রহ করে
-                              <span className="text-[#48DDFF] font-medium">
-                                {" "}
-                                লাইভচ্যাটের মাধ্যমে সহায়তা নিন।
-                              </span>
-                            </p>
-                          </div>
-
-                          {/* 5 */}
-                          <div className="flex gap-3">
-                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-red-500/15 text-red-400 flex items-center justify-center text-xs font-semibold">
-                              ৫
-                            </span>
-                            <p className="leading-6">
-                              বাজির{" "}
-                              <span className="text-red-400 font-semibold">
-                                ODDS
-                              </span>{" "}
-                              অবশ্যই{" "}
-                              <span className="text-[#F5FAFF] font-semibold">
-                                ১.৩০-এর উপরে
-                              </span>{" "}
-                              হতে হবে। এর নিচের অডসে রাখা বাজি
-                              <span className="text-red-400 font-medium">
-                                {" "}
-                                উইথড্র টার্নওভারের জন্য গণনা করা হবে না।
-                              </span>
-                            </p>
-                          </div>
-                        </div>
+                      <div className="mt-2 bg-gray-800 border border-gray-700 rounded-lg p-4 text-gray-300 text-sm">
+                        <p>{t("depositReminder")}</p>
                       </div>
                     </details>
                   </div>
 
                   <div className="mb-8">
-                    <label className="text-[#F5FAFF] font-bold mb-4 flex items-center">
-                      <span className="w-1 h-6 bg-primary rounded-full mr-3 shadow-[0_0_8px_#00E5FF]"></span>
+                    <label className="text-white font-bold mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-primary rounded-full mr-3"></span>
                       {t("provider")}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
@@ -749,8 +632,8 @@ const DepositPage = () => {
                           onClick={() => setSelectedProvider(provider.id)}
                           className={`flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-md px-2 py-3 text-sm font-semibold transition-all duration-200 ${
                             selectedProvider === provider.id
-                              ? "bg-primary text-[#050912] font-bold shadow-[0_0_15px_rgba(0,229,255,0.4)]"
-                              : "bg-[#050912] text-[#18C8FF] border border-[#16314D] hover:bg-[#16314D]/40 hover:shadow-lg hover:shadow-primary/20 active:scale-95"
+                              ? "bg-primary text-black shadow-lg shadow-primary/50"
+                              : "bg-gray-700 text-primary hover:bg-gray-600 hover:shadow-lg hover:shadow-primary/20 active:scale-95"
                           }`}
                         >
                           <span className="flex h-10 w-full items-center justify-center rounded bg-white/95 px-2 py-1">
@@ -769,8 +652,8 @@ const DepositPage = () => {
 
                   {/* Select Promotion */}
                   <div id="promo-section" className="mb-8">
-                    <label className="text-[#F5FAFF] font-bold mb-4 flex items-center">
-                      <span className="w-1 h-6 bg-primary rounded-full mr-3 shadow-[0_0_8px_#00E5FF]"></span>
+                    <label className="text-white font-bold mb-4 flex items-center">
+                      <span className="w-1 h-6 bg-primary rounded-full mr-3"></span>
                       {t("selectPromotion")}
                     </label>
 
@@ -783,13 +666,13 @@ const DepositPage = () => {
                           if (e.key === "Enter" || e.key === " ")
                             setPromotionModalOpen(true);
                         }}
-                        className="relative w-full bg-[#050912] border-2 border-[#16314D] rounded-xl px-4 py-4 text-lg font-semibold text-[#F5FAFF] focus:outline-none cursor-pointer hover:border-primary transition-colors"
+                        className="relative w-full bg-gray-900 border-2 border-gray-700 rounded-xl px-4 py-4 text-lg font-semibold text-white focus:outline-none cursor-pointer hover:border-primary transition-colors"
                       >
                         {selectedPromotionLabel}
                       </div>
                     </div>
 
-                    <p className="text-sm text-[#8FA6BC] mt-2">
+                    <p className="text-sm text-gray-500 mt-2">
                       {t("promotionHelpText")}
                     </p>
 
@@ -806,15 +689,15 @@ const DepositPage = () => {
 
                   {promotionModalOpen && (
                     <div className="fixed inset-0 z-99998 flex items-center justify-center bg-black/70 px-4 py-6">
-                      <div className="w-full max-w-2xl rounded-2xl border border-[#16314D] bg-[#0B1220] shadow-2xl overflow-hidden">
-                        <div className="flex items-center justify-between border-b border-[#16314D] px-5 py-4">
-                          <h3 className="text-lg font-bold text-[#F5FAFF]">
+                      <div className="w-full max-w-2xl rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl overflow-hidden">
+                        <div className="flex items-center justify-between border-b border-gray-800 px-5 py-4">
+                          <h3 className="text-lg font-bold text-white">
                             {t("selectPromotion")}
                           </h3>
                           <button
                             type="button"
                             onClick={() => setPromotionModalOpen(false)}
-                            className="text-[#8FA6BC] hover:text-[#F5FAFF] transition-colors"
+                            className="text-gray-400 hover:text-white transition-colors"
                           >
                             ✕
                           </button>
@@ -822,7 +705,7 @@ const DepositPage = () => {
 
                         <div className="max-h-[60vh] overflow-y-auto p-5 space-y-3">
                           {promotionsLoading && (
-                            <div className="py-12 text-center text-[#8FA6BC]">
+                            <div className="py-12 text-center text-gray-400">
                               {t("loadingPromotions")}
                             </div>
                           )}
@@ -836,7 +719,7 @@ const DepositPage = () => {
                           {!promotionsLoading &&
                             !promotionsError &&
                             availablePromotions.length === 0 && (
-                              <div className="py-12 text-center text-[#8FA6BC]">
+                              <div className="py-12 text-center text-gray-400">
                                 {t("noActivePromotions")}
                               </div>
                             )}
@@ -859,31 +742,31 @@ const DepositPage = () => {
                                   }
                                   className={`w-full rounded-xl border px-4 py-4 text-left transition-all duration-200 ${
                                     isSelected
-                                      ? "border-primary bg-primary/10 shadow-[0_0_12px_rgba(0,229,255,0.2)]"
-                                      : "border-[#16314D] bg-[#050912] hover:border-[#18C8FF]/50"
+                                      ? "border-primary bg-primary/10"
+                                      : "border-gray-700 bg-gray-800 hover:border-gray-500"
                                   }`}
                                 >
                                   <div className="flex items-start justify-between gap-4">
                                     <div>
-                                      <div className="text-[#F5FAFF] font-bold text-base">
+                                      <div className="text-white font-bold text-base">
                                         {promotion.title}
                                       </div>
-                                      <div className="mt-1 text-sm text-[#8FA6BC]">
+                                      <div className="mt-1 text-sm text-gray-400">
                                         {t("category")}:{" "}
                                         {promotion.allowedCategories?.[0] ||
                                           t("all")}
                                       </div>
-                                      <div className="mt-1 text-sm text-primary font-semibold">
+                                      <div className="mt-1 text-sm text-bg-primary font-semibold">
                                         {formatPromoBonus(promotion)}
                                       </div>
-                                      <div className="mt-1 text-xs text-[#8FA6BC]/70">
+                                      <div className="mt-1 text-xs text-gray-500">
                                         {promotion.shortDescription ||
                                           promotion.fullDescription ||
                                           t("activePromotion")}
                                       </div>
                                     </div>
 
-                                    <div className="text-right text-xs text-[#8FA6BC]">
+                                    <div className="text-right text-xs text-gray-400">
                                       <div>
                                         {t("start")}:{" "}
                                         {formatPromoExpiry(promotion.createdAt)}
@@ -903,8 +786,8 @@ const DepositPage = () => {
                             })}
                         </div>
 
-                        <div className="flex items-center justify-between gap-3 border-t border-[#16314D] px-5 py-4">
-                          <div className="text-sm text-[#8FA6BC]">
+                        <div className="flex items-center justify-between gap-3 border-t border-gray-800 px-5 py-4">
+                          <div className="text-sm text-gray-400">
                             {pendingPromotion
                               ? `{${t("selected")}: ${pendingPromotion.title || pendingPromotion.promoCode || "Promotion"}}`
                               : `{${t("selectPromotionToContinue")}}`}
@@ -914,7 +797,7 @@ const DepositPage = () => {
                             <button
                               type="button"
                               onClick={() => setPromotionModalOpen(false)}
-                              className="h-11 rounded-xl border border-[#16314D] px-4 text-sm font-semibold text-[#8FA6BC] hover:bg-[#050912] hover:text-[#F5FAFF] transition-colors"
+                              className="h-11 rounded-xl border border-gray-700 px-4 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
                             >
                               {t("cancel")}
                             </button>
@@ -922,7 +805,7 @@ const DepositPage = () => {
                               type="button"
                               onClick={handleConfirmPromotion}
                               disabled={!pendingPromotion}
-                              className="h-11 rounded-xl bg-primary px-4 text-sm font-bold text-[#050912] hover:bg-[#48DDFF] shadow-[0_0_12px_rgba(0,229,255,0.35)] transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                              className="h-11 rounded-xl bg-primary px-4 text-sm font-bold text-black hover:bg-yellow-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               {t("confirmSelection")}
                             </button>
@@ -937,17 +820,17 @@ const DepositPage = () => {
                     <input
                       type="checkbox"
                       id="terms"
-                      className="mt-1 mr-3 h-5 w-5 rounded border-[#16314D] bg-[#050912] text-primary focus:ring-primary"
+                      className="mt-1 mr-3 h-5 w-5 rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary"
                       required
                     />
-                    <label htmlFor="terms" className="text-[#8FA6BC] text-sm">
+                    <label htmlFor="terms" className="text-gray-400 text-sm">
                       {t("agreeTerms")}
                     </label>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-primary hover:bg-[#48DDFF] active:scale-95 text-[#050912] font-bold text-lg py-4 rounded-lg shadow-lg shadow-[rgba(0,229,255,0.3)] hover:shadow-[0_0_20px_rgba(0,229,255,0.5)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-primary hover:bg-yellow-600 active:scale-95 text-black font-bold text-lg py-4 rounded-lg shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={
                       submitting ||
                       promotionsLoading ||
@@ -964,13 +847,13 @@ const DepositPage = () => {
           </div>
 
           {/* Security Footer */}
-          <div className="mt-12 pt-8 mb-22 border-t border-[#16314D]">
+          <div className="mt-12 pt-8 mb-22 border-t border-gray-800">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center space-x-6">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-[#050912] border border-[#16314D] rounded-full flex items-center justify-center mr-3">
+                  <div className="w-10 h-10 bg-green-900 rounded-full flex items-center justify-center mr-3">
                     <svg
-                      className="w-6 h-6 text-primary"
+                      className="w-6 h-6 text-green-400"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -982,18 +865,16 @@ const DepositPage = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="font-bold text-[#F5FAFF]">
-                      {t("securePayment")}
-                    </p>
-                    <p className="text-xs text-[#8FA6BC]">
+                    <p className="font-bold text-black">{t("securePayment")}</p>
+                    <p className="text-xs text-gray-500">
                       {t("sslEncryption")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-[#050912] border border-[#16314D] rounded-full flex items-center justify-center mr-3">
+                  <div className="w-10 h-10 bg-blue-900 rounded-full flex items-center justify-center mr-3">
                     <svg
-                      className="w-6 h-6 text-[#147BFF]"
+                      className="w-6 h-6 text-blue-400"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -1001,10 +882,8 @@ const DepositPage = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="font-bold text-[#F5FAFF]">
-                      {t("support247")}
-                    </p>
-                    <p className="text-xs text-[#8FA6BC]">
+                    <p className="font-bold text-black">{t("support247")}</p>
+                    <p className="text-xs text-gray-500">
                       {t("liveChatPhone")}
                     </p>
                   </div>
@@ -1013,57 +892,23 @@ const DepositPage = () => {
 
               <div className="flex items-center space-x-4">
                 <div className="text-center">
-                  <p className="text-xs text-[#8FA6BC]">
+                  <p className="text-xs text-gray-500">
                     {t("licensedRegulated")}
                   </p>
-                  <p className="font-bold text-sm text-[#F5FAFF]">
-                    {t("mgaCuracaoEgaming")}
-                  </p>
+                  <p className="font-bold text-sm">{t("mgaCuracaoEgaming")}</p>
                 </div>
-                <div className="h-8 w-px bg-[#16314D]"></div>
+                <div className="h-8 w-px bg-gray-700"></div>
                 <div className="text-center">
-                  <p className="text-xs text-[#8FA6BC]">
+                  <p className="text-xs text-gray-500">
                     {t("responsibleGambling")}
                   </p>
-                  <p className="font-bold text-sm text-[#F5FAFF]">
-                    {t("adultsOnly")}
-                  </p>
+                  <p className="font-bold text-sm">{t("adultsOnly")}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Maximum Deposit Warning Modal */}
-      {maxAmountModalOpen && (
-        <div
-          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
-          onClick={() => setMaxAmountModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-2xl border border-[#16314D] bg-[#0B1220] p-6 text-center shadow-2xl shadow-black/80"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold text-[#F5FAFF] mb-3">
-              নোটিফিকেশন
-            </h3>
-
-            <p className="text-sm text-[#8FA6BC] leading-relaxed mb-6">
-              দুঃখিত! সর্বোচ্চ ৩০,০০০ টাকা পর্যন্ত ডিপোজিট করা যাবে। অনুগ্রহ করে
-              ৩০,০০০ টাকা বা তার কম একটি এমাউন্ট দিন।
-            </p>
-
-            <button
-              type="button"
-              onClick={() => setMaxAmountModalOpen(false)}
-              className="w-full h-11 rounded-xl bg-primary hover:bg-[#48DDFF] active:scale-95 text-[#050912] font-bold text-base transition-all duration-200 shadow-md shadow-[rgba(0,229,255,0.3)]"
-            >
-              ঠিক আছে
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 };

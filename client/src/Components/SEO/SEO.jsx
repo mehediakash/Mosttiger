@@ -17,9 +17,9 @@ import { Helmet } from "react-helmet-async";
  */
 
 const SEO = ({
-  title = "mosttiger Live | Trusted Online Betting & Casino Platform",
-  description = "Experience the best online betting and casino games at mosttiger Live. Live sports betting, cricket, football, slots, and more. Fast payouts, trusted platform.",
-  keywords = "online betting bangladesh, mosttiger live, casino games, sports betting, cricket betting, football betting",
+  title = "ck369 Live | Trusted Online Betting & Casino Platform",
+  description = "Experience the best online betting and casino games at ck369 Live. Live sports betting, cricket, football, slots, and more. Fast payouts, trusted platform.",
+  keywords = "online betting bangladesh, ck369 live, casino games, sports betting, cricket betting, football betting",
   canonical = "https://mosttiger.com",
   ogImage = "https://mosttiger.com/og-image.jpg",
   ogType = "website",
@@ -67,7 +67,7 @@ const SEO = ({
       <meta property="og:image" content={ogImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content="mosttiger Live" />
+      <meta property="og:site_name" content="ck369 Live" />
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card Tags */}
@@ -75,8 +75,8 @@ const SEO = ({
       <meta name="twitter:title" content={optimizedTitle} />
       <meta name="twitter:description" content={optimizedDescription} />
       <meta name="twitter:image" content={ogImage} />
-      <meta name="twitter:site" content="@mosttigerlive" />
-      <meta name="twitter:creator" content="@mosttigerlive" />
+      <meta name="twitter:site" content="@ck369live" />
+      <meta name="twitter:creator" content="@ck369live" />
 
       {/* Mobile Optimization */}
       <meta
@@ -94,8 +94,8 @@ const SEO = ({
       <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 
       {/* Author & Publisher */}
-      <meta name="author" content="mosttiger Live" />
-      <meta name="publisher" content="mosttiger Live" />
+      <meta name="author" content="ck369 Live" />
+      <meta name="publisher" content="ck369 Live" />
 
       {/* Revisit */}
       <meta name="revisit-after" content="1 days" />

@@ -13,8 +13,8 @@ const GameCard = memo(function GameCard({ game, onGameLaunch }) {
 
   return (
     <div className="group cursor-pointer" onClick={handleClick}>
-      <div className="relative overflow-hidden rounded-lg bg-[#0B1220] border border-[#16314D] hover:border-[#18C8FF]/50 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_15px_rgba(0,229,255,0.2)]">
-        <div className="relative w-full aspect-square bg-[#050912] overflow-hidden">
+      <div className="relative overflow-hidden rounded-lg bg-[#2a2a2a] transition-transform duration-300 hover:scale-105">
+        <div className="relative w-full aspect-square bg-[#1a1a1a] overflow-hidden">
           <SafeGameImage
             src={game.image}
             alt={game.title}
@@ -23,24 +23,24 @@ const GameCard = memo(function GameCard({ game, onGameLaunch }) {
           />
 
           <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
-            <div className="bg-primary p-3 rounded-full transform transition-transform duration-300 group-hover:scale-110 shadow-[0_0_15px_rgba(0,229,255,0.4)]">
-              <MdPlayArrow className="w-6 h-6 text-[#050912]" />
+            <div className="bg-primary p-3 rounded-full transform transition-transform duration-300 group-hover:scale-110">
+              <MdPlayArrow className="w-6 h-6 text-black" />
             </div>
           </div>
 
           {game.provider && (
-            <div className="absolute top-2 right-2 bg-primary text-[#050912] px-2 py-1 rounded text-xs font-bold shadow-md">
+            <div className="absolute top-2 right-2 bg-primary/90 text-black px-2 py-1 rounded text-xs font-semibold">
               {game.provider.slice(0, 3).toUpperCase()}
             </div>
           )}
         </div>
 
         <div className="p-2 sm:p-3">
-          <h3 className="text-[#F5FAFF] font-medium text-xs sm:text-sm line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="text-white font-medium text-xs sm:text-sm line-clamp-2 group-hover:text-primary transition-colors">
             {game.title}
           </h3>
           {game.category && (
-            <p className="text-[#8FA6BC] text-xs mt-1">{game.category}</p>
+            <p className="text-gray-400 text-xs mt-1">{game.category}</p>
           )}
         </div>
       </div>
@@ -54,14 +54,14 @@ const LoadingSkeletonGrid = memo(function LoadingSkeletonGrid() {
       {Array.from({ length: 14 }).map((_, index) => (
         <div
           key={`game-skeleton-${index}`}
-          className="overflow-hidden rounded-lg bg-[#0B1220] border border-[#16314D]"
+          className="overflow-hidden rounded-lg bg-[#2a2a2a]"
         >
-          <div className="relative w-full aspect-square bg-[#050912] overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse" />
+          <div className="relative w-full aspect-square bg-[#1a1a1a] overflow-hidden">
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/8 to-transparent animate-pulse" />
           </div>
           <div className="p-2 sm:p-3 space-y-2">
-            <div className="h-3 w-4/5 rounded bg-[#16314D] animate-pulse" />
-            <div className="h-3 w-1/2 rounded bg-[#16314D]/60 animate-pulse" />
+            <div className="h-3 w-4/5 rounded bg-white/10 animate-pulse" />
+            <div className="h-3 w-1/2 rounded bg-white/5 animate-pulse" />
           </div>
         </div>
       ))}
@@ -213,8 +213,8 @@ function GamesGrid({
     return (
       <div className="flex items-center justify-center min-h-100">
         <div className="text-center">
-          <p className="text-[#8FA6BC] text-lg">No games available</p>
-          <p className="text-[#8FA6BC]/60 text-sm mt-2">
+          <p className="text-gray-400 text-lg">No games available</p>
+          <p className="text-gray-500 text-sm mt-2">
             Try adjusting your filters
           </p>
         </div>
@@ -247,7 +247,7 @@ function GamesGrid({
         )}
 
         {!hasMore && games.length > 0 && (
-          <p className="text-[#8FA6BC]/70 text-sm">No more games to load</p>
+          <p className="text-gray-500 text-sm">No more games to load</p>
         )}
       </div>
     </div>

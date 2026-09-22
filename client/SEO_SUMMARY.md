@@ -213,7 +213,7 @@ npm run preview
 ### Primary Keywords (Bangladesh Market):
 
 - online betting bangladesh ✅
-- mosttiger live ✅
+- ck369 live ✅
 - casino games bangladesh ✅
 - sports betting bd ✅
 - cricket betting ✅
@@ -337,7 +337,7 @@ Also check:
 
 ## ✨ Summary
 
-Your mosttiger Live platform now has:
+Your ck369 Live platform now has:
 
 ✅ **Professional SEO system** - Production ready  
 ✅ **13 pages configured** - Ready to use  

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser, loginUser, setTempUserId } from "../store/authSlice";
+import { registerUser, setTempUserId } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import { validatePromoCode } from "../services/promoService";
@@ -125,25 +125,11 @@ export default function Register() {
         ...(affiliateCode ? { aff: affiliateCode } : {}),
         ...(referralCode ? { ref: referralCode, referralCode } : {}),
       };
-      const result = await dispatch(registerUser(registrationData)).unwrap();
+      await dispatch(registerUser(registrationData)).unwrap();
       clearStoredAffiliateCode();
       clearStoredReferralCode();
-      if (result?.token && result?.user) {
-        navigate("/profile");
-      } else {
-        try {
-          await dispatch(
-            loginUser({
-              username: form.username.trim().toLowerCase(),
-              password: form.password,
-              rememberMe: true,
-            }),
-          ).unwrap();
-          navigate("/profile");
-        } catch {
-          navigate("/login");
-        }
-      }
+      alert(t("registration_successful") || "Registration successful");
+      navigate("/profile");
     } catch (err) {
       console.error(err);
     }

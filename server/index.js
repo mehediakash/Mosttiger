@@ -17,7 +17,6 @@ const logger = require("./utils/logger");
 const { validatePayment24x7Config } = require("./config/payment24x7");
 const { getNineWicketConfigStatus } = require("./config/nineWicket");
 const ensureUserPromotionIndexes = require("./utils/ensureUserPromotionIndexes");
-const ensureDepositIndexes = require("./utils/ensureDepositIndexes");
 
 try {
   validatePayment24x7Config();
@@ -111,7 +110,6 @@ const connectWithRetry = () => {
     .then(async () => {
       logger.info("MongoDB Connected");
       await ensureUserPromotionIndexes();
-      await ensureDepositIndexes();
     })
     .catch((err) => {
       logger.error("MongoDB connection error", { message: err.message });
@@ -127,10 +125,6 @@ app.use("/api/payments", require("./routes/payments"));
 app.post(
   "/api/payment24x7/callback",
   require("./controllers/paymentController").handlePaymentWebhookController,
-);
-app.post(
-  "/api/uddoktapay/callback",
-  require("./controllers/paymentController").handleUddoktaPayWebhookController,
 );
 app.use("/api/wallet", require("./routes/wallet"));
 app.use("/api/wallet-transactions", require("./routes/walletTransactions"));
@@ -182,7 +176,6 @@ app.use("/api/withdrawal-validation", require("./routes/withdrawalValidation"));
 app.use("/api/free-spins", require("./routes/freeSpins"));
 app.use("/api/betting-records", require("./routes/bettingRecords"));
 app.use("/api/admin/promotions", require("./routes/promotions"));
-app.use("/api/announcements", require("./routes/announcements"));
 
 // Add auto-promo to deposit approval
 app.post("/api/deposits/:id/approve", async (req, res, next) => {

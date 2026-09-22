@@ -52,12 +52,10 @@ import PromotionManagement from "./pages/Promotions/PromotionManagement";
 // Settings Components
 import AutoApprovalSettings from "./pages/Settings/AutoApprovalSettings";
 import SEOSettings from "./pages/Settings/SEOSettings";
-import PaymentGatewayRouting from "./pages/Settings/PaymentGatewayRouting";
 
 // CMS Components
 import ContentManagement from "./pages/CMS/ContentManagement";
 import FavoriteBannerManagement from "./pages/CMS/FavoriteBannerManagement";
-import AnnouncementManagement from "./pages/CMS/AnnouncementManagement";
 
 // System Components
 
@@ -249,16 +247,6 @@ function App() {
                   }
                 />
 
-                {/* Payment Gateway & Routing Management */}
-                <Route
-                  path="payment-gateways"
-                  element={
-                    <ProtectedRoute>
-                      <PaymentGatewayRouting />
-                    </ProtectedRoute>
-                  }
-                />
-
                 {/* Live Chat Routes */}
                 <Route
                   path="live-chat"
@@ -313,16 +301,6 @@ function App() {
                       requiredPermission={PERMISSIONS.MANAGE_CONTENT}
                     >
                       <FavoriteBannerManagement />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="cms/announcements"
-                  element={
-                    <ProtectedRoute
-                      requiredPermission={PERMISSIONS.MANAGE_CONTENT}
-                    >
-                      <AnnouncementManagement />
                     </ProtectedRoute>
                   }
                 />
@@ -460,6 +438,10 @@ const DashboardRouter = () => {
     return null;
   }
 
+  if (user.role === "moderator") {
+    return <Navigate to="/live-chat/inbox" replace />;
+  }
+
   switch (user.role) {
     case "admin":
       return <AdminDashboard />;
@@ -501,7 +483,7 @@ const ReferralRouter = () => {
 const LiveChatRouter = () => {
   const user = useSelector((state) => state.auth.user);
 
-  if (user?.role !== "admin") {
+  if (!["admin", "moderator"].includes(user?.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 

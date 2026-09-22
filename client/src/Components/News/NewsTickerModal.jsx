@@ -8,7 +8,7 @@ import {
 
 import { MdEmail, MdOutlineSupportAgent } from "react-icons/md";
 
-const DEFAULT_ANNOUNCEMENTS = [
+const announcements = [
   {
     date: "3/19/27",
     text: `mosttiger.com 🏏
@@ -34,11 +34,7 @@ const DEFAULT_ANNOUNCEMENTS = [
   },
 ];
 
-const NewsTickerModal = ({
-  open,
-  onClose,
-  announcements: propAnnouncements,
-}) => {
+const NewsTickerModal = ({ open, onClose }) => {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -311,31 +307,7 @@ const NewsTickerModal = ({
 
           {/* ANNOUNCEMENTS */}
           <div className="space-y-5">
-            {(propAnnouncements && propAnnouncements.length > 0
-              ? propAnnouncements.map((item) => {
-                  let dateStr = item.date;
-                  if (!dateStr && item.createdAt) {
-                    try {
-                      dateStr = new Date(item.createdAt).toLocaleDateString(
-                        "en-US",
-                        {
-                          month: "numeric",
-                          day: "numeric",
-                          year: "2-digit",
-                        },
-                      );
-                    } catch {
-                      dateStr = "";
-                    }
-                  }
-                  return {
-                    title: item.title,
-                    date: dateStr || "Notice",
-                    text: item.message || item.text,
-                  };
-                })
-              : DEFAULT_ANNOUNCEMENTS
-            ).map((item, index) => (
+            {announcements.map((item, index) => (
               <div
                 key={index}
                 className="
@@ -349,37 +321,27 @@ const NewsTickerModal = ({
                   p-4
                 "
               >
-                {/* DATE & TITLE */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  {item.date && (
-                    <div
-                      className="
-                        inline-flex
+                {/* DATE */}
+                <div
+                  className="
+                    inline-flex
 
-                        items-center
-                        justify-center
+                    items-center
+                    justify-center
 
-                        px-3
-                        py-1
+                    px-3
+                    py-1
 
-                        rounded-full
+                    rounded-full
 
-                        bg-primary
+                    bg-primary
 
-                        text-black
-                        text-xs
-                        font-bold
-                      "
-                    >
-                      {item.date}
-                    </div>
-                  )}
-
-                  {item.title && (
-                    <span className="text-white font-semibold text-sm">
-                      {item.title}
-                    </span>
-                  )}
+                    text-black
+                    text-xs
+                    font-bold
+                  "
+                >
+                  {item.date}
                 </div>
 
                 {/* TEXT */}

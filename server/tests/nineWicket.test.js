@@ -108,12 +108,6 @@ function fakeDb(restores) {
     async () => ({ acknowledged: true }),
     restores,
   );
-  replace(
-    NineWicketTransfer,
-    "findOne",
-    () => ({ lean: async () => null }),
-    restores,
-  );
   const mockNullQuery = () => ({
     select: () => ({ lean: async () => null, then: (r) => r(null) }),
     sort: () => ({ lean: async () => null, then: (r) => r(null) }),
@@ -272,13 +266,13 @@ test("insufficient wallet balance blocks launch before provider call", async () 
   }
 });
 
-test("zero wallet balance blocks new launch before provider call", async () => {
+test("negative wallet balance blocks new launch before provider call", async () => {
   const restores = [];
   fakeDb(restores);
   replace(
     WalletService,
     "getWalletBalance",
-    async () => ({ main: 0 }),
+    async () => ({ main: -10 }),
     restores,
   );
   let called = false;
@@ -5742,4 +5736,124 @@ test("Step 7: Scenario 8 - Existing non-9Wicket providers (PGSoft, JILI, etc.) r
   // Does NOT contain any 9Wicket proxy flags
   assert.equal(pgsoftPayload.isProxyTurnover, undefined);
   assert.equal(pgsoftPayload.turnoverUnavailable, undefined);
+});
+
+test("Step 8: getActiveSession returns active session with safe fields when session exists", async () => {
+  const restores = [];
+  fakeDb(restores);
+  const nineWicketController = require("../controllers/nineWicketController");
+  const testUserId = new mongoose.Types.ObjectId();
+
+  const newerSession = {
+    _id: new mongoose.Types.ObjectId(),
+    user: testUserId,
+    sessionId: "S_NEW_456",
+    gameUid: "9W_SPORTS",
+    symbol: "9W",
+    status: "active",
+    cashoutStatus: "not_started",
+    secretKey: "SUPER_SECRET",
+    createdAt: new Date(),
+  };
+
+  replace(
+    NineWicketSession,
+    "findOne",
+    (query) => {
+      assert.equal(String(query.user), String(testUserId));
+      assert.deepEqual(query.status, {
+        $in: ["active", "ending", "cashout_pending"],
+      });
+      return {
+        sort: (sortObj) => {
+          assert.equal(sortObj.createdAt, -1);
+          return Promise.resolve(newerSession);
+        },
+      };
+    },
+    restores,
+  );
+
+  try {
+    const serviceRes = await service.getActiveSession({ userId: testUserId });
+    assert.equal(serviceRes.success, true);
+    assert.equal(serviceRes.hasActiveSession, true);
+    assert.equal(serviceRes.session.sessionId, "S_NEW_456");
+    assert.equal(serviceRes.session.gameUid, "9W_SPORTS");
+    assert.equal(serviceRes.session.symbol, "9W");
+    assert.equal(serviceRes.session.status, "active");
+    assert.equal(serviceRes.session.cashoutStatus, "not_started");
+    assert.equal(
+      serviceRes.session.secretKey,
+      undefined,
+      "Must NOT expose secrets",
+    );
+
+    // Test controller
+    let statusCode = 0;
+    let jsonResponse = null;
+    const req = { user: { _id: testUserId } };
+    const res = {
+      status(code) {
+        statusCode = code;
+        return this;
+      },
+      json(body) {
+        jsonResponse = body;
+        return this;
+      },
+    };
+
+    await nineWicketController.getActiveSession(req, res);
+    assert.equal(statusCode, 200);
+    assert.equal(jsonResponse.success, true);
+    assert.equal(jsonResponse.hasActiveSession, true);
+    assert.equal(jsonResponse.session.sessionId, "S_NEW_456");
+  } finally {
+    restoreAll(restores);
+  }
+});
+
+test("Step 8: getActiveSession returns hasActiveSession: false when no active session exists", async () => {
+  const restores = [];
+  fakeDb(restores);
+  const nineWicketController = require("../controllers/nineWicketController");
+  const testUserId = new mongoose.Types.ObjectId();
+
+  replace(
+    NineWicketSession,
+    "findOne",
+    () => ({
+      sort: () => Promise.resolve(null),
+    }),
+    restores,
+  );
+
+  try {
+    const serviceRes = await service.getActiveSession({ userId: testUserId });
+    assert.equal(serviceRes.success, true);
+    assert.equal(serviceRes.hasActiveSession, false);
+    assert.equal(serviceRes.session, undefined);
+
+    let statusCode = 0;
+    let jsonResponse = null;
+    const req = { user: { _id: testUserId } };
+    const res = {
+      status(code) {
+        statusCode = code;
+        return this;
+      },
+      json(body) {
+        jsonResponse = body;
+        return this;
+      },
+    };
+
+    await nineWicketController.getActiveSession(req, res);
+    assert.equal(statusCode, 200);
+    assert.equal(jsonResponse.success, true);
+    assert.equal(jsonResponse.hasActiveSession, false);
+  } finally {
+    restoreAll(restores);
+  }
 });

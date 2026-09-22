@@ -78,14 +78,14 @@ const BannerSlider = () => {
 
   if (loading && slides.length === 0) {
     return (
-      <div className="w-full h-[180px] sm:h-[240px] md:h-[320px] lg:h-[420px] bg-[#050912] flex items-center justify-center">
+      <div className="w-full h-[180px] sm:h-[240px] md:h-[320px] lg:h-[420px] bg-black flex items-center justify-center">
         <span className="h-6 w-40 animate-pulse rounded-md bg-white/10" />
       </div>
     );
   }
 
   return (
-    <div className="relative w-full overflow-hidden bg-[#050912]">
+    <div className="relative w-full overflow-hidden bg-black">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         loop={slides.length > 1}
@@ -121,7 +121,7 @@ const BannerSlider = () => {
       >
         {slides.map((img, i) => (
           <SwiperSlide key={i}>
-            <div className="w-full bg-[#050912] overflow-hidden rounded-xl h-[180px] sm:h-[240px] md:h-[320px] lg:h-[420px]">
+            <div className="w-full bg-black overflow-hidden rounded-xl h-[180px] sm:h-[240px] md:h-[320px] lg:h-[420px]">
               <img
                 src={img}
                 alt={`banner-${i}`}
@@ -184,7 +184,6 @@ const BannerSlider = () => {
           width: 22px;
           border-radius: 999px;
           background: var(--color-primary);
-          box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
         }
 
         @media (max-width: 640px) {

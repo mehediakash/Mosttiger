@@ -8,6 +8,7 @@ export const ROLES = {
   AGENT: "agent",
   SUB_AGENT: "sub_agent",
   USER: "user",
+  MODERATOR: "moderator",
 };
 
 /**
@@ -135,6 +136,8 @@ export const getRoleDisplayName = (role) => {
     agent: "Agent",
     [ROLES.USER]: "User",
     user: "User",
+    [ROLES.MODERATOR]: "Moderator",
+    moderator: "Moderator",
   };
   return roleMap[role] || "Unknown Role";
 };

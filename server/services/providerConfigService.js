@@ -656,7 +656,7 @@ class ProviderConfigService {
 
     try {
       uploadedImage = await cloudinaryUploadService.uploadImage(file, {
-        folder: `mosttiger/provider-images/${brandId}`,
+        folder: `ck369/provider-images/${brandId}`,
       });
 
       existingConfig.customImageUrl =

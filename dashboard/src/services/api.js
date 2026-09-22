@@ -988,25 +988,3 @@ export const adminBetsAPI = {
 };
 
 export const betHistoryAPI = adminBetsAPI;
-
-// Payment Gateway & Routing Management API
-export const paymentGatewayRoutingAPI = {
-  getRoutingConfig: () =>
-    axiosInstance.get("/api/admin/payment-gateways/routing"),
-  updateRoutingConfig: (data) =>
-    axiosInstance.put("/api/admin/payment-gateways/routing", data),
-};
-
-// Announcement Management API
-export const announcementAPI = {
-  getAnnouncements: (params) =>
-    axiosInstance.get("/api/admin/announcements", { params }),
-  createAnnouncement: (data) =>
-    axiosInstance.post("/api/admin/announcements", data),
-  updateAnnouncement: (id, data) =>
-    axiosInstance.put(`/api/admin/announcements/${id}`, data),
-  deleteAnnouncement: (id) =>
-    axiosInstance.delete(`/api/admin/announcements/${id}`),
-  toggleStatus: (id, isActive) =>
-    axiosInstance.patch(`/api/admin/announcements/${id}/status`, { isActive }),
-};

@@ -40,43 +40,31 @@ const formatDateForInput = (value) => {
 };
 
 const getPhoneRowsFromUser = (profile) => {
-  const signupPhone =
-    (typeof profile?.phone === "string" ? profile.phone.trim() : "") ||
-    (Array.isArray(profile?.phones)
-      ? profile.phones.find((p) => p.isPrimary)?.number?.trim()
-      : "") ||
-    "";
-
   const phones =
     Array.isArray(profile?.phones) && profile.phones.length
       ? profile.phones
-      : signupPhone
-        ? [{ number: signupPhone, isPrimary: true }]
+      : profile?.phone
+        ? [{ number: profile.phone, isPrimary: true }]
         : [];
 
   const normalized = phones
     .map((entry) => ({
-      number: typeof entry?.number === "string" ? entry.number.trim() : "",
+      number: typeof entry?.number === "string" ? entry.number : "",
       isPrimary: Boolean(entry?.isPrimary),
     }))
     .filter((entry) => entry.number);
 
   if (!normalized.length) {
-    return [createPhoneRow(signupPhone, true)];
+    return [createPhoneRow("", true)];
   }
 
-  let primaryIndex = normalized.findIndex((entry) => entry.isPrimary);
-  if (primaryIndex === -1 && signupPhone) {
-    primaryIndex = normalized.findIndex(
-      (entry) => entry.number === signupPhone,
-    );
-  }
-  if (primaryIndex === -1) {
-    primaryIndex = 0;
-  }
+  const primaryIndex = normalized.findIndex((entry) => entry.isPrimary);
 
   return normalized.map((entry, index) =>
-    createPhoneRow(entry.number, index === primaryIndex),
+    createPhoneRow(
+      entry.number,
+      primaryIndex === -1 ? index === 0 : index === primaryIndex,
+    ),
   );
 };
 
@@ -153,6 +141,22 @@ const PersonalInfoModal = ({ open, onClose }) => {
   }, [open, user]);
 
   const updatePhoneRow = (rowId, field, value) => {
+    const registeredPrimaryPhone =
+      user?.phone ||
+      user?.phones?.find((phone) => phone?.isPrimary)?.number ||
+      "";
+    if (
+      field === "number" &&
+      form.phones.some(
+        (row) =>
+          row.id === rowId &&
+          registeredPrimaryPhone &&
+          row.number === registeredPrimaryPhone,
+      )
+    ) {
+      return;
+    }
+
     setForm((current) => ({
       ...current,
       phones: current.phones.map((row) =>
@@ -206,17 +210,28 @@ const PersonalInfoModal = ({ open, onClose }) => {
   };
 
   const removePhoneRow = (rowId) => {
-    setForm((current) => {
-      const targetRow = current.phones.find((row) => row.id === rowId);
-      // Never allow removing the primary signup phone number
-      if (targetRow?.isPrimary) {
-        return current;
-      }
+    const registeredPrimaryPhone =
+      user?.phone ||
+      user?.phones?.find((phone) => phone?.isPrimary)?.number ||
+      "";
+    if (
+      registeredPrimaryPhone &&
+      form.phones.some(
+        (row) => row.id === rowId && row.number === registeredPrimaryPhone,
+      )
+    ) {
+      return;
+    }
 
+    setForm((current) => {
       const nextPhones = current.phones.filter((row) => row.id !== rowId);
 
       if (!nextPhones.length) {
-        return current;
+        return { ...current, phones: [createPhoneRow("", true)] };
+      }
+
+      if (!nextPhones.some((row) => row.isPrimary)) {
+        nextPhones[0] = { ...nextPhones[0], isPrimary: true };
       }
 
       return { ...current, phones: nextPhones };
@@ -224,16 +239,36 @@ const PersonalInfoModal = ({ open, onClose }) => {
     setErrors((current) => ({ ...current, phones: "" }));
   };
 
+  const setPrimaryPhone = (rowId) => {
+    const registeredPrimaryPhone =
+      user?.phone ||
+      user?.phones?.find((phone) => phone?.isPrimary)?.number ||
+      "";
+    if (
+      registeredPrimaryPhone &&
+      form.phones.some((row) => row.number === registeredPrimaryPhone)
+    ) {
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      phones: current.phones.map((row) => ({
+        ...row,
+        isPrimary: row.id === rowId,
+      })),
+    }));
+  };
+
   const handleSave = async () => {
     const nextErrors = {};
     const trimmedFullName = form.fullName.trim();
     const normalizedEmail = form.email.trim().toLowerCase();
     const birthday = form.birthday ? new Date(form.birthday) : null;
-
-    const primaryPhoneRow = form.phones.find((row) => row.isPrimary);
-    if (!primaryPhoneRow || !primaryPhoneRow.number.trim()) {
-      nextErrors.phones = "Primary phone number cannot be removed or empty";
-    }
+    const registeredPrimaryPhone =
+      user?.phone ||
+      user?.phones?.find((phone) => phone?.isPrimary)?.number ||
+      "";
 
     const phoneRows = form.phones
       .map((row) => ({
@@ -241,6 +276,13 @@ const PersonalInfoModal = ({ open, onClose }) => {
         number: row.number.trim(),
       }))
       .filter((row) => row.number);
+
+    if (
+      registeredPrimaryPhone &&
+      !phoneRows.some((row) => row.number === registeredPrimaryPhone)
+    ) {
+      nextErrors.phones = "Primary phone number cannot be removed";
+    }
 
     const hasEmptyPhoneRow = form.phones.some((row) => !row.number.trim());
     if (hasEmptyPhoneRow && !phoneRows.length) {
@@ -290,7 +332,11 @@ const PersonalInfoModal = ({ open, onClose }) => {
     const primaryIndex = normalizedPhones.findIndex((row) => row.isPrimary);
     const resolvedPhones = normalizedPhones.map((row, index) => ({
       number: row.number,
-      isPrimary: primaryIndex === -1 ? index === 0 : index === primaryIndex,
+      isPrimary: registeredPrimaryPhone
+        ? row.number === registeredPrimaryPhone
+        : primaryIndex === -1
+          ? index === 0
+          : index === primaryIndex,
     }));
 
     setSaving(true);
@@ -332,6 +378,10 @@ const PersonalInfoModal = ({ open, onClose }) => {
   if (!open) return null;
 
   const currentPhones = form.phones;
+  const registeredPrimaryPhone =
+    user?.phone ||
+    user?.phones?.find((phone) => phone?.isPrimary)?.number ||
+    "";
 
   return (
     <div className="fixed inset-0 z-99999 flex items-center justify-center bg-black/80 p-2 backdrop-blur-md sm:p-4">
@@ -546,6 +596,9 @@ const PersonalInfoModal = ({ open, onClose }) => {
                 {currentPhones.length ? (
                   currentPhones.map((phoneRow) => {
                     const isPrimary = Boolean(phoneRow.isPrimary);
+                    const isRegisteredPrimary =
+                      Boolean(registeredPrimaryPhone) &&
+                      phoneRow.number === registeredPrimaryPhone;
 
                     return (
                       <div
@@ -560,7 +613,7 @@ const PersonalInfoModal = ({ open, onClose }) => {
                           <div
                             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border ${
                               isPrimary
-                                ? "border-[#ffcc33]/25 bg-primary/10 text-[#ffcc33]"
+                                ? "border-[#ffcc33]/25 primary/10 text-[#ffcc33]"
                                 : "border-[#ffffff10] bg-[#151515] text-[#ffcc33]"
                             }`}
                           >
@@ -571,6 +624,7 @@ const PersonalInfoModal = ({ open, onClose }) => {
                             <div className="flex items-center gap-2">
                               <input
                                 value={phoneRow.number}
+                                readOnly={isRegisteredPrimary}
                                 onChange={(e) =>
                                   updatePhoneRow(
                                     phoneRow.id,
@@ -578,22 +632,13 @@ const PersonalInfoModal = ({ open, onClose }) => {
                                     e.target.value.replace(/[^0-9]/g, ""),
                                   )
                                 }
-                                onBlur={(e) => {
-                                  if (isPrimary && !e.target.value.trim()) {
-                                    updatePhoneRow(
-                                      phoneRow.id,
-                                      "number",
-                                      user?.phone || "",
-                                    );
-                                  }
-                                }}
                                 inputMode="numeric"
                                 maxLength={11}
                                 className="w-full min-w-0 bg-transparent text-sm font-semibold tracking-wide text-white outline-none placeholder:text-[#7f7f7f]"
                                 placeholder="01XXXXXXXXX"
                               />
                               {isPrimary && (
-                                <span className="shrink-0 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
+                                <span className="shrink-0 rounded-full primary px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-black">
                                   {t("primary")}
                                 </span>
                               )}
@@ -607,7 +652,19 @@ const PersonalInfoModal = ({ open, onClose }) => {
                         </div>
 
                         <div className="flex shrink-0 items-center gap-1.5">
-                          {!isPrimary && (
+                          {!isPrimary && !isRegisteredPrimary && (
+                            <button
+                              type="button"
+                              onClick={() => setPrimaryPhone(phoneRow.id)}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#ffcc33]/15 bg-[#171717] text-[#ffcc33] transition-all duration-200 hover:border-[#ffcc33]/35 hover:bg-[#1f1f1f]"
+                              aria-label={t("setAsPrimary")}
+                              title={t("setAsPrimary")}
+                            >
+                              <Star size={15} />
+                            </button>
+                          )}
+
+                          {!isRegisteredPrimary && (
                             <button
                               type="button"
                               onClick={() => removePhoneRow(phoneRow.id)}

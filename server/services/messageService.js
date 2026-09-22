@@ -16,7 +16,7 @@ const VALID_MESSAGE_TYPES = ["text", "image", "file", "system"];
 const IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const USER_PUBLIC_FIELDS = "_id username fullName profilePhoto";
 
-const isAdmin = (user) => user?.role === "admin";
+const isAdmin = (user) => user?.role === "admin" || user?.role === "moderator";
 
 const normalizePagination = ({ page = 1, limit = 30 } = {}) => {
   const currentPage = Math.max(parseInt(page, 10) || 1, 1);
@@ -243,7 +243,7 @@ class MessageService {
     if (file) {
       uploadedAttachment = await cloudinaryUploadService.uploadChatAttachment(
         file,
-        { folder: "mosttiger/live-chat" },
+        { folder: "ck369/live-chat" },
       );
     }
 

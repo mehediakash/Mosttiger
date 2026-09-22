@@ -24,8 +24,6 @@ const {
 
 const adminManagementController = require("../controllers/adminManagementController");
 const adminBetsController = require("../controllers/adminBetsController");
-const paymentGatewayRoutingController = require("../controllers/paymentGatewayRoutingController");
-const announcementController = require("../controllers/announcementController");
 
 const { protect, authorize } = require("../middleware/auth");
 
@@ -90,26 +88,6 @@ router.delete(
 router.post(
   "/agents/create-with-permissions",
   adminManagementController.createAgentWithPermissions,
-);
-
-// Payment Gateway & Routing Management
-router.get(
-  "/payment-gateways/routing",
-  paymentGatewayRoutingController.getRoutingConfig,
-);
-router.put(
-  "/payment-gateways/routing",
-  paymentGatewayRoutingController.updateRoutingConfig,
-);
-
-// Announcement Management
-router.get("/announcements", announcementController.getAllAnnouncements);
-router.post("/announcements", announcementController.createAnnouncement);
-router.put("/announcements/:id", announcementController.updateAnnouncement);
-router.delete("/announcements/:id", announcementController.deleteAnnouncement);
-router.patch(
-  "/announcements/:id/status",
-  announcementController.toggleAnnouncementStatus,
 );
 
 module.exports = router;

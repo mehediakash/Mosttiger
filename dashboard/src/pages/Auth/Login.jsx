@@ -36,7 +36,7 @@ const Login = () => {
       const { user, token } = response.data || {};
 
       dispatch(loginSuccess({ user, token }));
-      navigate("/dashboard");
+      navigate(user?.role === "moderator" ? "/live-chat/inbox" : "/dashboard");
     } catch (err) {
       dispatch(
         loginFailure(

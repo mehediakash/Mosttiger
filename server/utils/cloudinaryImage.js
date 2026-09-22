@@ -12,7 +12,7 @@ const normalizeCloudinaryFolder = (folder) => {
   const value =
     typeof folder === "string" && folder.trim()
       ? folder.trim()
-      : process.env.CLOUDINARY_UPLOAD_FOLDER || "mosttiger/uploads";
+      : process.env.CLOUDINARY_UPLOAD_FOLDER || "ck369/uploads";
 
   const normalized = value
     .replace(/\\/g, "/")
@@ -21,7 +21,7 @@ const normalizeCloudinaryFolder = (folder) => {
     .filter(Boolean)
     .join("/");
 
-  return normalized || "mosttiger/uploads";
+  return normalized || "ck369/uploads";
 };
 
 const getCloudinaryResourceType = () => "image";

@@ -91,22 +91,22 @@ const LiveBetting = () => {
   return (
     <>
       <Helmet>
-        <title>Live Betting - mosttiger BD | Bet on Live Sports</title>
+        <title>Live Betting - ck369 BD | Bet on Live Sports</title>
         <meta
           name="description"
-          content="Place bets on live sports matches at mosttiger BD. Real-time odds, live scores, and in-play betting on football, cricket, basketball, and more."
+          content="Place bets on live sports matches at ck369 BD. Real-time odds, live scores, and in-play betting on football, cricket, basketball, and more."
         />
         <meta
           name="keywords"
-          content="live betting Bangladesh, in-play betting, live sports odds, real-time betting, mosttiger BD live"
+          content="live betting Bangladesh, in-play betting, live sports odds, real-time betting, ck369 BD live"
         />
-        <meta property="og:title" content="Live Betting - mosttiger BD" />
+        <meta property="og:title" content="Live Betting - ck369 BD" />
         <meta
           property="og:description"
           content="Experience the thrill of live betting with real-time odds and instant results."
         />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://mosttigerbd.com/live-betting" />
+        <link rel="canonical" href="https://ck369bd.com/live-betting" />
       </Helmet>
 
       <div className="min-h-screen bg-primary from-[#0f2a47] via-[#205583] to-[#0f2a47]">

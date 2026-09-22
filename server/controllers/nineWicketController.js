@@ -12,7 +12,9 @@ exports.launch = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      code: 0,
       data: {
+        code: 0,
         url: result.url,
       },
     });
@@ -117,6 +119,21 @@ exports.settleActiveSession = async (req, res) => {
     return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || "9Wicket settlement failed",
+    });
+  }
+};
+
+exports.getActiveSession = async (req, res) => {
+  try {
+    const result = await nineWicketService.getActiveSession({
+      userId: req.user._id,
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "Failed to retrieve active 9Wicket session",
     });
   }
 };

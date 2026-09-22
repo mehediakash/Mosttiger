@@ -1,10 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { MdClose, MdFullscreen, MdFullscreenExit } from "react-icons/md";
+import {
+  MdClose,
+  MdFullscreen,
+  MdFullscreenExit,
+  MdCheckCircle,
+  MdErrorOutline,
+  MdWarningAmber,
+  MdSync,
+} from "react-icons/md";
 import walletService from "../services/walletService";
 import InsufficientBalanceModal from "../shared/InsufficientBalanceModal";
 import { useCasinoGame } from "../../hooks/useCasinoGame";
+import { isNineWicketGame } from "../store/casinoGameSlice";
+import NineWicketSettlementToast from "./NineWicketSettlementToast";
 
 const LiveWinnerTicker = React.memo(() => {
   const config = useMemo(
@@ -94,6 +104,11 @@ const CasinoGameModal = React.memo(() => {
     isClosing,
     launchError,
     isFullscreen,
+    settlementNotice,
+    clearSettlementNotice,
+    activeNineWicketSession,
+    returnActiveBalance,
+    clearActiveNineWicketSession,
     closeGame,
     toggleFullscreen,
     restoreGame,
@@ -104,6 +119,15 @@ const CasinoGameModal = React.memo(() => {
   const { user } = useSelector((state) => state.auth);
   const [walletBalance, setWalletBalance] = useState(null);
   const [balanceLoading, setBalanceLoading] = useState(false);
+
+  useEffect(() => {
+    if (settlementNotice?.status === "success") {
+      const timer = setTimeout(() => {
+        clearSettlementNotice();
+      }, 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [settlementNotice, clearSettlementNotice]);
 
   const extractBalance = useCallback((payload) => {
     if (!payload) return 0;
@@ -181,20 +205,26 @@ const CasinoGameModal = React.memo(() => {
   }, [extractBalance, isOpen, user]);
 
   const displayBalance = useMemo(() => {
-    const raw =
-      typeof walletBalance === "number" ? walletBalance : user?.balance;
-    if (typeof raw === "number" && Number.isFinite(raw)) {
-      return raw.toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
+    if (typeof walletBalance === "number") {
+      return walletBalance.toLocaleString();
+    }
+
+    if (user?.balance && typeof user.balance === "number") {
+      return user.balance.toLocaleString();
     }
 
     return balanceLoading ? "..." : "--";
   }, [balanceLoading, user?.balance, walletBalance]);
 
+  const is9W = isNineWicketGame(currentGame);
   const headerLabel = currentGame?.name || currentGame?.title || "Casino Game";
-  const modalVisible = isOpen || loading || isClosing || Boolean(launchError);
+  const hasNotice = Boolean(
+    settlementNotice && !settlementNotice.isReloadRecovery,
+  );
+  const modalVisible =
+    (!is9W && (isOpen || loading || isClosing)) ||
+    Boolean(launchError) ||
+    hasNotice;
   const requiresDeposit =
     launchError &&
     typeof launchError === "object" &&
@@ -220,26 +250,27 @@ const CasinoGameModal = React.memo(() => {
 
   return (
     <>
-      <div
-        className={`fixed inset-0 transition-all duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 visible"}`}
-        style={{ zIndex: 9999999 }}
-        aria-hidden={!isOpen}
-      >
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
+      {isOpen && !is9W && (
+        <div
+          className={`fixed inset-0 transition-all duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 visible"}`}
+          style={{ zIndex: 9999999 }}
+          aria-hidden={!isOpen}
+        >
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
 
-        <div className="relative w-full h-full">
-          <div className="fixed items-center left-0 top-2 z-[999999] pointer-events-auto">
-            <div className="inline-flex items-center gap-3 rounded-full bg-black/40 backdrop-blur-sm  px-3 py-1 ">
-              {headerLabel}
+          <div className="relative w-full h-full">
+            <div className="fixed items-center left-0 top-2 z-[999999] pointer-events-auto">
+              <div className="inline-flex items-center gap-3 rounded-full bg-black/40 backdrop-blur-sm  px-3 py-1 ">
+                {headerLabel}
+              </div>
             </div>
-          </div>
 
-          <div className="fixed right-1 top-1 z-[999999]">
-            <button
-              type="button"
-              onClick={closeGame}
-              disabled={isClosing}
-              className="
+            <div className="fixed right-1 top-1 z-[999999]">
+              <button
+                type="button"
+                onClick={closeGame}
+                disabled={isClosing}
+                className="
       inline-flex
       h-10
       w-10
@@ -256,54 +287,49 @@ const CasinoGameModal = React.memo(() => {
       hover:bg-red-500/80
       disabled:opacity-60
     "
-              aria-label="Close game"
-            >
-              <MdClose size={22} />
-            </button>
-          </div>
-
-          <div className="relative flex h-full items-center justify-center ">
-            <div className="relative h-[calc(100vh-6rem)] w-full max-w-6xl overflow-hidden  border border-white/10 bg-black shadow-[0_20px_80px_rgba(0,0,0,0.45)]">
-              <div
-                className={`absolute inset-0 z-20 transition-opacity duration-300 ${loading || isClosing ? "opacity-100" : "pointer-events-none opacity-0"}`}
+                aria-label="Close game"
               >
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
-                <div className="relative flex h-full items-center justify-center">
-                  <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/40 px-8 py-10 backdrop-blur-sm">
-                    <div className="h-14 w-14 rounded-full border-4 border-primary/25 border-t-primary animate-spin" />
-                    <div className="text-center">
-                      <p className="text-lg font-semibold text-white">
-                        {isClosing ? "Closing Game..." : "Launching Game..."}
-                      </p>
-                      <p className="text-sm text-white/60">
-                        {isClosing
-                          ? "Please wait while we close your session."
-                          : "Please wait while we prepare your session."}
-                      </p>
+                <MdClose size={22} />
+              </button>
+            </div>
+
+            <div className="relative flex h-full items-center justify-center ">
+              <div className="relative h-[calc(100vh-6rem)] w-full max-w-6xl overflow-hidden  border border-white/10 bg-black shadow-[0_20px_80px_rgba(0,0,0,0.45)]">
+                <div
+                  className={`absolute inset-0 z-20 transition-opacity duration-300 ${loading || isClosing ? "opacity-100" : "pointer-events-none opacity-0"}`}
+                >
+                  <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+                  <div className="relative flex h-full items-center justify-center">
+                    <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/40 px-8 py-10 backdrop-blur-sm">
+                      <div className="h-14 w-14 rounded-full border-4 border-primary/25 border-t-primary animate-spin" />
+                      <div className="text-center">
+                        <p className="text-lg font-semibold text-white">
+                          {isClosing ? "Closing Game..." : "Launching Game..."}
+                        </p>
+                        <p className="text-sm text-white/60">
+                          {isClosing
+                            ? "Please wait while we close your session."
+                            : "Please wait while we prepare your session."}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                <iframe
+                  src={gameUrl || "about:blank"}
+                  title="Casino Game"
+                  className="h-full w-full border-0"
+                  allow="autoplay; fullscreen; encrypted-media; payment"
+                  allowFullScreen
+                  loading="eager"
+                  aria-hidden={loading || isClosing}
+                />
               </div>
-
-              <iframe
-                src={gameUrl || "about:blank"}
-                title="Casino Game"
-                className="h-full w-full border-0"
-                allow="autoplay; fullscreen; encrypted-media; payment"
-                allowFullScreen
-                loading="eager"
-                aria-hidden={loading || isClosing}
-              />
-            </div>
-          </div>
-
-          <div className="absolute left-0 right-0 bottom-3 z-50 pointer-events-none">
-            <div className="mx-auto max-w-6xl ">
-              <LiveWinnerTicker />
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {launchError && requiresDeposit && (
         <InsufficientBalanceModal
@@ -340,6 +366,14 @@ const CasinoGameModal = React.memo(() => {
           </div>
         </div>
       )}
+
+      <NineWicketSettlementToast
+        settlementNotice={settlementNotice}
+        isSettling={isClosing}
+        user={user}
+        onReturnBalance={returnActiveBalance}
+        onDismissNotice={clearSettlementNotice}
+      />
     </>
   );
 });

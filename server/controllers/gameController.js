@@ -220,6 +220,22 @@ exports.getGameById = async (req, res) => {
 // @access  Private
 exports.launchGame = async (req, res) => {
   try {
+    const wallet = await WalletService.getWalletBalance(req.user._id || req.user.id);
+    const mainBalance = Math.round(Number(wallet?.main || 0) * 100) / 100;
+    if (mainBalance <= 0) {
+      return res.status(400).json({
+        success: false,
+        code: "INSUFFICIENT_BALANCE",
+        message:
+          "Your account balance is currently 0. Please deposit funds to start playing.",
+        requiresDeposit: true,
+        data: {
+          availableBalance: mainBalance,
+          requiredAmount: null,
+        },
+      });
+    }
+
     const canLaunch = await GGRService.canLaunchGame();
 
     if (!canLaunch) {

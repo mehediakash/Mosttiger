@@ -71,7 +71,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       key: "financial",
       icon: <BankOutlined />,
       label: "Financial Management",
-      disabled: user?.role !== "admin",
+      disabled: !["admin", "moderator"].includes(user?.role),
       children: [
         {
           key: "/transactions",
@@ -90,12 +90,6 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       key: "/ggr-topup",
       icon: <DollarOutlined />,
       label: "GGR TopUP",
-      disabled: user?.role !== "admin",
-    },
-    {
-      key: "/payment-gateways",
-      icon: <BankOutlined />,
-      label: "Payment Gateway & Routing Management",
       disabled: user?.role !== "admin",
     },
     {
@@ -217,13 +211,15 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
           key: "/cms/favorite-banner",
           label: "Favorite Banner",
         },
-        {
-          key: "/cms/announcements",
-          label: "Announcements",
-        },
       ],
     },
   ];
+
+  const moderatorMenuItems = menuItems.filter(
+    (item) => item.key === "live-chat",
+  );
+  const visibleMenuItems =
+    user?.role === "moderator" ? moderatorMenuItems : menuItems;
 
   // Filter menu items based on user permissions
   const filterMenuItems = (items) => {
@@ -239,7 +235,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
       .map((item) => ({ ...item }));
   };
 
-  const filteredMenuItems = filterMenuItems(menuItems);
+  const filteredMenuItems = filterMenuItems(visibleMenuItems);
 
   const handleMenuClick = ({ key }) => {
     navigate(key);
@@ -256,11 +252,7 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
     <div className="flex flex-col h-full bg-[#0d1e2e]">
       <div className="p-3 bg-[#205583] text-center border-b border-[#1e3a52] flex items-center justify-between">
         <div className="flex-1 flex justify-center">
-          <img
-            src={logo}
-            alt="mosttiger live"
-            className="h-12 object-contain"
-          />
+          <img src={logo} alt="ck369 live" className="h-12 object-contain" />
         </div>
         {mobileOpen && (
           <Button

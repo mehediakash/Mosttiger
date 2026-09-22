@@ -5,7 +5,6 @@ const withdrawalValidationService = require("../services/withdrawalValidationSer
 const User = require("../models/User");
 const Transaction = require("../models/Transaction");
 const logger = require("../utils/logger");
-const paymentGatewayRoutingService = require("../services/paymentGatewayRoutingService");
 const {
   createWithdrawal: createPayment24x7Withdrawal,
   getErrorMessage,
@@ -292,16 +291,6 @@ exports.createWithdrawal = async (req, res) => {
       });
     }
 
-    const activeGateway = await paymentGatewayRoutingService.getActiveGateway();
-    if (!activeGateway) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(503).json({
-        success: false,
-        message: "Payment gateway is currently unavailable.",
-      });
-    }
-
     const user = await User.findById(req.user.id).session(session);
     const currentBalance =
       Number(user?.mainWallet ?? user?.wallet?.main ?? 0) || 0;
@@ -333,7 +322,7 @@ exports.createWithdrawal = async (req, res) => {
           netAmount,
           processingFee,
           paymentMethod: normalizedProvider,
-          provider: activeGateway,
+          provider: "payment24x7",
           status: "pending",
           paymentDetails: {
             toNumber: trimmedAccountNumber,
@@ -357,14 +346,14 @@ exports.createWithdrawal = async (req, res) => {
           previousBalance: currentBalance,
           newBalance: currentBalance - withdrawAmount,
           status: "pending",
-          description: `${activeGateway === "uddoktapay" ? "UddoktaPay" : "Payment24x7"} withdrawal request - ${normalizedProvider}`,
-          paymentMethod: activeGateway,
+          description: `Payment24x7 withdrawal request - ${normalizedProvider}`,
+          paymentMethod: "payment24x7",
           metadata: {
             withdrawalId: withdrawal[0]._id.toString(),
             merchantReference: withdrawal[0].referenceId,
             payment24x7Reference: null,
             paymentMethod: normalizedProvider,
-            provider: activeGateway,
+            provider: "payment24x7",
             payoutMethod: normalizedProvider,
           },
         },
@@ -374,28 +363,6 @@ exports.createWithdrawal = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
-
-    if (activeGateway === "uddoktapay") {
-      logger.info("UddoktaPay withdrawal submitted for admin approval", {
-        withdrawalId: withdrawal[0]._id.toString(),
-        merchantReference: withdrawal[0].referenceId,
-        amount: withdrawAmount,
-        provider: normalizedProvider,
-      });
-
-      return res.status(201).json({
-        success: true,
-        message: "Withdrawal request submitted successfully",
-        data: {
-          withdrawalId: withdrawal[0]._id,
-          referenceId: withdrawal[0].referenceId,
-          amount: withdrawal[0].amount,
-          netAmount: withdrawal[0].netAmount,
-          processingFee: withdrawal[0].processingFee,
-          status: withdrawal[0].status,
-        },
-      });
-    }
 
     try {
       const payment24x7Withdrawal = await createPayment24x7Withdrawal({
@@ -459,8 +426,7 @@ exports.createWithdrawal = async (req, res) => {
         message: "Withdrawal request submitted successfully",
         data: {
           withdrawalId: updatedWithdrawal?._id || withdrawal[0]._id,
-          referenceId:
-            updatedWithdrawal?.referenceId || withdrawal[0].referenceId,
+          referenceId: updatedWithdrawal?.referenceId || withdrawal[0].referenceId,
           payment24x7Reference: payment24x7Withdrawal.reference || null,
           amount: updatedWithdrawal?.amount || withdrawal[0].amount,
           netAmount: updatedWithdrawal?.netAmount || withdrawal[0].netAmount,
@@ -530,9 +496,7 @@ exports.createWithdrawal = async (req, res) => {
     });
     res.status(toGatewayHttpStatus(error)).json({
       success: false,
-      message:
-        getErrorMessage(error) ||
-        "Server error while creating withdrawal request",
+      message: getErrorMessage(error) || "Server error while creating withdrawal request",
     });
   }
 };
@@ -545,9 +509,7 @@ exports.getWithdrawalHistory = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const status = String(req.query.status || "").trim();
-    const provider = String(req.query.provider || "")
-      .trim()
-      .toLowerCase();
+    const provider = String(req.query.provider || "").trim().toLowerCase();
     const search = String(
       req.query.search || req.query.q || req.query.keyword || "",
     ).trim();
@@ -579,18 +541,10 @@ exports.getWithdrawalHistory = async (req, res) => {
     }
 
     if (search) {
-      const regex = new RegExp(
-        search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "i",
-      );
+      const regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
       const matchedUsers = isAdminAll
         ? await User.find({
-            $or: [
-              { fullName: regex },
-              { username: regex },
-              { email: regex },
-              { phone: regex },
-            ],
+            $or: [{ fullName: regex }, { username: regex }, { email: regex }, { phone: regex }],
           })
             .select("_id")
             .limit(100)

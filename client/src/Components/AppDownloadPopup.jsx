@@ -15,8 +15,8 @@ import {
   Zap,
 } from "lucide-react";
 
-const DOWNLOAD_URL = "https://mosttiger.com/downloads/mosttiger.apk";
-const STORAGE_KEY = "mosttiger_app_download_popup_closed_at";
+const DOWNLOAD_URL = "https://mosttiger.com/downloads/ck369.apk";
+const STORAGE_KEY = "ck369_app_download_popup_closed_at";
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const SHOW_DELAY_MS = 2000;
 const EXIT_ANIMATION_MS = 260;
@@ -231,7 +231,7 @@ export default function AppDownloadPopup() {
                       aria-hidden="true"
                     />
                     <p className="mt-2 text-sm font-bold text-white">
-                      mosttiger App
+                      ck369 App
                     </p>
                     <p className="text-xs text-emerald-200/80">
                       Premium mobile play
@@ -251,7 +251,7 @@ export default function AppDownloadPopup() {
                 id="app-download-title"
                 className="text-2xl font-black leading-tight text-white sm:text-3xl"
               >
-                Download mosttiger Android App
+                Download ck369 Android App
               </h2>
               <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
                 Play faster, safer and enjoy exclusive rewards.

@@ -3,12 +3,12 @@ import { Download, X } from "lucide-react";
 import { getAppDownloadLinkProps } from "../utils/appDownload";
 
 const APP_ICON_SRC = "/android-chrome-192x192.png";
-const STORAGE_KEY = "mosttiger_app_download_bar_closed_at";
+const STORAGE_KEY = "ck369_app_download_bar_closed_at";
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const SHOW_DELAY_MS = 2000;
 const EXIT_ANIMATION_MS = 240;
 const MOBILE_QUERY = "(max-width: 767px)";
-const CHAT_OFFSET_VAR = "--mosttiger-app-download-offset";
+const CHAT_OFFSET_VAR = "--ck369-app-download-offset";
 const BAR_BOTTOM_OFFSET_PX = 65;
 const BAR_GAP_PX = 10;
 
@@ -109,7 +109,7 @@ export default function AppDownloadBar() {
   return (
     <section
       ref={barRef}
-      aria-label="mosttiger Android app download"
+      aria-label="ck369 Android app download"
       className={`fixed l z-[9997] md:hidden transition-all duration-300 ease-out ${
         isVisible
           ? "translate-y-0 opacity-100"
@@ -129,7 +129,7 @@ export default function AppDownloadBar() {
 
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-[12px] font-black leading-tight text-white min-[360px]:text-[13px] min-[390px]:text-sm">
-            mosttiger Android App
+            ck369 Android App
           </h2>
           <div
             className="mt-0.5 text-[10px] leading-none text-primary"

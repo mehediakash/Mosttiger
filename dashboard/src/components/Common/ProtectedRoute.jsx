@@ -1,18 +1,27 @@
 // src/components/Common/ProtectedRoute.jsx
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import { Spin } from 'antd';
-import { hasPermission } from '../../utils/rolePermissions';
+import React from "react";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { Spin } from "antd";
+import { hasPermission } from "../../utils/rolePermissions";
 
 const ProtectedRoute = ({ children, requiredPermission }) => {
-  const auth = useSelector(state => state.auth);
+  const auth = useSelector((state) => state.auth);
   const { user, initialized } = auth;
+  const location = useLocation();
 
   // While we haven't decided auth status, render loading to avoid flash
   if (!initialized) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "60vh",
+        }}
+      >
         <Spin size="large" />
       </div>
     );
@@ -21,6 +30,13 @@ const ProtectedRoute = ({ children, requiredPermission }) => {
   // If not authenticated -> go to login
   if (!user) {
     return <Navigate to="/auth/login" replace />;
+  }
+
+  if (
+    user.role === "moderator" &&
+    !location.pathname.startsWith("/live-chat")
+  ) {
+    return <Navigate to="/live-chat/inbox" replace />;
   }
 
   // If permission required, check it

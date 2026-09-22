@@ -21,7 +21,7 @@ const ChatHeader = ({
         />
       </div>
       <div className="min-w-0">
-        <div className="truncate text-sm font-black">mosttiger Support</div>
+        <div className="truncate text-sm font-black">ck369 Support</div>
         <div className="text-xs text-white/65">
           {typing
             ? "Support is typing..."

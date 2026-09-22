@@ -12,6 +12,7 @@ import { BsCreditCard2BackFill } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
 
 import walletService from "../services/walletService";
+import { formatMoney as formatWalletBalance } from "../../utils/currencyFormatter";
 import { TbCoinTaka } from "react-icons/tb";
 import { IoIosAddCircle } from "react-icons/io";
 import {
@@ -120,7 +121,9 @@ const NavbarSidebar = () => {
   const { user } = useSelector((state) => state.auth); // get login state
   const affiliateStatus = user?.affiliate?.status;
   const affiliatePath =
-    affiliateStatus === "approved" ? "/affiliate/dashboard" : "/affiliate";
+    affiliateStatus === "approved"
+      ? "/affiliate/dashboard"
+      : "/affiliate/signup";
   const [walletBalance, setWalletBalance] = useState(null);
   const [refreshingBalance, setRefreshingBalance] = useState(false);
   const [showWalletActions, setShowWalletActions] = useState(false);
@@ -391,14 +394,6 @@ const NavbarSidebar = () => {
     };
   }, [user]);
 
-  const formatMoney = (v) =>
-    v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
-      ? "--"
-      : Number(v).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-
   // Auth Modal States and Logic
   const { status: authStatus, error: authError } = useSelector((s) => s.auth);
   const phoneRegex = /^01[3-9]\d{8}$/;
@@ -491,21 +486,21 @@ const NavbarSidebar = () => {
         ...(affiliateCode ? { aff: affiliateCode } : {}),
         ...(referralCode ? { ref: referralCode, referralCode } : {}),
       };
-      const result = await dispatch(registerUser(registrationData)).unwrap();
+      await dispatch(registerUser(registrationData)).unwrap();
       clearStoredAffiliateCode();
       clearStoredReferralCode();
-      if (!result?.token || !result?.user) {
-        try {
-          await dispatch(
-            loginUser({
-              username: registerForm.username.trim().toLowerCase(),
-              password: registerForm.password,
-              rememberMe: true,
-            }),
-          ).unwrap();
-        } catch (e) {}
-      }
-      closeAuthModal();
+      alert("Registration successful!");
+      setShowAuthModal(false);
+      setRegisterForm({
+        username: "",
+        phone: "",
+        password: "",
+        agreedToTerms: false,
+      });
+      setPromoCode("");
+      setPromoValidation(null);
+      setShowPromo(false);
+      setTermsError("");
     } catch (err) {
       console.error(err);
     }
@@ -537,7 +532,7 @@ const NavbarSidebar = () => {
       {/* ================= NAVBAR ================= */}
       <header
         data-mobile-sticky-navbar
-        className="sticky top-0 z-50 bg-[#050912] shadow-md py-2 px-3 border-primary border-b-2"
+        className="sticky top-0 z-50 bg-black shadow-md py-2 px-3 border-primary border-b-4"
       >
         {/* Menu Button */}
         <button
@@ -550,7 +545,7 @@ const NavbarSidebar = () => {
           {/* Logo */}
           <div className="flex-1 ml-10 flex justify-between">
             <Link to={"/"}>
-              <img src={logo} alt="Mosttiger" className="h-8" />
+              <img src={logo} alt="Baba88" className="h-8" />
             </Link>
           </div>
 
@@ -561,23 +556,23 @@ const NavbarSidebar = () => {
 
               <Link
                 to="/login"
-                className="hidden md:block px-4 py-2 bg-[#0B1220] border-primary border hover:bg-primary/20 text-[#F5FAFF] rounded-lg font-semibold transition"
+                className="hidden md:block px-4 py-2 bg-white/10 border-primary border hover:bg-white/20 text-white rounded-lg font-semibold transition"
               >
                 {t("login")}
               </Link>
               <a
                 href="/register"
-                className="hidden md:block px-4 py-2 bg-primary text-black rounded-lg font-semibold hover:bg-[#48DDFF] transition"
+                className="hidden md:block px-4 py-2 bg-primary text-black rounded-lg font-semibold hover:opacity-90 transition"
               >
                 {t("sign_up")}
               </a>
             </>
           ) : (
             <div className="flex items-center ">
-              <div className="flex items-center bg-[#0B1220] text-[#F5FAFF] px-2 py-1 border border-[#16314D] rounded-l-lg">
-                <TbCoinTaka size={18} className="text-primary mr-1" />
+              <div className="flex items-center bg-[#0f0f0f] text-white  px-1 py-1 border border-[#222]">
+                <TbCoinTaka size={18} className="text-primary" />
                 <span className="text-sm font-semibold truncate max-w-[120px]">
-                  {formatMoney(walletBalance)}
+                  {formatWalletBalance(walletBalance)}
                 </span>
                 <button
                   onClick={(e) => {
@@ -586,7 +581,7 @@ const NavbarSidebar = () => {
                     refreshBalance();
                   }}
                   aria-label="Refresh balance"
-                  className={`p-1 text-[#F5FAFF] hover:text-primary transition ${refreshingBalance ? "animate-spin" : ""}`}
+                  className={`p-1  text-white hover:bg-white/5 transition ${refreshingBalance ? "animate-spin" : ""}`}
                 >
                   <TbRefresh size={16} />
                 </button>
@@ -595,7 +590,7 @@ const NavbarSidebar = () => {
               <div className="" ref={walletActionsRef}>
                 <button
                   onClick={() => setShowWalletActions((s) => !s)}
-                  className="bg-primary hover:bg-[#48DDFF] text-black p-2 rounded-r-lg transition shadow-md"
+                  className="bg-primary hover:bg-primary text-black p-2  transition shadow-md"
                   aria-expanded={showWalletActions}
                 >
                   <IoIosAddCircle size={18} />
@@ -603,14 +598,14 @@ const NavbarSidebar = () => {
 
                 {showWalletActions && (
                   <div
-                    className={`absolute flex w-full left-0 mt-2 bg-[#0B1220] border border-[#16314D] text-[#F5FAFF] rounded-lg shadow-2xl p-2 z-50 transform origin-top-right transition ease-out duration-150 gap-2`}
+                    className={`absolute flex w-full left-0 mt-2  bg-gray-900 text-white rounded-lg sm:rounded-lg shadow-2xl p-2 z-50 transform origin-top-right transition ease-out duration-150`}
                   >
                     <button
                       onClick={() => {
                         setShowWalletActions(false);
                         navigate("/withdraw");
                       }}
-                      className="w-full text-center py-2 px-3 bg-[#050912] border border-[#16314D] text-[#F5FAFF] hover:bg-[#16314D] rounded transition"
+                      className="w-full text-center py-2 px-3  bg-gray-800 border border-gray-700 text-white hover:bg-gray-700 transition"
                     >
                       {t("withdraw")}
                     </button>
@@ -619,7 +614,7 @@ const NavbarSidebar = () => {
                         setShowWalletActions(false);
                         navigate("/deposit");
                       }}
-                      className="w-full text-center py-2 px-3 bg-primary text-black hover:bg-[#48DDFF] font-semibold rounded transition"
+                      className="w-full text-center py-2 px-3  bg-primary text-black hover:bg-yellow-300 transition"
                     >
                       {t("deposit")}
                     </button>
@@ -869,7 +864,7 @@ const NavbarSidebar = () => {
                       </button>
                     </div>
                     <h2 className="!text-black text-lg font-black mt-1">
-                      {formatMoney(walletBalance)}
+                      {formatWalletBalance(walletBalance)}
                     </h2>
                   </div>
 
@@ -1018,15 +1013,15 @@ const NavbarSidebar = () => {
             }
 
             .sidebar-card {
-              background: #0B1220;
-              border: 1px solid #16314D;
+              background: linear-gradient(to right, #2d2d2d, #222222);
+              border: 1px solid #2563eb;
               border-radius: 16px;
               display: flex;
               flex-direction: column;
               align-items: center;
               justify-content: center;
               padding: 14px;
-              color: #F5FAFF;
+              color: white;
               font-weight: 600;
               transition: 0.3s;
               cursor: pointer;
@@ -1034,12 +1029,11 @@ const NavbarSidebar = () => {
 
             .sidebar-card:hover {
               transform: translateY(-2px);
-              border-color: #18C8FF;
-              box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+              border-color: rgba(255, 224, 0, 0.4);
             }
 
             .sidebar-icon {
-              color: #18C8FF;
+              color: #FFE100;
               font-size: 32px;
               margin-bottom: 8px;
             }
@@ -1050,14 +1044,14 @@ const NavbarSidebar = () => {
       {/* Fixed Bottom Login/Signup Bar for Mobile - Only when not logged in */}
       {!user && (
         <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden">
-          <div className="bg-[#0B1220] border-t border-[#16314D] shadow-2xl">
+          <div className="bg-[#1A1A1A] border-t border-[#2A2A2A] shadow-2xl">
             <div className="flex items-stretch h-16">
               {/* Language Section */}
-              <div className="flex-1 border-r border-[#16314D]">
+              <div className="flex-1 border-r border-[#2A2A2A]">
                 <button
                   onClick={handleLanguageToggle}
                   className="w-full h-full flex items-center justify-center gap-2 px-2
-                  hover:bg-[#16314D]/40 transition-all duration-300"
+                  hover:bg-[#252525] transition-all duration-300"
                 >
                   <img
                     src={
@@ -1072,12 +1066,12 @@ const NavbarSidebar = () => {
                   />
 
                   <div className="flex flex-col text-left leading-tight">
-                    <span className="text-[11px] text-[#8FA6BC]">
+                    <span className="text-[11px] text-gray-400">
                       {currentLanguage === "bn"
                         ? "Bangladesh"
                         : "United States"}
                     </span>
-                    <span className="text-xs font-medium text-[#F5FAFF]">
+                    <span className="text-xs font-medium text-white">
                       {currentLanguage === "bn" ? "বাংলা" : "English"}
                     </span>
                   </div>
@@ -1089,8 +1083,8 @@ const NavbarSidebar = () => {
                 <button
                   onClick={() => openAuthModal("login")}
                   className="w-full h-full flex flex-col items-center justify-center
-              bg-[#050912] text-[#F5FAFF]
-              hover:bg-[#16314D]
+              bg-[#232323] text-white
+              hover:bg-[#2d2d2d]
               transition-all duration-300"
                 >
                   <span className="text-sm font-semibold">{t("login")}</span>
@@ -1104,7 +1098,7 @@ const NavbarSidebar = () => {
                   className="w-full h-full flex flex-col items-center justify-center
               bg-primary
               !text-black font-bold
-              hover:bg-[#48DDFF]
+              hover:brightness-110
               transition-all duration-300"
                 >
                   <span className="text-sm !text-black">{t("signup")}</span>
@@ -1119,13 +1113,13 @@ const NavbarSidebar = () => {
       {showAuthModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div
-            className="relative w-full max-w-md bg-[#0B1220] rounded-2xl shadow-[0_10px_50px_rgba(0,229,255,0.12)] border max-h-[90vh] overflow-y-auto"
-            style={{ borderColor: "#16314D" }}
+            className="relative w-full max-w-md bg-[#0f0f0f] rounded-xl shadow-[0_10px_50px_rgba(255,215,0,0.08)] border max-h-[90vh] overflow-y-auto"
+            style={{ borderColor: "rgba(255,215,0,0.15)" }}
           >
             {/* Close Button */}
             <button
               onClick={closeAuthModal}
-              className="absolute top-0 right-0 z-10 p-2 text-[#8FA6BC] hover:text-[#F5FAFF] rounded-full transition-all hover:scale-110"
+              className="absolute top-0 right-0 z-10 p-2  text-white rounded-full transition-all hover:scale-110"
             >
               <MdClose size={24} />
             </button>
@@ -1133,13 +1127,13 @@ const NavbarSidebar = () => {
             {/* Modal Content */}
             <div className="p-4 sm:p-6 pt-12">
               {/* Toggle Tabs */}
-              <div className="flex gap-2 mb-6 bg-[#050912] p-1 rounded-xl border border-[#16314D]">
+              <div className="flex gap-2 mb-6 bg-[#111111] p-1 rounded-xl">
                 <button
                   onClick={() => setAuthMode("login")}
                   className={`flex-1 py-3 rounded-lg font-bold text-sm transition-all duration-300 ${
                     authMode === "login"
                       ? "bg-primary text-black shadow-lg"
-                      : "text-[#8FA6BC] hover:text-[#F5FAFF]"
+                      : "text-gray-400 hover:text-white"
                   }`}
                 >
                   {t("login")}
@@ -1149,7 +1143,7 @@ const NavbarSidebar = () => {
                   className={`flex-1 py-3 rounded-lg font-bold text-sm transition-all duration-300 ${
                     authMode === "register"
                       ? "bg-primary text-black shadow-lg"
-                      : "text-[#8FA6BC] hover:text-[#F5FAFF]"
+                      : "text-gray-400 hover:text-white"
                   }`}
                 >
                   {t("signup")}
@@ -1160,16 +1154,16 @@ const NavbarSidebar = () => {
               {authMode === "login" && (
                 <form onSubmit={handleLoginSubmit} className="space-y-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-primary mb-1">
+                    <h2 className="text-2xl font-bold text-[#FFD700] mb-1">
                       {t("welcomeBack")}
                     </h2>
-                    <p className="text-sm text-[#8FA6BC] mb-4">
+                    <p className="text-sm text-gray-400 mb-4">
                       {t("loginToYourAccount")}
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm text-[#8FA6BC] mb-2">
+                    <label className="block text-sm text-gray-300 mb-2">
                       {t("userName")}
                     </label>
                     <input
@@ -1180,13 +1174,13 @@ const NavbarSidebar = () => {
                         setLoginForm({ ...loginForm, username: e.target.value })
                       }
                       required
-                      className="w-full p-3 rounded-xl bg-[#050912] border border-[#16314D] text-[#F5FAFF] placeholder-[#8FA6BC]/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+                      className="w-full p-3 rounded-xl bg-[#111111] border !border-primary text-white placeholder-white/50 focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition-colors"
                       placeholder={t("username")}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-[#8FA6BC] mb-2">
+                    <label className="block text-sm text-gray-300 mb-2">
                       {t("password")}
                     </label>
                     <input
@@ -1197,13 +1191,13 @@ const NavbarSidebar = () => {
                         setLoginForm({ ...loginForm, password: e.target.value })
                       }
                       required
-                      className="w-full p-3 rounded-xl bg-[#050912] border border-[#16314D] text-[#F5FAFF] placeholder-[#8FA6BC]/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+                      className="w-full p-3 rounded-xl bg-[#111111] border !border-primary text-white placeholder-white/50 focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition-colors"
                       placeholder="••••••••"
                     />
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
-                    <label className="flex items-center gap-2 text-[#8FA6BC] cursor-pointer">
+                    <label className="flex items-center gap-2 text-gray-300 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={loginForm.rememberMe}
@@ -1230,7 +1224,7 @@ const NavbarSidebar = () => {
                     type="submit"
                     disabled={authStatus === "loading"}
                     className="w-full py-3 bg-primary text-black font-bold rounded-xl
-                      hover:bg-[#48DDFF] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+                      hover:from-[#FFB800] hover:to-[#FFD700] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
                       transition-all duration-300 shadow-lg"
                   >
                     {authStatus === "loading" ? t("loggingIn") : t("login")}
@@ -1250,10 +1244,10 @@ const NavbarSidebar = () => {
               {authMode === "register" && (
                 <form onSubmit={handleRegisterSubmit} className="space-y-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-primary mb-1">
+                    <h2 className="text-2xl font-bold text-[#FFD700] mb-1">
                       {t("createAccount")}
                     </h2>
-                    <p className="text-sm text-[#8FA6BC] mb-4">
+                    <p className="text-sm text-gray-400 mb-4">
                       {t("joinAndStartWinning")}
                     </p>
                   </div>
@@ -1271,20 +1265,23 @@ const NavbarSidebar = () => {
                     }
                     required
                     placeholder={t("username")}
-                    className="w-full p-3 rounded-xl bg-[#050912] text-[#F5FAFF] placeholder-[#8FA6BC]/50 border border-[#16314D] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                    className="w-full p-3 rounded-xl bg-[#111111] text-white placeholder-white/50 border !border-primary focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition"
                   />
 
                   {/* BD phone input: [🇧🇩 +88] [phone input] */}
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 bg-[#050912] rounded-xl p-2 border border-[#16314D]">
-                      <div className="w-8 h-8 rounded-full bg-[#0B1220] flex items-center justify-center">
+                    <div
+                      className="flex items-center gap-2 bg-[#0f0f0f] rounded-xl p-2"
+                      style={{ border: "1px solid primary" }}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-[#111111] flex items-center justify-center">
                         <img
                           src="https://img.d4040p.com/dp/h5/assets/images/flag/BD.png?v=1778569350194"
                           alt="BD Flag"
                           className="w-full h-full object-contain"
                         />
                       </div>
-                      <div className="text-[#F5FAFF] font-medium pl-1 pr-2">
+                      <div className="text-white/90 font-medium pl-1 pr-2">
                         +88
                       </div>
                     </div>
@@ -1305,7 +1302,7 @@ const NavbarSidebar = () => {
                       inputMode="numeric"
                       maxLength={11}
                       placeholder="01708376600"
-                      className="flex-1 p-3 rounded-xl bg-[#050912] text-[#F5FAFF] placeholder-[#8FA6BC]/50 border border-[#16314D] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                      className="flex-1 p-3 rounded-xl bg-[#111111] text-white placeholder-white/50 border !border-primary focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition"
                     />
                   </div>
 
@@ -1321,10 +1318,10 @@ const NavbarSidebar = () => {
                     }
                     required
                     placeholder={t("password")}
-                    className="w-full p-3 rounded-xl bg-[#050912] text-[#F5FAFF] placeholder-[#8FA6BC]/50 border border-[#16314D] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                    className="w-full p-3 rounded-xl bg-[#111111] text-white placeholder-white/50 border !border-primary focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition"
                   />
 
-                  <label className="flex items-center gap-2 text-sm text-[#8FA6BC] cursor-pointer">
+                  <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={registerForm.agreedToTerms}
@@ -1348,11 +1345,97 @@ const NavbarSidebar = () => {
                     </div>
                   )}
 
+                  {/* Promo Code Section
+                  <div>
+                    {!showPromo ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowPromo(true)}
+                        className="text-sm text-[#FFD700] hover:text-[#FFB800] transition-colors flex items-center gap-1"
+                      >
+                        <FiGift />
+                        Have a promo code?
+                        <FiChevronDown className="text-xs" />
+                      </button>
+                    ) : (
+                      <div className="space-y-3">
+                        <button
+                          type="button"
+                          onClick={() => setShowPromo(false)}
+                          className="text-sm text-gray-400 hover:text-gray-300 flex items-center gap-1"
+                        >
+                          <FiChevronUp className="text-xs" />
+                          Hide promo code
+                        </button>
+
+                        <div className="bg-[#111111] border border-[rgba(255,215,0,0.15)] rounded-xl p-3">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={promoCode}
+                              onChange={(e) => {
+                                setPromoCode(e.target.value.toUpperCase());
+                                setPromoValidation(null);
+                              }}
+                              onBlur={() =>
+                                promoCode.trim() && handleValidatePromo()
+                              }
+                              placeholder="Enter promo code"
+                              className="flex-1 p-2 rounded-lg bg-[#0f0f0f] text-white border border-[rgba(255,215,0,0.15)] focus:border-[#FFD700] focus:outline-none uppercase text-sm"
+                              maxLength={20}
+                            />
+                            <button
+                              type="button"
+                              onClick={handleValidatePromo}
+                              disabled={promoLoading || !promoCode.trim()}
+                              className="px-3 py-2 bg-primary hover:from-[#FFB800] hover:to-[#FFD700] disabled:bg-gray-600 text-black font-semibold rounded-lg text-sm transition-colors"
+                            >
+                              {promoLoading ? "..." : "Apply"}
+                            </button>
+                          </div>
+
+                          {promoValidation && (
+                            <div
+                              className={`mt-2 p-2 rounded-lg text-sm flex items-start gap-2 ${
+                                promoValidation.isValid
+                                  ? "bg-green-500/10 border border-green-500/30 text-green-400"
+                                  : "bg-red-500/10 border border-red-500/30 text-red-400"
+                              }`}
+                            >
+                              {promoValidation.isValid ? (
+                                <FiCheck className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                              ) : (
+                                <FiX className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                              )}
+                              <div className="flex-1 text-xs">
+                                {promoValidation.isValid ? (
+                                  <>
+                                    <div className="font-semibold">
+                                      Promo Applied!
+                                    </div>
+                                    <div className="opacity-90">
+                                      {promoValidation.bonusPercentage &&
+                                        `${promoValidation.bonusPercentage}% bonus`}
+                                      {promoValidation.bonusAmount &&
+                                        ` up to ৳${promoValidation.bonusAmount.toLocaleString()}`}
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div>{promoValidation.message}</div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div> */}
+
                   <button
                     type="submit"
                     disabled={authStatus === "loading"}
                     className="w-full py-3 bg-primary text-black font-bold rounded-xl
-                      hover:bg-[#48DDFF] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+                      hover:from-[#FFB800] hover:to-[#FFD700] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
                       transition-all duration-300 shadow-lg"
                   >
                     {authStatus === "loading" ? t("creating") : t("Confirme")}

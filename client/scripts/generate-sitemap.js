@@ -1,5 +1,5 @@
 /**
- * Sitemap Generator for mosttiger Live
+ * Sitemap Generator for ck369 Live
  * Generates sitemap.xml with all public routes
  * Run this script during build or manually: node scripts/generate-sitemap.js
  */

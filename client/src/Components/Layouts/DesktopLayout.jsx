@@ -31,6 +31,7 @@ import { TbRefresh } from "react-icons/tb";
 import { BsCreditCard2BackFill } from "react-icons/bs";
 
 import walletService from "../services/walletService";
+import { formatMoney as formatWalletBalance } from "../../utils/currencyFormatter";
 import { TbCoinTaka } from "react-icons/tb";
 import { IoIosAddCircle } from "react-icons/io";
 import {
@@ -166,14 +167,6 @@ const DesktopLayout = () => {
       window.removeEventListener("gameSessionsClosed", handleRefresh);
     };
   }, [user]);
-
-  const formatMoney = (v) =>
-    v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
-      ? "--"
-      : Number(v).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
 
   const refreshBalance = async () => {
     if (!user) {
@@ -369,21 +362,21 @@ const DesktopLayout = () => {
         ...(affiliateCode ? { aff: affiliateCode } : {}),
         ...(referralCode ? { ref: referralCode, referralCode } : {}),
       };
-      const result = await dispatch(registerUser(registrationData)).unwrap();
+      await dispatch(registerUser(registrationData)).unwrap();
       clearStoredAffiliateCode();
       clearStoredReferralCode();
-      if (!result?.token || !result?.user) {
-        try {
-          await dispatch(
-            loginUser({
-              username: registerForm.username.trim().toLowerCase(),
-              password: registerForm.password,
-              rememberMe: true,
-            }),
-          ).unwrap();
-        } catch (e) {}
-      }
-      closeAuthModal();
+      alert("Registration successful!");
+      setShowAuthModal(false);
+      setRegisterForm({
+        username: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+        agreedToTerms: true,
+      });
+      setPromoCode("");
+      setPromoValidation(null);
+      setShowPromo(false);
     } catch (err) {
       console.error(err);
     }
@@ -599,10 +592,7 @@ const DesktopLayout = () => {
   };
 
   return (
-    <Layout
-      style={{ minHeight: "100vh", background: "#050912" }}
-      className="bg-[#050912]"
-    >
+    <Layout style={{ minHeight: "100vh" }} className="bg-gray-900">
       {/* ================= SIDEBAR ================= */}
       <AntSider
         trigger={null}
@@ -612,9 +602,8 @@ const DesktopLayout = () => {
         collapsedWidth={70}
         theme="dark"
         style={{
-          background: "#0B1220",
-          borderRight: "1px solid #16314D",
-          boxShadow: "2px 0 12px rgba(0,0,0,0.5)",
+          background: "#1a1a1a",
+          boxShadow: "2px 0 12px rgba(0,0,0,0.4)",
           position: "fixed",
           left: 0,
           top: 0,
@@ -634,7 +623,7 @@ const DesktopLayout = () => {
         <div
           style={{
             height: "72px",
-            borderBottom: "1px solid #16314D",
+            borderBottom: "1px solid #333",
             marginBottom: "8px",
             position: "relative",
             display: "flex",
@@ -647,12 +636,12 @@ const DesktopLayout = () => {
           {!collapsed && (
             <Link
               to="/deposit"
-              className="flex w-[80%] justify-center text-center items-center gap-1 !bg-[#0B1220] border border-[#16314D] hover:border-primary !text-[#F5FAFF] text-md font-bold px-4 py-2 mx-4 rounded-lg transition"
+              className="flex w-[80%] justify-center text-center  items-center gap-1 !bg-[#F3F3F3] !text-black text-md font-bold  px-4 py-2 mx-4 rounded-lg transition"
             >
               <div className="flex items-center">
-                <BiSolidCricketBall className="!text-primary" size={22} />
+                <BiSolidCricketBall className="!text-black" size={22} />
 
-                <p className="hidden sm:block !text-[#F5FAFF] text-center w-[100%]">
+                <p className="hidden sm:block !text-black text-center w-[100%]">
                   {t("categories.Cricket")}
                 </p>
               </div>
@@ -699,7 +688,7 @@ const DesktopLayout = () => {
             WebkitOverflowScrolling: "touch",
 
             scrollbarWidth: "thin",
-            scrollbarColor: "#16314D #0B1220",
+            scrollbarColor: "#000000 #1a1a1a",
           }}
         >
           <Menu
@@ -763,7 +752,7 @@ const DesktopLayout = () => {
               }
             }}
             style={{
-              background: "#0B1220",
+              background: "#1a1a1a",
               border: "none",
             }}
           />
@@ -780,14 +769,14 @@ const DesktopLayout = () => {
         {/* ================= HEADER ================= */}
         <Header
           style={{
-            background: "linear-gradient(135deg, #0B1220 0%, #050912 100%)",
+            background: "#0f0f0f",
             padding: "0 26px",
             height: "72px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            borderBottom: "1px solid #16314D",
+            borderBottom: "1px solid #333",
             position: "sticky",
             top: 0,
             zIndex: 999,
@@ -800,7 +789,7 @@ const DesktopLayout = () => {
               {/* Logo */}
               <div className="flex-1 flex ">
                 <Link to={"/"}>
-                  <img src={logo} alt="mosttiger" className="h-10" />
+                  <img src={logo} alt="ck369" className="h-10" />
                 </Link>
               </div>
 
@@ -817,13 +806,13 @@ justify-center
 h-10
 px-5
 text-sm
-!bg-[#0B1220]
+!bg-[#D7D7D7]
 border border-primary
 rounded-lg
 font-semibold
 transition
-hover:bg-primary/20
-!text-[#F5FAFF]
+hover:bg-white/20
+!text-black
 whitespace-nowrap
 "
                     >
@@ -844,7 +833,7 @@ text-sm
 !text-black
 rounded-lg
 font-semibold
-hover:bg-[#48DDFF]
+hover:opacity-90
 transition
 whitespace-nowrap
 "
@@ -857,7 +846,7 @@ whitespace-nowrap
                 <div className="flex items-center gap-4">
                   <Link
                     to="/deposit"
-                    className="flex items-center gap-1 !bg-primary hover:bg-[#48DDFF] !text-black text-sm p-2 rounded-lg font-semibold transition"
+                    className="flex items-center gap-1 !bg-primary !text-black text-sm  p-2 rounded-lg transition"
                   >
                     <BsCreditCard2BackFill size={15} />
 
@@ -865,7 +854,7 @@ whitespace-nowrap
                       {t("deposit")}
                     </p>
                   </Link>
-                  <div className="flex items-center gap-1 !bg-[#0B1220] border border-[#16314D] !text-[#F5FAFF] text-sm p-2 rounded-lg transition">
+                  <div className="flex items-center gap-1 !bg-[#F3F3F3] !text-black text-sm  p-2 rounded-lg transition">
                     <TbRefresh
                       size={22}
                       onClick={(e) => {
@@ -873,17 +862,17 @@ whitespace-nowrap
                         e.stopPropagation();
                         refreshBalance();
                       }}
-                      className="cursor-pointer text-primary hover:rotate-180 transition-transform duration-300"
+                      className="cursor-pointer"
                     />
 
-                    <p className="hidden sm:block !text-[#F5FAFF]">
+                    <p className="hidden sm:block !text-black">
                       {t("mainWallet")}: {t("BDT")}{" "}
-                      {formatMoney(walletBalance)}{" "}
+                      {formatWalletBalance(walletBalance)}{" "}
                     </p>
                   </div>
                   <Link
                     to="/profile"
-                    className="flex items-center gap-2 !text-[#F5FAFF] hover:text-primary transition"
+                    className="flex items-center gap-2 !text-white hover:opacity-90"
                   >
                     <FaUserCircle className="text-2xl" />
                   </Link>
@@ -917,7 +906,7 @@ whitespace-nowrap
         <Content
           style={{
             padding: "24px",
-            background: "#050912",
+            background: "#0f0f0f",
             minHeight: "calc(100vh - 64px)",
           }}
         >
@@ -936,8 +925,8 @@ whitespace-nowrap
 
     /* ================= TOGGLE BUTTON ================= */
     .desktop-sidebar-menu .ant-menu-item-selected::after {
-      display: none !important;
-    }
+  display: none !important;
+}
 
     .sidebar-toggle-btn {
       background: var(--color-primary) !important;
@@ -947,14 +936,14 @@ whitespace-nowrap
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      color: #050912 !important;
-      border: 2px solid #0B1220 !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+      color: #000 !important;
+      border: 2px solid #1a1a1a !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
       transition: all 0.35s ease !important;
     }
 
     .sidebar-toggle-btn:hover {
-      background: #48DDFF !important;
+      background: #ffd24d !important;
       transform: scale(1.06);
     }
 
@@ -962,7 +951,7 @@ whitespace-nowrap
 
     .desktop-sidebar-menu .ant-menu-item-selected {
       background-color: var(--color-primary) !important;
-      color: #050912 !important;
+      color: #000 !important;
     }
 
     .desktop-sidebar-menu .ant-menu-item-selected::after {
@@ -970,14 +959,14 @@ whitespace-nowrap
     }
 
     .desktop-sidebar-menu .ant-menu-item:hover {
-      background-color: rgba(24, 200, 255, 0.12) !important;
+      background-color: rgba(255, 184, 12, 0.1) !important;
       color: var(--color-primary) !important;
       border-radius: 4px;
       transition: all 0.3s ease;
     }
 
     .desktop-sidebar-menu .ant-menu-item {
-      color: #F5FAFF;
+      color: #ffffff;
       transition: all 0.3s ease;
       border-radius: 4px;
       margin: 4px 8px;
@@ -986,13 +975,13 @@ whitespace-nowrap
     }
 
     .desktop-sidebar-menu .ant-menu-submenu-title:hover {
-      background-color: rgba(24, 200, 255, 0.12) !important;
+      background-color: rgba(255, 184, 12, 0.1) !important;
       color: var(--color-primary) !important;
       border-radius: 4px;
     }
 
     .desktop-sidebar-menu .ant-menu-submenu-title {
-      color: #F5FAFF !important;
+      color: #ffffff !important;
       border-radius: 4px;
       margin: 4px 8px;
       transition: all 0.3s ease;
@@ -1008,12 +997,12 @@ whitespace-nowrap
     }
 
     .desktop-sidebar-menu .ant-menu-item-selected a {
-      color: #050912 !important;
+      color: #000 !important;
       font-weight: 600;
     }
 
     .desktop-sidebar-menu .ant-menu-item-divider {
-      background-color: #16314D;
+      background-color: #333;
       margin: 8px 0;
     }
 
@@ -1026,7 +1015,7 @@ whitespace-nowrap
       scroll-behavior: smooth;
 
       scrollbar-width: thin;
-      scrollbar-color: #16314D #0B1220;
+      scrollbar-color: #222222 #111111;
     }
 
     /* Chrome, Edge */
@@ -1036,17 +1025,17 @@ whitespace-nowrap
     }
 
     .sidebar-scroll-wrapper::-webkit-scrollbar-track {
-      background: #0B1220;
+      background: #111111;
       border-radius: 999px;
     }
 
     .sidebar-scroll-wrapper::-webkit-scrollbar-thumb {
-      background: #16314D;
+      background: #222222;
       border-radius: 999px;
     }
 
     .sidebar-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-      background: #18C8FF;
+      background: #333333;
     }
 
     /* ================= HEADER ================= */
@@ -1054,15 +1043,15 @@ whitespace-nowrap
     .desktop-header {
       background: linear-gradient(
         135deg,
-        #0B1220 0%,
-        #050912 100%
+        #1a1a1a 0%,
+        #0f0f0f 100%
       );
     }
 
     /* ================= LAYOUT ================= */
 
     .ant-layout {
-      background: #050912;
+      background: #0f0f0f;
     }
       .desktop-sidebar-menu .ant-menu-item-selected::after {
   display: none !important;

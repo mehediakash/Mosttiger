@@ -72,16 +72,16 @@ const footerLinks = [
 const Footer = () => {
   const { t } = useTranslation();
   return (
-    <footer className="w-full bg-[#050912] text-[#F5FAFF] pt-3 md:pb-5 pb-24 border-t border-[#16314D]">
+    <footer className="w-full bg-black text-white pt-3 md:pb-5 pb-24">
       <div className=" mx-auto px-2 md:px-3">
         {/* ================= Brand Ambassador ================= */}
 
         <div className="mb-3">
-          <h3 className="text-[#F5FAFF] text-[15px] md:text-[18px] font-bold mb-2">
+          <h3 className="text-white text-[15px] md:text-[18px] font-bold mb-2">
             {t("brandAmbassador")}
           </h3>
 
-          <div className="bg-[#0B1220] border border-[#16314D] rounded-xl p-3">
+          <div className="bg-[#2b2b2b] rounded-md p-3">
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {ambassadors.map((item, index) => (
                 <div key={index} className="flex flex-col items-start">
@@ -95,11 +95,11 @@ const Footer = () => {
                     "
                   />
 
-                  <h4 className="text-[#F5FAFF] text-[14px] font-bold leading-tight">
+                  <h4 className="text-white text-[14px] font-bold leading-tight">
                     {item.name}
                   </h4>
 
-                  <p className="text-[#8FA6BC] italic text-[12px] md:text-[13px] leading-tight">
+                  <p className="text-white italic text-[12px] md:text-[13px] leading-tight opacity-90">
                     {t(item.role)}
                   </p>
                 </div>
@@ -111,11 +111,11 @@ const Footer = () => {
         {/* ================= Official Partner ================= */}
 
         <div className="mb-3">
-          <h3 className="text-[#F5FAFF] text-[15px] md:text-[18px] font-bold mb-2">
+          <h3 className="text-white text-[15px] md:text-[18px] font-bold mb-2">
             {t("officialPartner")}
           </h3>
 
-          <div className="bg-[#0B1220] border border-[#16314D] rounded-xl p-3 flex items-center">
+          <div className="bg-[#2b2b2b] rounded-md p-3 flex items-center">
             <img
               src="https://img.d4040p.com/dp/h5/assets/images/footer/color-black/official-partner-heyvip.png?v=1783417384360&source=mcdsrc"
               alt="Official Partner"
@@ -127,11 +127,11 @@ const Footer = () => {
         {/* ================= Community Websites ================= */}
 
         <div className="mb-3">
-          <h3 className="text-[#F5FAFF] text-[15px] md:text-[18px] font-bold mb-2">
+          <h3 className="text-white text-[15px] md:text-[18px] font-bold mb-2">
             {t("communityWebsites")}
           </h3>
 
-          <div className="bg-[#0B1220] border border-[#16314D] rounded-xl p-3">
+          <div className="bg-[#2b2b2b] rounded-md p-3">
             <div className="flex flex-wrap items-center gap-3">
               {socialLinks.map((item, index) => (
                 <button
@@ -161,11 +161,11 @@ const Footer = () => {
         {/* ================= Payment Methods ================= */}
 
         <div className="mb-3">
-          <h3 className="text-[#F5FAFF] text-[15px] md:text-[18px] font-bold mb-2">
+          <h3 className="text-white text-[15px] md:text-[18px] font-bold mb-2">
             {t("paymentMethods")}
           </h3>
 
-          <div className="bg-[#0B1220] border border-[#16314D] rounded-xl p-3">
+          <div className="bg-[#2b2b2b] rounded-md p-3">
             <div className="flex flex-wrap items-center gap-2">
               {paymentMethods.map((item, index) => (
                 <div
@@ -195,11 +195,11 @@ const Footer = () => {
         {/* ================= About Us ================= */}
 
         <div className="mb-3">
-          <h3 className="text-[#F5FAFF] text-[15px] md:text-[18px] font-bold mb-2">
+          <h3 className="text-white text-[15px] md:text-[18px] font-bold mb-2">
             {t("aboutUs")}
           </h3>
 
-          <div className="bg-[#0B1220] border border-[#16314D] rounded-xl px-3 py-4">
+          <div className="bg-[#2b2b2b] rounded-md px-3 py-4">
             <div
               className="
                 flex
@@ -218,7 +218,6 @@ const Footer = () => {
                       text-[13px]
                       md:text-[15px]
                       font-semibold
-                      hover:text-[#48DDFF]
                       hover:underline
                       transition-all
                     "
@@ -227,7 +226,7 @@ const Footer = () => {
                   </button>
 
                   {index !== footerLinks.length - 1 && (
-                    <span className="mx-3 text-[#8FA6BC] opacity-60">:</span>
+                    <span className="mx-3 text-white opacity-60">:</span>
                   )}
                 </React.Fragment>
               ))}
@@ -242,9 +241,9 @@ const Footer = () => {
             href="https://t.me/gamebetxofficial"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+            className="text-[#229ED9] hover:underline"
           >
-            <p className="text-[#8FA6BC] text-[13px] md:text-[15px] font-medium">
+            <p className="text-white text-[13px] md:text-[15px] font-semibold">
               {t("copyright")}
             </p>
           </a>

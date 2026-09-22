@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 import api from "../axios/axios";
 import walletService from "../services/walletService";
+import { formatMoney as formatWalletBalance } from "../../utils/currencyFormatter";
 import { affiliateAPI } from "../services/affiliateService";
 
 import { useLanguage } from "../../context/LanguageContext";
@@ -18,27 +19,63 @@ import FreeSpinModal from "./FreeSpinModal";
 import ReferralBonusModal from "./ReferralBonusModal";
 import PersonalInfoModal from "./PersonalInfoModal/PersonalInfoModal";
 import ChangePasswordModal from "./ChangePasswordModal/ChangePasswordModal";
-import { openLiveChat } from "../liveChat/liveChatUtils";
 
-import { FaWallet } from "react-icons/fa";
-import { MdOutlineAccountBalanceWallet } from "react-icons/md";
-import { HiOutlineRefresh } from "react-icons/hi";
 import {
-  ArrowDownCircle,
-  ArrowUpCircle,
-  Coins,
-  Gift,
+  ArrowDownToLine,
+  ArrowUpFromLine,
   ClipboardList,
-  RotateCw,
-  Receipt,
-  User,
-  Lock,
-  Users,
-  MessageSquare,
+  LockKeyhole,
   Mail,
-  Send,
   MessageCircle,
+  ReceiptText,
+  RefreshCw,
+  Send,
+  UserRound,
+  UserRoundPlus,
+  Wallet,
 } from "lucide-react";
+
+import {
+  FaWallet,
+  FaGift,
+  FaHistory,
+  FaUserCog,
+  FaTelegramPlane,
+  FaEnvelope,
+  FaComments,
+  FaCoins,
+} from "react-icons/fa";
+
+const MobileProfileIcon = ({ name }) => {
+  const icons = {
+    deposit: ArrowDownToLine,
+    withdraw: ArrowUpFromLine,
+    bonusWallet: Wallet,
+    freeSpin: RefreshCw,
+    bettingRecords: ClipboardList,
+    turnover: RefreshCw,
+    transactions: ReceiptText,
+    personalInfo: UserRound,
+    changePassword: LockKeyhole,
+    referBonus: UserRoundPlus,
+    liveChat: MessageCircle,
+    email: Mail,
+    telegram: Send,
+    messenger: MessageCircle,
+  };
+  const Icon = icons[name] || MessageCircle;
+  return <Icon size={18} strokeWidth={1.8} />;
+};
+
+import {
+  MdOutlineAccountBalanceWallet,
+  MdOutlineLock,
+  MdOutlineSupportAgent,
+} from "react-icons/md";
+
+import { RiSecurePaymentLine, RiMoneyDollarCircleLine } from "react-icons/ri";
+
+import { HiOutlineRefresh } from "react-icons/hi";
 
 export default function Profile() {
   const dispatch = useDispatch();
@@ -154,12 +191,11 @@ export default function Profile() {
   }, [user]);
 
   const formatMoney = (v) =>
-    v === null || v === undefined || v === "" || !Number.isFinite(Number(v))
+    v === null || v === undefined
       ? "--"
-      : Number(v).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
+      : Math.floor(Number(v)).toLocaleString(
+          i18n.language === "bn" ? "bn-BD" : "en-US",
+        );
 
   const refreshWalletBalances = async () => {
     try {
@@ -212,18 +248,18 @@ export default function Profile() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#050912] mb-18 px-3 py-4 text-[#F5FAFF]">
+    <div className="min-h-screen bg-gradient-to-b from-[#050505] mb-18 via-[#0d0d0d] to-[#1a1405] px-3 py-4 text-white">
       {/* HEADER */}
 
-      <div className="mb-5 overflow-hidden rounded-3xl border border-[#16314D] bg-[#0B1220] p-5 shadow-2xl shadow-black/40">
+      <div className="mb-5 overflow-hidden rounded-3xl border border-[#ffb80022] bg-gradient-to-r from-[#111111] to-[#1a1a1a] p-5 shadow-2xl shadow-black/40">
         <div className="flex items-center gap-4">
           {/* AVATAR */}
 
-          <div className="h-[78px] w-[78px] overflow-hidden rounded-full border-2 border-primary bg-primary shadow-lg shadow-[rgba(0,229,255,0.35)]">
+          <div className="h-[78px] w-[78px] overflow-hidden rounded-full border-2 border-primary bg-primary shadow-lg shadow-[#ffb80033]">
             <img
               src={`https://ui-avatars.com/api/?name=${
                 user?.fullName || user?.name || "User"
-              }&background=18C8FF&color=050912&bold=true`}
+              }&background=FFB80C&color=000&bold=true`}
               alt="user"
               className="h-full w-full object-cover"
             />
@@ -232,14 +268,14 @@ export default function Profile() {
           {/* USER INFO */}
 
           <div className="flex-1">
-            <h2 className="text-[30px] font-black tracking-wide text-[#F5FAFF]">
+            <h2 className="text-[30px] font-black tracking-wide text-white">
               {user?.fullName || user?.name || "User"}
             </h2>
 
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#16314D] bg-[#050912] px-4 py-1">
-              <span className="text-sm text-[#8FA6BC]">{t("playerId")}</span>
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#ffcc33]/20 bg-[#1a1a1a] px-4 py-1">
+              <span className="text-sm text-[#d0d0d0]">{t("playerId")}</span>
 
-              <span className="font-bold text-[#F5FAFF]">
+              <span className="font-bold text-white">
                 {user?._id?.slice(-6) || "N/A"}
               </span>
             </div>
@@ -249,53 +285,46 @@ export default function Profile() {
 
       {/* WALLET */}
 
-      <div className="mb-5 overflow-hidden rounded-3xl border border-[#16314D] bg-[#0B1220] shadow-xl shadow-black/30">
-        <div className="grid grid-cols-2 divide-x divide-[#16314D]">
+      <div className="mb-5 overflow-hidden rounded-3xl border border-[#ffb80022] bg-[#111111] shadow-xl shadow-black/30">
+        <div className="grid grid-cols-2 divide-x divide-[#ffb80014]">
           {/* MAIN WALLET */}
 
           <div className="p-5">
-            <div className="flex items-center gap-2 text-[#8FA6BC]">
-              <FaWallet size={20} className="text-primary" />
+            <div className="flex items-center gap-2 text-white">
+              <FaWallet size={20} />
 
-              <span className="text-[#F5FAFF] font-semibold">
-                {t("mainWallet")}
-              </span>
+              <span className="">{t("mainWallet")}</span>
 
               <button
                 onClick={refreshWalletBalances}
-                className="transition-all duration-300 hover:rotate-180 hover:text-primary"
+                className="transition-all duration-300 hover:rotate-180"
               >
                 <HiOutlineRefresh />
               </button>
             </div>
 
-            <div className="mt-4 text-[22px] font-black text-[#F5FAFF]">
-              ৳ {formatMoney(walletBalance)}
+            <div className="mt-4 text-[22px] font-black text-white">
+              ৳ {formatWalletBalance(walletBalance)}
             </div>
           </div>
 
           {/* BONUS WALLET */}
 
           <div className="p-5">
-            <div className="flex items-center gap-2 text-[#8FA6BC]">
-              <MdOutlineAccountBalanceWallet
-                size={20}
-                className="text-primary"
-              />
+            <div className="flex items-center gap-2 text-white">
+              <MdOutlineAccountBalanceWallet size={20} />
 
-              <span className="text-[#F5FAFF] font-semibold">
-                {t("bonusWallet")}
-              </span>
+              <span className="">{t("bonusWallet")}</span>
 
               <button
                 onClick={refreshWalletBalances}
-                className="transition-all duration-300 hover:rotate-180 hover:text-primary"
+                className="transition-all duration-300 hover:rotate-180"
               >
                 <HiOutlineRefresh />
               </button>
             </div>
 
-            <div className="mt-4 text-[22px] font-black text-[#F5FAFF]">
+            <div className="mt-4 text-[22px] font-black text-white">
               ৳ {formatMoney(bonusBalance)}
             </div>
           </div>
@@ -312,11 +341,11 @@ export default function Profile() {
 
       {/* FUNDS */}
 
-      <div className="mb-5 overflow-hidden rounded-3xl border border-[#16314D] bg-[#0B1220] shadow-xl shadow-black/30">
-        <div className="flex items-center gap-3 border-b border-[#16314D] px-4 py-4">
-          <div className="h-6 w-[5px] rounded-full bg-primary shadow-[0_0_8px_#00E5FF]" />
+      <div className="mb-5 overflow-hidden rounded-3xl border border-[#ffb80022] bg-[#111111] shadow-xl shadow-black/30">
+        <div className="flex items-center gap-3 border-b border-[#ffb80014] px-4 py-4">
+          <div className="h-6 w-[5px] rounded-full primary" />
 
-          <h3 className="text-xl font-black text-[#F5FAFF]">{t("funds")}</h3>
+          <h3 className="text-xl font-black text-white">{t("funds")}</h3>
         </div>
 
         <div className="grid grid-cols-4">
@@ -324,13 +353,18 @@ export default function Profile() {
 
           <Link
             to="/deposit"
-            className="group flex flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex flex-col items-center gap-3 py-5"
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <ArrowDownCircle className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="deposit" />
+              </span>
+              <span className="hidden sm:block">
+                <RiMoneyDollarCircleLine />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("deposit")}
             </span>
           </Link>
@@ -339,13 +373,18 @@ export default function Profile() {
 
           <Link
             to="/withdraw"
-            className="group flex flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex flex-col items-center gap-3 py-5"
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <ArrowUpCircle className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="withdraw" />
+              </span>
+              <span className="hidden sm:block">
+                <RiSecurePaymentLine />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("withdraw")}
             </span>
           </Link>
@@ -354,13 +393,18 @@ export default function Profile() {
 
           <div
             onClick={() => setBonusModalOpen(true)}
-            className="group text-center flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group text-center flex cursor-pointer flex-col items-center gap-3 py-5"
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <Coins className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="bonusWallet" />
+              </span>
+              <span className="hidden sm:block">
+                <FaWallet />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("bonusWallet")}
             </span>
           </div>
@@ -369,13 +413,18 @@ export default function Profile() {
 
           <div
             onClick={() => setFreeSpinModalOpen(true)}
-            className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex cursor-pointer flex-col items-center gap-3 py-5"
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <Gift className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="freeSpin" />
+              </span>
+              <span className="hidden sm:block">
+                <FaGift />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("freeSpin")}
             </span>
           </div>
@@ -384,11 +433,11 @@ export default function Profile() {
 
       {/* HISTORY */}
 
-      <div className="mb-5 overflow-hidden rounded-3xl border border-[#16314D] bg-[#0B1220] shadow-xl shadow-black/30">
-        <div className="flex items-center gap-3 border-b border-[#16314D] px-4 py-4">
-          <div className="h-6 w-[5px] rounded-full bg-primary shadow-[0_0_8px_#00E5FF]" />
+      <div className="mb-5 overflow-hidden rounded-3xl border border-[#ffb80022] bg-[#111111] shadow-xl shadow-black/30">
+        <div className="flex items-center gap-3 border-b border-[#ffb80014] px-4 py-4">
+          <div className="h-6 w-[5px] rounded-full primary" />
 
-          <h3 className="text-xl font-black text-[#F5FAFF]">History</h3>
+          <h3 className="text-xl font-black text-white">History</h3>
         </div>
 
         <div className="grid grid-cols-3">
@@ -396,13 +445,18 @@ export default function Profile() {
 
           <div
             onClick={() => setBettingRecordsOpen(true)}
-            className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex cursor-pointer flex-col items-center gap-3 py-5"
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <ClipboardList className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="bettingRecords" />
+              </span>
+              <span className="hidden sm:block">
+                <FaHistory />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-center text-sm font-medium text-white">
               {t("bettingRecords")}
             </span>
           </div>
@@ -411,13 +465,18 @@ export default function Profile() {
 
           <div
             onClick={() => setTurnoverOpen(true)}
-            className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex cursor-pointer flex-col items-center gap-3 py-5"
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <RotateCw className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="turnover" />
+              </span>
+              <span className="hidden sm:block">
+                <FaCoins />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("turnover")}
             </span>
           </div>
@@ -484,15 +543,21 @@ export default function Profile() {
                 setRecordsLoading(false);
               }
             }}
-            className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex flex-col items-center gap-3 py-5"
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <Receipt className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="transactions" />
+              </span>
+              <span className="hidden sm:block">
+                <MdOutlineAccountBalanceWallet />
+              </span>
             </div>
 
-            <button className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors cursor-pointer">
+            <button className="text-center text-sm font-medium text-white">
               {t("transactions")}
-              <br className="hidden sm:inline" /> {t("records")}
+              <br />
+              {t("records")}
             </button>
           </div>
         </div>
@@ -500,20 +565,18 @@ export default function Profile() {
 
       {/* PROFILE */}
 
-      <div className="mb-5 overflow-hidden rounded-3xl border border-[#16314D] bg-[#0B1220] shadow-xl shadow-black/30">
-        <div className="flex items-center gap-3 border-b border-[#16314D] px-4 py-4">
-          <div className="h-6 w-[5px] rounded-full bg-primary shadow-[0_0_8px_#00E5FF]" />
+      <div className="mb-5 overflow-hidden rounded-3xl border border-[#ffb80022] bg-[#111111] shadow-xl shadow-black/30">
+        <div className="flex items-center gap-3 border-b border-[#ffb80014] px-4 py-4">
+          <div className="h-6 w-[5px] rounded-full primary" />
 
-          <h3 className="text-xl font-black text-[#F5FAFF]">
-            {t("myAccount")}
-          </h3>
+          <h3 className="text-xl font-black text-white">{t("myAccount")}</h3>
         </div>
 
         <div className="grid grid-cols-3">
           {/* PERSONAL INFO */}
 
           <div
-            className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex cursor-pointer flex-col items-center gap-3 py-5"
             role="button"
             tabIndex={0}
             onClick={() => setOpenPersonalInfoModal(true)}
@@ -522,11 +585,16 @@ export default function Profile() {
                 setOpenPersonalInfoModal(true);
             }}
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <User className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="personalInfo" />
+              </span>
+              <span className="hidden sm:block">
+                <FaUserCog />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("personalInfo")}
             </span>
           </div>
@@ -534,7 +602,7 @@ export default function Profile() {
           {/* CHANGE PASSWORD */}
 
           <div
-            className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex cursor-pointer flex-col items-center gap-3 py-5"
             role="button"
             tabIndex={0}
             onClick={() => setOpenChangePasswordModal(true)}
@@ -543,11 +611,16 @@ export default function Profile() {
                 setOpenChangePasswordModal(true);
             }}
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <Lock className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="changePassword" />
+              </span>
+              <span className="hidden sm:block">
+                <MdOutlineLock />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("changePassword")}
             </span>
           </div>
@@ -555,7 +628,7 @@ export default function Profile() {
           {/* REFERRAL */}
 
           <div
-            className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+            className="group flex cursor-pointer flex-col items-center gap-3 py-5"
             role="button"
             tabIndex={0}
             onClick={() => setOpenReferralModal(true)}
@@ -564,11 +637,16 @@ export default function Profile() {
                 setOpenReferralModal(true);
             }}
           >
-            <div className="flex h-11 w-11 sm:h-[60px] sm:w-[60px] items-center justify-center rounded-full border border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-              <Users className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white shadow-lg shadow-black/30 transition-all duration-300 group-hover:scale-110 sm:h-[60px] sm:w-[60px] sm:text-[28px]">
+              <span className="sm:hidden">
+                <MobileProfileIcon name="referBonus" />
+              </span>
+              <span className="hidden sm:block">
+                <FaComments />
+              </span>
             </div>
 
-            <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+            <span className="text-sm font-medium text-white">
               {t("referBonus")}
             </span>
           </div>
@@ -577,71 +655,61 @@ export default function Profile() {
 
       {/* CONTACT */}
 
-      <div className="mb-5 overflow-hidden rounded-3xl border border-[#16314D] bg-[#0B1220] shadow-xl shadow-black/30">
-        <div className="flex items-center gap-3 border-b border-[#16314D] px-4 py-4">
-          <div className="h-6 w-[5px] rounded-full bg-primary shadow-[0_0_8px_#00E5FF]" />
+      <div className="mb-5 overflow-hidden rounded-3xl border border-[#ffb80022] bg-[#111111] shadow-xl shadow-black/30">
+        <div className="flex items-center gap-3 border-b border-[#ffb80014] px-4 py-4">
+          <div className="h-6 w-[5px] rounded-full primary" />
 
-          <h3 className="text-xl font-black text-[#F5FAFF]">
-            {t("contactUs")}
-          </h3>
+          <h3 className="text-xl font-black text-white">{t("contactUs")}</h3>
         </div>
 
         <div className="grid grid-cols-4">
           {[
             {
-              icon: (
-                <MessageSquare className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
-              ),
+              icon: <MdOutlineSupportAgent />,
+              iconName: "liveChat",
               label: t("liveChat"),
-              onClick: openLiveChat,
+              onClick: () => window.dispatchEvent(new Event("open-live-chat")),
             },
             {
-              icon: (
-                <Mail className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
-              ),
+              icon: <FaEnvelope />,
+              iconName: "email",
               label: t("email"),
             },
             {
-              icon: (
-                <Send className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
-              ),
+              icon: <FaTelegramPlane />,
+              iconName: "telegram",
               label: t("telegram"),
             },
             {
-              icon: (
-                <MessageCircle className="w-[18px] h-[18px] sm:w-[26px] sm:h-[26px]" />
-              ),
+              icon: <FaComments />,
+              iconName: "messenger",
               label: t("messenger"),
             },
           ].map((item, index) => (
             <div
               key={index}
+              className="group flex cursor-pointer flex-col items-center gap-3 py-5"
               onClick={item.onClick}
-              role={item.onClick ? "button" : undefined}
-              tabIndex={item.onClick ? 0 : undefined}
-              onKeyDown={
-                item.onClick
-                  ? (e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        item.onClick();
-                      }
-                    }
-                  : undefined
-              }
-              className="group flex cursor-pointer flex-col items-center gap-2 sm:gap-3 py-3 sm:py-5"
+              onKeyDown={(e) => {
+                if (item.onClick && (e.key === "Enter" || e.key === " ")) {
+                  item.onClick();
+                }
+              }}
             >
               <div
                 className={`flex items-center justify-center rounded-full border transition-all duration-300 group-hover:scale-110 ${
                   item.label === t("messenger")
-                    ? "h-11 w-11 sm:h-[64px] sm:w-[64px] border-green-500/20 bg-green-600 text-white"
-                    : "h-11 w-11 sm:h-[60px] sm:w-[60px] border-[#16314D] bg-[#050912] text-primary shadow-lg shadow-black/30 group-hover:border-primary group-hover:shadow-[0_0_15px_rgba(0,229,255,0.3)]"
+                    ? "h-10 w-10 border-green-500/20 bg-green-600 text-base text-white sm:h-[64px] sm:w-[64px] sm:text-[30px]"
+                    : "h-10 w-10 border-[#ffcc33]/20 bg-primary from-[#1a1200] to-[#2a1d00] text-base text-white sm:h-[60px] sm:w-[60px] sm:text-[28px]"
                 }`}
               >
-                {item.icon}
+                <span className="sm:hidden">
+                  <MobileProfileIcon name={item.iconName} />
+                </span>
+                <span className="hidden sm:block">{item.icon}</span>
               </div>
 
-              <span className="text-center text-xs sm:text-sm font-medium text-[#F5FAFF] group-hover:text-primary transition-colors">
+              <span className="text-center text-sm font-medium text-white">
                 {item.label}
               </span>
             </div>
@@ -651,17 +719,17 @@ export default function Profile() {
 
       {/* AFFILIATE */}
 
-      <div className="mb-5 overflow-hidden rounded-3xl border border-[#16314D] bg-[#0B1220] shadow-xl shadow-black/30">
-        <div className="flex items-center gap-3 border-b border-[#16314D] px-4 py-4">
-          <div className="h-6 w-[5px] rounded-full bg-primary shadow-[0_0_8px_#00E5FF]" />
+      <div className="mb-5 overflow-hidden rounded-3xl border border-[#ffb80022] bg-[#111111] shadow-xl shadow-black/30">
+        <div className="flex items-center gap-3 border-b border-[#ffb80014] px-4 py-4">
+          <div className="h-6 w-[5px] rounded-full primary" />
 
-          <h3 className="text-xl font-black text-[#F5FAFF]">Affiliate</h3>
+          <h3 className="text-xl font-black text-white">Affiliate</h3>
         </div>
 
         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-[#8FA6BC]">Affiliate Status</p>
-            <p className="mt-1 text-lg font-black capitalize text-[#F5FAFF]">
+            <p className="text-sm text-white/60">Affiliate Status</p>
+            <p className="mt-1 text-lg font-black capitalize text-white">
               {affiliateLoading
                 ? "Checking..."
                 : affiliateStatus || "Not Applied"}
@@ -671,14 +739,14 @@ export default function Profile() {
           {affiliateStatus === "approved" ? (
             <Link
               to="/affiliate/dashboard"
-              className="rounded-xl bg-primary hover:bg-[#48DDFF] px-5 py-3 text-center text-sm font-black text-[#050912] shadow-[0_0_15px_rgba(0,229,255,0.3)] transition"
+              className="rounded-xl bg-primary px-5 py-3 text-center text-sm font-black text-black transition hover:opacity-90"
             >
               Affiliate Dashboard
             </Link>
           ) : !affiliateStatus ? (
             <Link
               to="/affiliate/signup"
-              className="rounded-xl bg-primary hover:bg-[#48DDFF] px-5 py-3 text-center text-sm font-black text-[#050912] shadow-[0_0_15px_rgba(0,229,255,0.3)] transition"
+              className="rounded-xl bg-primary px-5 py-3 text-center text-sm font-black text-black transition hover:opacity-90"
             >
               Become Affiliate
             </Link>

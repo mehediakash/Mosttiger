@@ -223,7 +223,7 @@ The sitemap will be automatically generated before each build.
 ### Primary Keywords
 
 - online betting bangladesh
-- mosttiger live
+- ck369 live
 - casino games bangladesh
 - sports betting bd
 - cricket betting
@@ -251,10 +251,10 @@ The sitemap will be automatically generated before each build.
 
 ### Required Social Media Accounts
 
-- Facebook: @mosttigerlive
-- Twitter: @mosttigerlive
-- Instagram: @mosttigerlive
-- Telegram: @mosttigerlive
+- Facebook: @ck369live
+- Twitter: @ck369live
+- Instagram: @ck369live
+- Telegram: @ck369live
 
 Update these in seoData.js structuredData.sameAs array.
 

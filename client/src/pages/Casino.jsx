@@ -80,22 +80,22 @@ const Casino = () => {
   return (
     <>
       <Helmet>
-        <title>Casino Games - mosttiger BD | Play Online Casino Games</title>
+        <title>Casino Games - ck369 BD | Play Online Casino Games</title>
         <meta
           name="description"
-          content="Play the best online casino games at mosttiger BD. Enjoy slots, table games, live casino, and jackpot games with real money betting."
+          content="Play the best online casino games at ck369 BD. Enjoy slots, table games, live casino, and jackpot games with real money betting."
         />
         <meta
           name="keywords"
-          content="online casino Bangladesh, casino games, slots, table games, live casino, jackpot games, mosttiger BD"
+          content="online casino Bangladesh, casino games, slots, table games, live casino, jackpot games, ck369 BD"
         />
-        <meta property="og:title" content="Casino Games - mosttiger BD" />
+        <meta property="og:title" content="Casino Games - ck369 BD" />
         <meta
           property="og:description"
           content="Experience world-class casino gaming with thousands of games from top providers."
         />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://mosttigerbd.com/casino" />
+        <link rel="canonical" href="https://ck369bd.com/casino" />
       </Helmet>
 
       <div className="min-h-screen bg-primary from-[#0f2a47] via-[#205583] to-[#0f2a47]">
@@ -259,7 +259,7 @@ const Casino = () => {
               Ready to Win Big?
             </h2>
             <p className="text-xl text-white/80 mb-8">
-              Join thousands of players who trust mosttiger BD for their casino
+              Join thousands of players who trust ck369 BD for their casino
               gaming experience.
             </p>
             <a

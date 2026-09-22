@@ -1,4 +1,4 @@
-# 🚀 SEO Implementation Guide - mosttiger Live
+# 🚀 SEO Implementation Guide - ck369 Live
 
 ## ✅ COMPLETED TASKS
 
@@ -119,8 +119,8 @@ function GamePage({ gameId, gameName }) {
   return (
     <>
       <SEO
-        title={`Play ${gameName} | mosttiger Live Casino`}
-        description={`Enjoy ${gameName} at mosttiger Live. Win big with exciting casino games.`}
+        title={`Play ${gameName} | ck369 Live Casino`}
+        description={`Enjoy ${gameName} at ck369 Live. Win big with exciting casino games.`}
         keywords={`${gameName}, online casino, casino games bangladesh`}
         canonical={`https://mosttiger.com/games/${gameId}`}
       />

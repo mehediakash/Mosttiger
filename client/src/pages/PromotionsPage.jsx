@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useState,
   useMemo,
   useEffect,
@@ -166,10 +166,10 @@ const PromotionsModal = ({ open = true, onClose }) => {
           max-h-[92vh]
           rounded-[30px]
           overflow-hidden
-          bg-[#0B1220]
+          bg-[#161616]
           border
-          border-[#16314D]
-          shadow-[0_20px_60px_rgba(0,0,0,0.85)]
+          border-white/10
+          shadow-[0_20px_60px_rgba(0,0,0,0.65)]
           animate-[slideDown_.35s_ease-out]
           flex
           flex-col
@@ -185,12 +185,12 @@ const PromotionsModal = ({ open = true, onClose }) => {
             py-5
             px-5
             border-b
-            border-[#16314D]
+            border-white/5
           "
         >
           <h2
             className="
-              text-[#F5FAFF]
+              text-white
               text-[24px]
               font-bold
             "
@@ -207,15 +207,12 @@ const PromotionsModal = ({ open = true, onClose }) => {
               w-10
               h-10
               rounded-full
-              bg-[#050912]
-              border
-              border-[#16314D]
-              hover:bg-[#16314D]/40
+              bg-white/5
+              hover:bg-white/10
               flex
               items-center
               justify-center
-              text-[#8FA6BC]
-              hover:text-[#F5FAFF]
+              text-white
               transition-all
               duration-300
             "
@@ -230,7 +227,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
             px-3
             py-5
             border-b
-            border-[#16314D]
+            border-white/5
             overflow-x-auto
             scrollbar-hide
           "
@@ -254,17 +251,13 @@ const PromotionsModal = ({ open = true, onClose }) => {
                     activeCategory === category
                       ? `
                         bg-primary
-                        text-[#050912]
-                        shadow-[0_4px_14px_rgba(0,229,255,0.4)]
-                        font-bold
+                        text-black
+                        shadow-[0_6px_18px_rgba(255,225,0,0.35)]
                       `
                       : `
-                        bg-[#050912]
-                        text-[#8FA6BC]
-                        hover:bg-[#16314D]/40
-                        hover:text-[#F5FAFF]
-                        border
-                        border-[#16314D]
+                        bg-[#232323]
+                        text-[#d1d1d1]
+                        hover:bg-[#2f2f2f]
                       `
                   }
                 `}
@@ -325,10 +318,10 @@ const PromotionsModal = ({ open = true, onClose }) => {
                     className="
                       overflow-hidden
                       rounded-3xl
-                      bg-[#050912]
+                      bg-[#1e1e1e]
                       border
-                      border-[#16314D]
-                      shadow-[0_10px_35px_rgba(0,0,0,0.4)]
+                      border-white/5
+                      shadow-[0_10px_35px_rgba(0,0,0,0.35)]
                     "
                   >
                     {/* IMAGE */}
@@ -354,7 +347,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                         className="
                           absolute
                           inset-0
-                          bg-gradient-to-t
+                          bg-linear-to-t
                           from-black/70
                           via-black/20
                           to-transparent
@@ -373,10 +366,9 @@ const PromotionsModal = ({ open = true, onClose }) => {
                           py-2
                           rounded-full
                           bg-primary
-                          text-[#050912]
+                          text-black
                           text-xs
                           font-bold
-                          shadow-[0_0_10px_rgba(0,229,255,0.3)]
                         "
                       >
                         <FaGift />
@@ -393,7 +385,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                     <div className="p-5">
                       <h3
                         className="
-                          text-[#F5FAFF]
+                          text-white
                           text-[20px]
                           font-bold
                           leading-8
@@ -408,7 +400,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                           flex
                           items-center
                           gap-2
-                          text-[#8FA6BC]
+                          text-[#cfcfcf]
                           text-sm
                         "
                       >
@@ -431,7 +423,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                       <p
                         className="
                           mt-4
-                          text-[#8FA6BC]
+                          text-[#d2d2d2]
                           text-[14px]
                           leading-7
                           line-clamp-3
@@ -456,13 +448,11 @@ const PromotionsModal = ({ open = true, onClose }) => {
                             flex-1
                             h-12
                             rounded-2xl
-                            bg-[#0B1220]
-                            text-[#F5FAFF]
-                            border
-                            border-[#16314D]
+                            bg-[#2b2b2b]
+                            text-white
                             text-sm
                             font-semibold
-                            hover:bg-[#16314D]/40
+                            hover:bg-[#363636]
                             transition-all
                             duration-300
                             disabled:opacity-50
@@ -496,11 +486,10 @@ const PromotionsModal = ({ open = true, onClose }) => {
                             h-12
                             rounded-2xl
                             bg-primary
-                            text-[#050912]
+                            text-black
                             text-sm
                             font-bold
-                            hover:bg-[#48DDFF]
-                            shadow-[0_0_15px_rgba(0,229,255,0.3)]
+                            hover:opacity-90
                             transition-all
                             duration-300
                           "
@@ -556,10 +545,10 @@ const PromotionsModal = ({ open = true, onClose }) => {
                 lg:max-w-3xl
                 rounded-2xl
                 overflow-hidden
-                bg-[#0B1220]
+                bg-[#161616]
                 border
-                border-[#16314D]
-                shadow-[0_20px_60px_rgba(0,0,0,0.85)]
+                border-white/10
+                shadow-[0_20px_60px_rgba(0,0,0,0.65)]
                 flex
                 flex-col
               "
@@ -573,11 +562,11 @@ const PromotionsModal = ({ open = true, onClose }) => {
                   p-4
                   sm:p-5
                   border-b
-                  border-[#16314D]
+                  border-white/5
                   shrink-0
                 "
               >
-                <h3 className="text-[#F5FAFF] text-base sm:text-lg font-bold truncate pr-4">
+                <h3 className="text-white text-base sm:text-lg font-bold truncate pr-4">
                   {selectedPromotion.title}
                 </h3>
 
@@ -585,8 +574,8 @@ const PromotionsModal = ({ open = true, onClose }) => {
                   type="button"
                   onClick={() => setDetailsOpen(false)}
                   className="
-                    text-[#8FA6BC]
-                    hover:text-[#F5FAFF]
+                    text-white/80
+                    hover:text-white
                     shrink-0
                     text-xl
                   "
@@ -637,14 +626,14 @@ const PromotionsModal = ({ open = true, onClose }) => {
 
                     {(selectedPromotion.newUserOnly ||
                       selectedPromotion.firstDepositOnly) && (
-                      <div className="absolute top-4 right-4 rounded-full bg-primary px-3 py-2 text-[11px] font-bold text-[#050912] shadow-[0_0_15px_rgba(0,229,255,0.35)]">
+                      <div className="absolute top-4 right-4 rounded-full bg-primary px-3 py-2 text-[11px] font-bold text-black shadow-[0_6px_18px_rgba(255,225,0,0.35)]">
                         {t("newUserOnly")}
                       </div>
                     )}
 
                     {(selectedPromotion.newUserOnly ||
                       selectedPromotion.firstDepositOnly) && (
-                      <div className="mt-3 inline-flex rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-[#050912] shadow-[0_0_15px_rgba(0,229,255,0.35)]">
+                      <div className="mt-3 inline-flex rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-black shadow-[0_6px_18px_rgba(255,225,0,0.35)]">
                         {t("newUserOnly")}
                       </div>
                     )}
@@ -656,18 +645,18 @@ const PromotionsModal = ({ open = true, onClose }) => {
                       lg:col-span-2
                       text-xs
                       sm:text-sm
-                      text-[#8FA6BC]
+                      text-[#d2d2d2]
                     "
                   >
                     <p className="text-primary font-semibold">
                       {getBonusDescription(selectedPromotion.bonusConfig)}
                     </p>
 
-                    <p className="mt-2 sm:mt-3 text-[#F5FAFF] font-bold text-base sm:text-lg">
+                    <p className="mt-2 sm:mt-3 text-white font-bold text-base sm:text-lg">
                       {selectedPromotion.title}
                     </p>
 
-                    <p className="mt-2 sm:mt-3 leading-relaxed line-clamp-none text-[#8FA6BC]">
+                    <p className="mt-2 sm:mt-3 leading-relaxed line-clamp-none">
                       {selectedPromotion.fullDescription ||
                         selectedPromotion.shortDescription}
                     </p>
@@ -682,15 +671,15 @@ const PromotionsModal = ({ open = true, onClose }) => {
                         gap-2
                         sm:gap-3
                         text-xs
-                        text-[#8FA6BC]
+                        text-gray-300
                       "
                     >
                       <div>
-                        <div className="font-semibold text-[#F5FAFF]">
+                        <div className="font-semibold text-gray-200">
                           {t("turnoverMultiplier")}
                         </div>
 
-                        <div className="mt-1 text-primary">
+                        <div className="mt-1">
                           {selectedPromotion.bonusConfig?.turnoverMultiplier
                             ? `${selectedPromotion.bonusConfig.turnoverMultiplier}x`
                             : "N/A"}
@@ -698,7 +687,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                       </div>
 
                       <div>
-                        <div className="font-semibold text-[#F5FAFF]">
+                        <div className="font-semibold text-gray-200">
                           {t("expiry")}
                         </div>
 
@@ -718,7 +707,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                       </div>
 
                       <div>
-                        <div className="font-semibold text-[#F5FAFF]">
+                        <div className="font-semibold text-gray-200">
                           {t("freeSpins")}
                         </div>
 
@@ -730,7 +719,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                       </div>
 
                       <div>
-                        <div className="font-semibold text-[#F5FAFF]">
+                        <div className="font-semibold text-gray-200">
                           {t("minMaxDeposit")}
                         </div>
 
@@ -756,7 +745,7 @@ const PromotionsModal = ({ open = true, onClose }) => {
                   p-4
                   sm:p-5
                   border-t
-                  border-[#16314D]
+                  border-white/5
                   shrink-0
                   flex-wrap
                   sm:flex-nowrap
@@ -784,13 +773,12 @@ const PromotionsModal = ({ open = true, onClose }) => {
                     py-2
                     sm:py-3
                     bg-primary
-                    text-[#050912]
+                    text-black
                     font-bold
                     text-sm
                     sm:text-base
                     rounded-lg
-                    hover:bg-[#48DDFF]
-                    shadow-[0_0_15px_rgba(0,229,255,0.35)]
+                    hover:bg-primary
                     transition-all
                     duration-200
                   "
@@ -807,14 +795,13 @@ const PromotionsModal = ({ open = true, onClose }) => {
                     py-2
                     sm:py-3
                     border
-                    border-[#16314D]
+                    border-white/10
                     rounded-lg
-                    text-[#8FA6BC]
+                    text-white
                     font-semibold
                     text-sm
                     sm:text-base
-                    hover:bg-[#050912]
-                    hover:text-[#F5FAFF]
+                    hover:bg-white/5
                     transition-all
                     duration-200
                   "

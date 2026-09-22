@@ -109,7 +109,7 @@ const PROVIDERS_CACHE_KEY = "home:casinoTabs:providers";
 const HOT_GAMES_CACHE_TTL = 4 * 60 * 1000;
 const PROVIDERS_CACHE_TTL = 10 * 60 * 1000;
 const CATEGORY_SCROLL_MARGIN_STYLE = {
-  scrollMarginTop: "calc(var(--mosttiger-mobile-navbar-height, 84px) + 1px)",
+  scrollMarginTop: "calc(var(--ck369-mobile-navbar-height, 84px) + 1px)",
 };
 const TABS_SCROLL_STYLE = {
   WebkitOverflowScrolling: "touch",
@@ -225,7 +225,7 @@ const CategoryTabs = memo(function CategoryTabs({
 
             ${
               activeTab === tab.name
-                ? "bg-[#0B1220] rounded-md !text-white shadow-lg shadow-primary/25 border border-[#16314D]"
+                ? "bg-[#1b1b1b] rounded-md !text-white shadow-lg shadow-primary/20"
                 : "!text-white hover:bg-white/10"
             }
           `}
@@ -266,9 +266,7 @@ const FeaturedGameCard = memo(function FeaturedGameCard({
       className="
         group
         relative
-        bg-[#0B1220]
-        border
-        border-[#16314D]
+        bg-[#1b1b1b]
         rounded-lg
         overflow-hidden
         cursor-pointer
@@ -276,8 +274,7 @@ const FeaturedGameCard = memo(function FeaturedGameCard({
         duration-300
         hover:scale-[1.03]
         hover:shadow-lg
-        hover:shadow-primary/25
-        hover:border-primary/60
+        hover:shadow-primary/20
         disabled:opacity-50
         disabled:cursor-not-allowed
         transform-gpu
@@ -286,7 +283,7 @@ const FeaturedGameCard = memo(function FeaturedGameCard({
       "
       title={game.name}
     >
-      <div className="relative overflow-hidden aspect-square bg-[#050912] transform-gpu will-change-transform backface-hidden">
+      <div className="relative overflow-hidden aspect-square bg-[#111111] transform-gpu will-change-transform backface-hidden">
         <SafeGameImage
           src={game.img}
           alt={game.name}
@@ -316,8 +313,8 @@ const FeaturedGameCard = memo(function FeaturedGameCard({
         <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-black/40 to-transparent group-hover:from-black/60 transition-all duration-300" />
       </div>
 
-      <div className="px-2 py-2 bg-[#0B1220] border-t border-[#16314D]">
-        <p className="text-[#F5FAFF] text-xs sm:text-sm font-medium truncate text-left">
+      <div className="px-2 py-2 bg-[#1b1b1b] border-t border-white/5">
+        <p className="text-white text-xs sm:text-sm font-medium truncate text-left">
           {game.name}
         </p>
       </div>
@@ -332,7 +329,7 @@ const HotGamesSection = memo(function HotGamesSection({
   gameLoading,
 }) {
   return (
-    <div className="w-full bg-[#050912] px-2 py-4">
+    <div className="w-full bg-[#111111] px-2 py-4">
       {hotLoading ? (
         <div className="flex justify-center items-center py-8">
           <div className="h-4 w-44 rounded bg-white/10 animate-pulse" />
@@ -762,7 +759,7 @@ const CasinoTabs = () => {
       <div
         ref={categoryBarRef}
         data-mobile-sticky-tabs
-        className="sticky top-[var(--mosttiger-mobile-navbar-height,0px)] md:top-[7%] z-90 w-full bg-primary"
+        className="sticky top-[var(--ck369-mobile-navbar-height,0px)] md:top-[7%] z-90 w-full bg-primary"
         style={CATEGORY_SCROLL_MARGIN_STYLE}
       >
         <CategoryTabs

@@ -5,10 +5,12 @@ const {
   callback,
   settleSession,
   settleActiveSession,
+  getActiveSession,
 } = require("../controllers/nineWicketController");
 
 const router = express.Router();
 
+router.get("/active-session", protect, getActiveSession);
 router.post("/launch", protect, launch);
 router.post("/callback", callback);
 router.post("/settle-active", protect, settleActiveSession);

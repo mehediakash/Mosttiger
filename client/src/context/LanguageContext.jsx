@@ -77,7 +77,7 @@ const translations = {
     login_now: "Login Now",
 
     // Games
-    live_games: "Live mosttiger Games",
+    live_games: "Live ck369 Games",
     select_category: "Select category and start playing",
     provider_filter: "Provider Filter",
     providers: "providers",

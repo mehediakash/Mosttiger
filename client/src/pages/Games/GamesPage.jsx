@@ -309,13 +309,13 @@ export default function GamesPage() {
   }, [page, loading, hasMore, fetchGames]);
 
   return (
-    <div className="w-full min-h-screen bg-[#050912] text-[#F5FAFF]">
+    <div className="w-full min-h-screen bg-black">
       {/* Mobile-only pinned search + provider pills.
           Why: mobile sticky can be broken by ancestor stacking/scroll contexts,
           so this uses a fixed shell under the existing header while keeping
           desktop and all business logic unchanged. */}
       <div className="md:hidden">
-        <div className="fixed left-0 right-0 top-16 z-60 bg-[#050912]/90 backdrop-blur-md px-3 py-2 shadow-lg shadow-black/40 border-b border-[#16314D]">
+        <div className="fixed left-0 right-0 top-16 z-60 bg-black/80 backdrop-blur-md px-3 py-2 shadow-lg shadow-black/30 border-b border-white/5">
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -323,21 +323,21 @@ export default function GamesPage() {
                   navigate(-1);
                 } catch (e) {}
               }}
-              className="p-2 bg-[#0B1220] border border-[#16314D] rounded-lg text-[#8FA6BC] hover:text-[#18C8FF] transition-colors"
+              className="p-2 bg-[#111111] rounded-lg text-white/80"
               aria-label="Back"
             >
               <IoChevronBack size={18} />
             </button>
 
             <div className="relative flex-1">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8FA6BC] pointer-events-none">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none">
                 <FiSearch size={16} />
               </div>
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search games"
-                className="w-full bg-[#0B1220] border border-[#16314D] focus:border-[#18C8FF] text-[#F5FAFF] rounded-full pl-10 pr-3 py-2 focus:outline-none placeholder-[#8FA6BC]/60 transition-colors"
+                className="w-full bg-[#121212] text-white rounded-full pl-10 pr-3 py-2 focus:outline-none placeholder-white/40"
               />
             </div>
           </div>
@@ -353,8 +353,8 @@ export default function GamesPage() {
                 onClick={() => handleToggleProvider("ALL")}
                 className={`shrink-0 px-3 py-1 rounded-full text-sm font-semibold transition-all ${
                   selectedProviders.length === 0
-                    ? "bg-primary text-[#050912] font-bold shadow-[0_0_10px_rgba(0,229,255,0.4)]"
-                    : "bg-[#0B1220] text-[#8FA6BC] border border-[#16314D] hover:text-[#F5FAFF]"
+                    ? "bg-primary text-black"
+                    : "bg-white/5 text-white"
                 }`}
               >
                 All
@@ -370,9 +370,7 @@ export default function GamesPage() {
                     }}
                     onClick={() => handleToggleProvider(p)}
                     className={`shrink-0 px-3 py-1 rounded-full text-sm font-semibold transition-all ${
-                      active
-                        ? "bg-primary text-[#050912] font-bold shadow-[0_0_10px_rgba(0,229,255,0.4)]"
-                        : "bg-[#0B1220] text-[#8FA6BC] border border-[#16314D] hover:text-[#F5FAFF]"
+                      active ? "bg-primary text-black" : "bg-white/5 text-white"
                     }`}
                   >
                     {p}

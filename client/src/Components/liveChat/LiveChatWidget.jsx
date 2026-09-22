@@ -74,7 +74,7 @@ const LiveChatWidget = () => {
       return "fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-3 right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[9998] flex overflow-hidden rounded-3xl border border-white/10 bg-[#101010] shadow-2xl md:bottom-8 md:left-8 md:right-8 md:top-8";
     }
 
-    return "fixed bottom-[calc(max(5.5rem,calc(4.75rem+env(safe-area-inset-bottom)))+var(--mosttiger-app-download-offset,0px))] left-3 right-3 top-auto z-[9998] flex h-[min(72dvh,680px)] max-h-[calc(100dvh-7rem-env(safe-area-inset-bottom)-env(safe-area-inset-top)-var(--mosttiger-app-download-offset,0px))] min-h-[min(420px,68dvh)] w-auto overflow-hidden rounded-3xl border border-white/10 bg-[#101010] shadow-2xl sm:left-auto sm:right-4 sm:w-[min(390px,calc(100vw-2rem))] md:bottom-6 md:right-6 md:h-[min(680px,calc(100dvh-3rem))]";
+    return "fixed bottom-[calc(max(5.5rem,calc(4.75rem+env(safe-area-inset-bottom)))+var(--ck369-app-download-offset,0px))] left-3 right-3 top-auto z-[9998] flex h-[min(72dvh,680px)] max-h-[calc(100dvh-7rem-env(safe-area-inset-bottom)-env(safe-area-inset-top)-var(--ck369-app-download-offset,0px))] min-h-[min(420px,68dvh)] w-auto overflow-hidden rounded-3xl border border-white/10 bg-[#101010] shadow-2xl sm:left-auto sm:right-4 sm:w-[min(390px,calc(100vw-2rem))] md:bottom-6 md:right-6 md:h-[min(680px,calc(100dvh-3rem))]";
   }, [expanded]);
 
   const showLogin = useCallback(() => {
@@ -124,7 +124,7 @@ const LiveChatWidget = () => {
       const hidden = document.visibilityState !== "visible";
       if (!hidden && open) return;
 
-      const notification = new Notification("mosttiger Support", {
+      const notification = new Notification("ck369 Support", {
         body: normalizePreview(message),
         tag: `live-chat-${message._id || Date.now()}`,
         silent: true,
@@ -291,22 +291,13 @@ const LiveChatWidget = () => {
   }, [authenticated, ensureConversation, joinConversation, showLogin]);
 
   useEffect(() => {
-    const handleOpenLiveChat = () => {
-      if (typeof window !== "undefined") {
-        window.__openLiveChatPending = false;
-      }
+    const handleExternalOpen = () => {
       openWidget();
     };
 
-    if (typeof window !== "undefined" && window.__openLiveChatPending) {
-      window.__openLiveChatPending = false;
-      openWidget();
-    }
-
-    window.addEventListener("open-live-chat", handleOpenLiveChat);
-    return () => {
-      window.removeEventListener("open-live-chat", handleOpenLiveChat);
-    };
+    window.addEventListener("open-live-chat", handleExternalOpen);
+    return () =>
+      window.removeEventListener("open-live-chat", handleExternalOpen);
   }, [openWidget]);
 
   const minimizeWidget = () => {

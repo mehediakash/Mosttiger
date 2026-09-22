@@ -17,9 +17,9 @@ const GuestSidebarHeader = ({ onLogin, onSignUp }) => {
         rounded-[22px]
 
         border
-        border-[#16314D]
+        border-white/10
 
-        bg-[#0B1220]/95
+        bg-[#1b1b1b]/95
 
         shadow-[0_10px_40px_rgba(0,0,0,0.45)]
 
@@ -58,9 +58,9 @@ const GuestSidebarHeader = ({ onLogin, onSignUp }) => {
 
             border-[3px]
             border-primary
-            !text-[#F5FAFF]
+            !text-white
 
-            shadow-[0_0_25px_rgba(0,229,255,0.3)]
+            shadow-[0_0_25px_rgba(255,225,0,0.25)]
 
             flex-shrink-0
           "
@@ -72,7 +72,7 @@ const GuestSidebarHeader = ({ onLogin, onSignUp }) => {
         <div className="flex flex-col">
           <span
             className="
-              !text-[#F5FAFF]
+              !text-white
 
               text-[22px]
               font-extrabold
@@ -87,7 +87,7 @@ const GuestSidebarHeader = ({ onLogin, onSignUp }) => {
             className="
               mt-1
 
-              !text-[#8FA6BC]
+              !text-[#d1d1d1]
               text-sm
               font-medium
             "
@@ -118,7 +118,7 @@ const GuestSidebarHeader = ({ onLogin, onSignUp }) => {
           grid-cols-2
 
           border-t
-          border-[#16314D]
+          border-white/5
         "
       >
         {/* LOGIN */}
@@ -142,7 +142,7 @@ const GuestSidebarHeader = ({ onLogin, onSignUp }) => {
             transition-all
             duration-300
 
-            hover:bg-[#48DDFF]
+            hover:brightness-95
           "
         >
           <FaSignInAlt className="text-[18px]" />
@@ -168,12 +168,12 @@ const GuestSidebarHeader = ({ onLogin, onSignUp }) => {
             font-bold
 
             border-l
-            border-[#16314D]
+            border-black/10
 
             transition-all
             duration-300
 
-            hover:bg-[#48DDFF]
+            hover:brightness-95
           "
         >
           <FaUserPlus className="text-[18px]" />

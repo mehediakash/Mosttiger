@@ -6,22 +6,22 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About Us - mosttiger BD | Leading Online Gaming Platform</title>
+        <title>About Us - ck369 BD | Leading Online Gaming Platform</title>
         <meta
           name="description"
-          content="Learn about mosttiger BD, Bangladesh's premier online gaming and betting platform. Discover our commitment to fair play, security, and responsible gaming."
+          content="Learn about ck369 BD, Bangladesh's premier online gaming and betting platform. Discover our commitment to fair play, security, and responsible gaming."
         />
         <meta
           name="keywords"
-          content="about mosttiger BD, online gaming Bangladesh, betting platform, responsible gaming, fair play"
+          content="about ck369 BD, online gaming Bangladesh, betting platform, responsible gaming, fair play"
         />
-        <meta property="og:title" content="About Us - mosttiger BD" />
+        <meta property="og:title" content="About Us - ck369 BD" />
         <meta
           property="og:description"
           content="Bangladesh's leading online gaming platform with secure, fair, and responsible betting services."
         />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://mosttigerbd.com/about" />
+        <link rel="canonical" href="https://ck369bd.com/about" />
       </Helmet>
 
       <div className="min-h-screen bg-primary from-[#0f2a47] via-[#205583] to-[#0f2a47]">
@@ -31,7 +31,7 @@ const About = () => {
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
               About{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-500">
-                mosttiger BD
+                ck369 BD
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed">
@@ -154,7 +154,7 @@ const About = () => {
                 <div>
                   <p className="text-lg text-white/80 leading-relaxed mb-6">
                     Founded with a vision to revolutionize online gaming in
-                    Bangladesh, mosttiger BD has grown from a small platform to
+                    Bangladesh, ck369 BD has grown from a small platform to
                     become the most trusted name in digital entertainment.
                   </p>
                   <p className="text-lg text-white/80 leading-relaxed mb-6">
@@ -170,12 +170,10 @@ const About = () => {
                 </div>
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center w-32 h-32 bg-primary from-primary to-orange-500 rounded-full mb-6">
-                    <span className="text-4xl font-bold text-white">
-                      mosttiger
-                    </span>
+                    <span className="text-4xl font-bold text-white">ck369</span>
                   </div>
                   <p className="text-white/80 text-lg">
-                    mosttiger Better Gaming Experience
+                    ck369 Better Gaming Experience
                   </p>
                 </div>
               </div>
@@ -191,8 +189,8 @@ const About = () => {
             </h2>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
               Experience the future of online gaming in Bangladesh. Register
-              today and discover why thousands of players choose mosttiger BD
-              for their entertainment needs.
+              today and discover why thousands of players choose ck369 BD for
+              their entertainment needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a

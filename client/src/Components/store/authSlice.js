@@ -56,7 +56,7 @@ export const registerUser = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const res = await api.post("/api/auth/register", payload);
-      const { token, user } = res.data || {};
+      const { token, user } = res.data;
       if (token && user) {
         localStorage.setItem(LS_KEY, JSON.stringify({ user, token }));
       }
@@ -227,11 +227,11 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.loading = false;
-        state.error = null;
         if (action.payload?.token && action.payload?.user) {
           state.user = action.payload.user;
           state.token = action.payload.token;
         }
+        state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.status = "failed";

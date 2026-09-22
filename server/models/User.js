@@ -172,7 +172,14 @@ const userSchema = new mongoose.Schema(
     // Role & Hierarchy
     role: {
       type: String,
-      enum: ["user", "sub_agent", "agent", "master_agent", "admin"],
+      enum: [
+        "user",
+        "sub_agent",
+        "agent",
+        "master_agent",
+        "admin",
+        "moderator",
+      ],
       default: "user",
     },
     referenceCode: {

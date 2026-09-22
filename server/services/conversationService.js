@@ -14,7 +14,7 @@ class ConversationServiceError extends Error {
   }
 }
 
-const isAdmin = (user) => user?.role === "admin";
+const isAdmin = (user) => user?.role === "admin" || user?.role === "moderator";
 const VALID_TAGS = [
   "general",
   "deposit",
@@ -52,7 +52,10 @@ const ensureAdmin = (user) => {
 
 const sanitizeText = (value, maxLength = 5000) =>
   typeof value === "string"
-    ? value.replace(/\u0000/g, "").trim().slice(0, maxLength)
+    ? value
+        .replace(/\u0000/g, "")
+        .trim()
+        .slice(0, maxLength)
     : "";
 
 const escapeCsv = (value) => {
@@ -86,7 +89,9 @@ const buildSimplePdfBuffer = (text) => {
     "36 806 Td",
     "12 TL",
     ...lines.map((line, index) =>
-      index === 0 ? `(${escapePdfText(line)}) Tj` : `T* (${escapePdfText(line)}) Tj`,
+      index === 0
+        ? `(${escapePdfText(line)}) Tj`
+        : `T* (${escapePdfText(line)}) Tj`,
     ),
     "ET",
   ].join("\n");
@@ -233,7 +238,10 @@ class ConversationService {
     }
 
     if (tag) {
-      const normalizedTag = String(tag).toLowerCase().trim().replace(/\s+/g, "_");
+      const normalizedTag = String(tag)
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "_");
       if (!VALID_TAGS.includes(normalizedTag)) {
         throw new ConversationServiceError("Invalid chat tag", 422);
       }
@@ -305,7 +313,9 @@ class ConversationService {
 
       if (matchedUsers.length) {
         or.push({ user: { $in: matchedUsers.map((entry) => entry._id) } });
-        or.push({ assignedAdmin: { $in: matchedUsers.map((entry) => entry._id) } });
+        or.push({
+          assignedAdmin: { $in: matchedUsers.map((entry) => entry._id) },
+        });
       }
 
       if (matchedMessages.length) {
@@ -402,14 +412,20 @@ class ConversationService {
     ensureAdmin(admin);
     ensureValidObjectId(conversationId, "conversation ID");
 
-    if (assignedAdminId) ensureValidObjectId(assignedAdminId, "assigned admin ID");
+    if (assignedAdminId)
+      ensureValidObjectId(assignedAdminId, "assigned admin ID");
 
     const conversation = await Conversation.findById(conversationId);
-    if (!conversation) throw new ConversationServiceError("Conversation not found", 404);
+    if (!conversation)
+      throw new ConversationServiceError("Conversation not found", 404);
 
     if (assignedAdminId) {
-      const targetAdmin = await User.findOne({ _id: assignedAdminId, role: "admin" }).lean();
-      if (!targetAdmin) throw new ConversationServiceError("Assigned admin not found", 404);
+      const targetAdmin = await User.findOne({
+        _id: assignedAdminId,
+        role: "admin",
+      }).lean();
+      if (!targetAdmin)
+        throw new ConversationServiceError("Assigned admin not found", 404);
     }
 
     const previousAdmin = conversation.assignedAdmin || null;
@@ -443,7 +459,8 @@ class ConversationService {
     }
 
     const conversation = await Conversation.findById(conversationId);
-    if (!conversation) throw new ConversationServiceError("Conversation not found", 404);
+    if (!conversation)
+      throw new ConversationServiceError("Conversation not found", 404);
 
     const previousStatus = conversation.status;
     conversation.status = status;
@@ -468,10 +485,15 @@ class ConversationService {
     }
 
     await conversation.save();
-    await this.logActivity(conversation._id, admin, status === "resolved" ? "resolve" : "status_change", {
-      previousStatus,
-      status,
-    });
+    await this.logActivity(
+      conversation._id,
+      admin,
+      status === "resolved" ? "resolve" : "status_change",
+      {
+        previousStatus,
+        status,
+      },
+    );
 
     await conversation.populate("user", USER_PUBLIC_FIELDS);
     return normalizeConversationUser(conversation);
@@ -490,8 +512,11 @@ class ConversationService {
       { new: true },
     ).lean();
 
-    if (!conversation) throw new ConversationServiceError("Conversation not found", 404);
-    await this.logActivity(conversation._id, admin, "priority_change", { priority });
+    if (!conversation)
+      throw new ConversationServiceError("Conversation not found", 404);
+    await this.logActivity(conversation._id, admin, "priority_change", {
+      priority,
+    });
     return normalizeConversationUser(
       await Conversation.findById(conversation._id)
         .populate("user", USER_PUBLIC_FIELDS)
@@ -502,8 +527,8 @@ class ConversationService {
   async updateTags(conversationId, admin, tags = []) {
     ensureAdmin(admin);
     ensureValidObjectId(conversationId, "conversation ID");
-    const normalizedTags = [...new Set(Array.isArray(tags) ? tags : [])].map((tag) =>
-      String(tag).toLowerCase().trim().replace(/\s+/g, "_"),
+    const normalizedTags = [...new Set(Array.isArray(tags) ? tags : [])].map(
+      (tag) => String(tag).toLowerCase().trim().replace(/\s+/g, "_"),
     );
 
     if (normalizedTags.some((tag) => !VALID_TAGS.includes(tag))) {
@@ -516,8 +541,11 @@ class ConversationService {
       { new: true },
     ).lean();
 
-    if (!conversation) throw new ConversationServiceError("Conversation not found", 404);
-    await this.logActivity(conversation._id, admin, "tag_update", { tags: normalizedTags });
+    if (!conversation)
+      throw new ConversationServiceError("Conversation not found", 404);
+    await this.logActivity(conversation._id, admin, "tag_update", {
+      tags: normalizedTags,
+    });
     return normalizeConversationUser(
       await Conversation.findById(conversation._id)
         .populate("user", USER_PUBLIC_FIELDS)
@@ -526,7 +554,11 @@ class ConversationService {
   }
 
   async archiveConversation(conversationId, admin) {
-    const conversation = await this.updateStatus(conversationId, admin, "archived");
+    const conversation = await this.updateStatus(
+      conversationId,
+      admin,
+      "archived",
+    );
     await this.logActivity(conversationId, admin, "archive", {});
     return conversation;
   }
@@ -537,12 +569,18 @@ class ConversationService {
     const conversation = await Conversation.findByIdAndUpdate(
       conversationId,
       {
-        $set: { status: "open", archivedAt: null, archivedBy: null, updatedAt: new Date() },
+        $set: {
+          status: "open",
+          archivedAt: null,
+          archivedBy: null,
+          updatedAt: new Date(),
+        },
       },
       { new: true },
     ).lean();
 
-    if (!conversation) throw new ConversationServiceError("Conversation not found", 404);
+    if (!conversation)
+      throw new ConversationServiceError("Conversation not found", 404);
     await this.logActivity(conversation._id, admin, "restore", {});
     return normalizeConversationUser(
       await Conversation.findById(conversation._id)
@@ -555,7 +593,9 @@ class ConversationService {
     ensureAdmin(admin);
     ensureValidObjectId(conversationId, "conversation ID");
 
-    const disabledUntil = payload.disabledUntil ? new Date(payload.disabledUntil) : null;
+    const disabledUntil = payload.disabledUntil
+      ? new Date(payload.disabledUntil)
+      : null;
     const conversation = await Conversation.findByIdAndUpdate(
       conversationId,
       {
@@ -574,7 +614,8 @@ class ConversationService {
       { new: true },
     ).lean();
 
-    if (!conversation) throw new ConversationServiceError("Conversation not found", 404);
+    if (!conversation)
+      throw new ConversationServiceError("Conversation not found", 404);
     await this.logActivity(conversation._id, admin, "chat_restriction_update", {
       chatRestriction: conversation.chatRestriction,
     });
@@ -593,7 +634,11 @@ class ConversationService {
     }
 
     const conversation = await Conversation.findOneAndUpdate(
-      { _id: conversationId, user: user._id, status: { $in: ["resolved", "closed"] } },
+      {
+        _id: conversationId,
+        user: user._id,
+        status: { $in: ["resolved", "closed"] },
+      },
       {
         $set: {
           rating: {
@@ -608,7 +653,10 @@ class ConversationService {
     ).lean();
 
     if (!conversation) {
-      throw new ConversationServiceError("Conversation not found or not ready for rating", 404);
+      throw new ConversationServiceError(
+        "Conversation not found or not ready for rating",
+        404,
+      );
     }
 
     return normalizeConversationUser(
@@ -622,7 +670,8 @@ class ConversationService {
     ensureAdmin(admin);
     await this.getConversationDetails(conversationId, admin);
     const sanitizedNote = sanitizeText(note);
-    if (!sanitizedNote) throw new ConversationServiceError("Note cannot be empty", 400);
+    if (!sanitizedNote)
+      throw new ConversationServiceError("Note cannot be empty", 400);
 
     const createdNote = await ChatInternalNote.create({
       conversation: conversationId,
@@ -639,7 +688,10 @@ class ConversationService {
   async getNotes(conversationId, admin) {
     ensureAdmin(admin);
     await this.getConversationDetails(conversationId, admin);
-    return ChatInternalNote.find({ conversation: conversationId, isDeleted: false })
+    return ChatInternalNote.find({
+      conversation: conversationId,
+      isDeleted: false,
+    })
       .sort({ createdAt: -1 })
       .lean();
   }
@@ -648,7 +700,8 @@ class ConversationService {
     ensureAdmin(admin);
     ensureValidObjectId(noteId, "note ID");
     const sanitizedNote = sanitizeText(note);
-    if (!sanitizedNote) throw new ConversationServiceError("Note cannot be empty", 400);
+    if (!sanitizedNote)
+      throw new ConversationServiceError("Note cannot be empty", 400);
 
     const updatedNote = await ChatInternalNote.findOneAndUpdate(
       { _id: noteId, isDeleted: false },
@@ -657,7 +710,12 @@ class ConversationService {
     ).lean();
 
     if (!updatedNote) throw new ConversationServiceError("Note not found", 404);
-    await this.logActivity(updatedNote.conversation, admin, "internal_note_edit", { noteId });
+    await this.logActivity(
+      updatedNote.conversation,
+      admin,
+      "internal_note_edit",
+      { noteId },
+    );
     return updatedNote;
   }
 
@@ -678,7 +736,12 @@ class ConversationService {
     ).lean();
 
     if (!deletedNote) throw new ConversationServiceError("Note not found", 404);
-    await this.logActivity(deletedNote.conversation, admin, "internal_note_delete", { noteId });
+    await this.logActivity(
+      deletedNote.conversation,
+      admin,
+      "internal_note_delete",
+      { noteId },
+    );
     return deletedNote;
   }
 
@@ -725,16 +788,20 @@ class ConversationService {
     ensureAdmin(admin);
     ensureValidObjectId(replyId, "saved reply ID");
     const updates = { updatedBy: admin._id, updatedAt: new Date() };
-    if (payload.title !== undefined) updates.title = sanitizeText(payload.title, 120);
-    if (payload.message !== undefined) updates.message = sanitizeText(payload.message);
-    if (payload.category !== undefined) updates.category = sanitizeText(payload.category, 80);
+    if (payload.title !== undefined)
+      updates.title = sanitizeText(payload.title, 120);
+    if (payload.message !== undefined)
+      updates.message = sanitizeText(payload.message);
+    if (payload.category !== undefined)
+      updates.category = sanitizeText(payload.category, 80);
 
     const reply = await ChatSavedReply.findOneAndUpdate(
       { _id: replyId, isActive: true },
       { $set: updates },
       { new: true },
     ).lean();
-    if (!reply) throw new ConversationServiceError("Saved reply not found", 404);
+    if (!reply)
+      throw new ConversationServiceError("Saved reply not found", 404);
     await ChatActivityLog.create({
       conversation: null,
       admin: admin._id,
@@ -749,10 +816,13 @@ class ConversationService {
     ensureValidObjectId(replyId, "saved reply ID");
     const reply = await ChatSavedReply.findOneAndUpdate(
       { _id: replyId, isActive: true },
-      { $set: { isActive: false, updatedBy: admin._id, updatedAt: new Date() } },
+      {
+        $set: { isActive: false, updatedBy: admin._id, updatedAt: new Date() },
+      },
       { new: true },
     ).lean();
-    if (!reply) throw new ConversationServiceError("Saved reply not found", 404);
+    if (!reply)
+      throw new ConversationServiceError("Saved reply not found", 404);
     await ChatActivityLog.create({
       conversation: null,
       admin: admin._id,
@@ -770,7 +840,8 @@ class ConversationService {
       { $inc: { usageCount: 1 }, $set: { updatedAt: new Date() } },
       { new: true },
     ).lean();
-    if (!reply) throw new ConversationServiceError("Saved reply not found", 404);
+    if (!reply)
+      throw new ConversationServiceError("Saved reply not found", 404);
     return reply;
   }
 
@@ -793,7 +864,9 @@ class ConversationService {
       firstAdminMessages,
     ] = await Promise.all([
       Conversation.countDocuments(),
-      Conversation.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      Conversation.aggregate([
+        { $group: { _id: "$status", count: { $sum: 1 } } },
+      ]),
       Conversation.aggregate([
         { $match: { "rating.score": { $ne: null } } },
         { $group: { _id: null, averageRating: { $avg: "$rating.score" } } },
@@ -801,16 +874,26 @@ class ConversationService {
       Message.countDocuments({ createdAt: { $gte: today } }),
       Message.countDocuments({ createdAt: { $gte: week } }),
       Message.countDocuments({ createdAt: { $gte: month } }),
-      Conversation.find({ closedAt: { $ne: null } }).select("createdAt closedAt").lean(),
+      Conversation.find({ closedAt: { $ne: null } })
+        .select("createdAt closedAt")
+        .lean(),
       Message.aggregate([
         { $match: { senderType: "admin" } },
         { $sort: { createdAt: 1 } },
-        { $group: { _id: "$conversation", firstReplyAt: { $first: "$createdAt" } } },
+        {
+          $group: {
+            _id: "$conversation",
+            firstReplyAt: { $first: "$createdAt" },
+          },
+        },
       ]),
     ]);
 
     const firstReplyByConversation = new Map(
-      firstAdminMessages.map((entry) => [String(entry._id), entry.firstReplyAt]),
+      firstAdminMessages.map((entry) => [
+        String(entry._id),
+        entry.firstReplyAt,
+      ]),
     );
     const responseSamples = await Conversation.find({
       _id: { $in: firstAdminMessages.map((entry) => entry._id) },
@@ -819,12 +902,19 @@ class ConversationService {
       .lean();
     const responseDurations = responseSamples
       .map((conversation) => {
-        const firstReplyAt = firstReplyByConversation.get(String(conversation._id));
-        return firstReplyAt ? new Date(firstReplyAt) - new Date(conversation.createdAt) : null;
+        const firstReplyAt = firstReplyByConversation.get(
+          String(conversation._id),
+        );
+        return firstReplyAt
+          ? new Date(firstReplyAt) - new Date(conversation.createdAt)
+          : null;
       })
       .filter((value) => Number.isFinite(value) && value >= 0);
     const resolutionDurations = closedConversations
-      .map((conversation) => new Date(conversation.closedAt) - new Date(conversation.createdAt))
+      .map(
+        (conversation) =>
+          new Date(conversation.closedAt) - new Date(conversation.createdAt),
+      )
       .filter((value) => Number.isFinite(value) && value >= 0);
     const statusMap = byStatus.reduce((acc, entry) => {
       acc[entry._id || "unknown"] = entry.count;
@@ -839,10 +929,16 @@ class ConversationService {
       closed: statusMap.closed || 0,
       archived: statusMap.archived || 0,
       averageResponseTimeMs: responseDurations.length
-        ? Math.round(responseDurations.reduce((sum, value) => sum + value, 0) / responseDurations.length)
+        ? Math.round(
+            responseDurations.reduce((sum, value) => sum + value, 0) /
+              responseDurations.length,
+          )
         : 0,
       averageResolutionTimeMs: resolutionDurations.length
-        ? Math.round(resolutionDurations.reduce((sum, value) => sum + value, 0) / resolutionDurations.length)
+        ? Math.round(
+            resolutionDurations.reduce((sum, value) => sum + value, 0) /
+              resolutionDurations.length,
+          )
         : 0,
       averageRating: averageRating[0]?.averageRating || 0,
       messagesToday,
@@ -853,11 +949,17 @@ class ConversationService {
 
   async exportConversation(conversationId, admin, format = "txt") {
     ensureAdmin(admin);
-    const conversation = await this.getConversationDetails(conversationId, admin);
-    const messages = await Message.find({ conversation: conversationId, "deleted.isDeleted": false })
-        .populate("attachment")
-        .sort({ createdAt: 1 })
-        .lean();
+    const conversation = await this.getConversationDetails(
+      conversationId,
+      admin,
+    );
+    const messages = await Message.find({
+      conversation: conversationId,
+      "deleted.isDeleted": false,
+    })
+      .populate("attachment")
+      .sort({ createdAt: 1 })
+      .lean();
 
     const rows = messages.map((message) => ({
       createdAt: message.createdAt,
@@ -868,16 +970,27 @@ class ConversationService {
       attachmentName: message.attachment?.originalName || "",
     }));
 
-    await this.logActivity(conversationId, admin, "conversation_export", { format });
+    await this.logActivity(conversationId, admin, "conversation_export", {
+      format,
+    });
 
     if (format === "csv") {
-      const header = ["createdAt", "senderType", "messageType", "message", "attachmentName", "attachment"];
+      const header = [
+        "createdAt",
+        "senderType",
+        "messageType",
+        "message",
+        "attachmentName",
+        "attachment",
+      ];
       return {
         contentType: "text/csv",
         filename: `conversation-${conversationId}.csv`,
         body: [
           header.map(escapeCsv).join(","),
-          ...rows.map((row) => header.map((key) => escapeCsv(row[key])).join(",")),
+          ...rows.map((row) =>
+            header.map((key) => escapeCsv(row[key])).join(","),
+          ),
         ].join("\n"),
       };
     }

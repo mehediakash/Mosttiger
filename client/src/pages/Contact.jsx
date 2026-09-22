@@ -42,22 +42,22 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Us - mosttiger BD | Get in Touch</title>
+        <title>Contact Us - ck369 BD | Get in Touch</title>
         <meta
           name="description"
-          content="Contact mosttiger BD for support, inquiries, or partnership opportunities. We're here to help 24/7."
+          content="Contact ck369 BD for support, inquiries, or partnership opportunities. We're here to help 24/7."
         />
         <meta
           name="keywords"
-          content="contact mosttiger BD, customer support, gambling support Bangladesh, betting help"
+          content="contact ck369 BD, customer support, gambling support Bangladesh, betting help"
         />
-        <meta property="og:title" content="Contact Us - mosttiger BD" />
+        <meta property="og:title" content="Contact Us - ck369 BD" />
         <meta
           property="og:description"
           content="Get in touch with our support team for any questions or assistance."
         />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://mosttigerbd.com/contact" />
+        <link rel="canonical" href="https://ck369bd.com/contact" />
       </Helmet>
 
       <div className="min-h-screen bg-primary from-[#0f2a47] via-[#205583] to-[#0f2a47]">
@@ -118,7 +118,7 @@ const Contact = () => {
                       <h3 className="text-white font-bold text-lg">
                         Email Support
                       </h3>
-                      <p className="text-white/60">support@mosttigerbd.com</p>
+                      <p className="text-white/60">support@ck369bd.com</p>
                       <p className="text-white/40 text-sm">
                         Response within 24 hours
                       </p>

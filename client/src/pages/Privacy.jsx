@@ -157,22 +157,22 @@ Your continued use of our services after such changes constitutes acceptance of 
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - mosttiger BD | Your Data Protection</title>
+        <title>Privacy Policy - ck369 BD | Your Data Protection</title>
         <meta
           name="description"
-          content="Learn how mosttiger BD protects your privacy and personal information. Our comprehensive privacy policy explains data collection, usage, and security measures."
+          content="Learn how ck369 BD protects your privacy and personal information. Our comprehensive privacy policy explains data collection, usage, and security measures."
         />
         <meta
           name="keywords"
-          content="privacy policy mosttiger BD, data protection, personal information, gambling privacy Bangladesh"
+          content="privacy policy ck369 BD, data protection, personal information, gambling privacy Bangladesh"
         />
-        <meta property="og:title" content="Privacy Policy - mosttiger BD" />
+        <meta property="og:title" content="Privacy Policy - ck369 BD" />
         <meta
           property="og:description"
           content="Your privacy is our priority. Learn how we protect and handle your personal information."
         />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://mosttigerbd.com/privacy" />
+        <link rel="canonical" href="https://ck369bd.com/privacy" />
       </Helmet>
 
       <div className="min-h-screen bg-primary from-[#0f2a47] via-[#205583] to-[#0f2a47]">
@@ -252,10 +252,10 @@ Your continued use of our services after such changes constitutes acceptance of 
                 Contact Support
               </a>
               <a
-                href="mailto:privacy@mosttigerbd.com"
+                href="mailto:privacy@ck369bd.com"
                 className="border-2 border-white/30 hover:border-white/50 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300"
               >
-                privacy@mosttigerbd.com
+                privacy@ck369bd.com
               </a>
             </div>
           </div>
