@@ -146,6 +146,7 @@ app.use("/api/promotions", require("./routes/publicPromotions"));
 app.use("/api/promotions", require("./routes/promotionUserRoutes"));
 app.use("/api/promo-codes", require("./routes/promoCode"));
 app.use("/api/notifications", require("./routes/notifications"));
+app.use("/api/announcements", require("./routes/announcements"));
 app.use("/api/realtime", require("./routes/realtime"));
 app.use("/api/conversations", require("./routes/conversations"));
 app.use("/api/agent-management", require("./routes/agentManagement")); // NEW

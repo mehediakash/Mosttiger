@@ -56,6 +56,7 @@ import SEOSettings from "./pages/Settings/SEOSettings";
 // CMS Components
 import ContentManagement from "./pages/CMS/ContentManagement";
 import FavoriteBannerManagement from "./pages/CMS/FavoriteBannerManagement";
+import AnnouncementManagement from "./pages/CMS/AnnouncementManagement";
 
 // System Components
 
@@ -301,6 +302,14 @@ function App() {
                       requiredPermission={PERMISSIONS.MANAGE_CONTENT}
                     >
                       <FavoriteBannerManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="announcements"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AnnouncementManagement />
                     </ProtectedRoute>
                   }
                 />

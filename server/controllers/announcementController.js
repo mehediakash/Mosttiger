@@ -8,6 +8,7 @@ const Announcement = require("../models/Announcement");
 exports.getActiveAnnouncements = async (req, res) => {
   try {
     const announcements = await Announcement.find({ isActive: true })
+      .select("title message isActive displayOrder createdAt")
       .sort({ displayOrder: 1, createdAt: -1 })
       .lean();
 

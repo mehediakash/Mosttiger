@@ -58,6 +58,18 @@ export const userAPI = {
     axiosInstance.get("/api/user-management/activity-logs", { params }),
 };
 
+export const announcementAPI = {
+  getAnnouncements: () => axiosInstance.get("/api/announcements/admin"),
+  createAnnouncement: (data) =>
+    axiosInstance.post("/api/announcements/admin", data),
+  updateAnnouncement: (id, data) =>
+    axiosInstance.put(`/api/announcements/admin/${id}`, data),
+  deleteAnnouncement: (id) =>
+    axiosInstance.delete(`/api/announcements/admin/${id}`),
+  toggleStatus: (id, isActive) =>
+    axiosInstance.patch(`/api/announcements/admin/${id}/status`, { isActive }),
+};
+
 export const agentAPI = {
   // Admin endpoints - for creating master agents
   getAgents: (params) => axiosInstance.get("/api/admin/agents", { params }),

@@ -213,6 +213,12 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
         },
       ],
     },
+    {
+      key: "/announcements",
+      icon: <MessageOutlined />,
+      label: "Announcements",
+      disabled: user?.role !== "admin",
+    },
   ];
 
   const moderatorMenuItems = menuItems.filter(

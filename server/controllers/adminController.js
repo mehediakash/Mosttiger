@@ -227,7 +227,15 @@ exports.getUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { fullName, email, phone, password, walletMainBalance } = req.body;
+    const { fullName, email, phone, password, walletMainBalance, role } =
+      req.body;
+
+    if (role !== undefined && !["user", "moderator"].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Role must be either user or moderator",
+      });
+    }
 
     // Validate required fields
     if (!fullName || !email || !phone) {
@@ -295,6 +303,7 @@ exports.updateUser = async (req, res) => {
     user.fullName = updateData.fullName;
     user.email = updateData.email;
     user.phone = updateData.phone;
+    if (role !== undefined) user.role = role;
     user.updatedAt = updateData.updatedAt;
 
     // Save the user (triggers password hashing if password was modified)
@@ -309,6 +318,7 @@ exports.updateUser = async (req, res) => {
           fullName: user.fullName,
           email: user.email,
           phone: user.phone,
+          role: user.role,
           wallet: {
             main: user.wallet.main,
             bonus: user.wallet.bonus,
@@ -548,7 +558,9 @@ exports.getPendingTransactions = async (req, res) => {
     }
 
     const query = { status: "pending" };
-    const normalizedProvider = String(provider || "").trim().toLowerCase();
+    const normalizedProvider = String(provider || "")
+      .trim()
+      .toLowerCase();
     if (normalizedProvider) {
       if (normalizedProvider === "payment24x7") {
         if (type === "deposit") query.paymentMethod = "payment24x7";

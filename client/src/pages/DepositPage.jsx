@@ -21,6 +21,7 @@ const DepositPage = () => {
   const [loadingBalance, setLoadingBalance] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
+  const [maxDepositModalOpen, setMaxDepositModalOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState("");
   const token = useSelector((state) => state.auth?.token);
   const paymentProviders = [
@@ -445,6 +446,12 @@ const DepositPage = () => {
         });
         return;
       }
+    }
+
+    const amount = Number(String(depositAmount).replace(/,/g, ""));
+    if (Number.isFinite(amount) && amount > 30000) {
+      setMaxDepositModalOpen(true);
+      return;
     }
 
     try {
@@ -909,6 +916,34 @@ const DepositPage = () => {
           </div>
         </div>
       </div>
+
+      {maxDepositModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="max-deposit-title"
+        >
+          <div className="w-full max-w-md rounded-2xl border border-primary/30 bg-gray-900 p-6 text-white shadow-2xl">
+            <h2 id="max-deposit-title" className="mb-3 text-xl font-bold">
+              নোটিফিকেশন
+            </h2>
+            <p className="text-sm leading-6 text-gray-200">
+              দুঃখিত! সর্বোচ্চ ৩০,০০০ টাকা পর্যন্ত ডিপোজিট করা যাবে। অনুগ্রহ করে
+              ৩০,০০০ টাকা বা তার কম একটি এমাউন্ট দিন।
+            </p>
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setMaxDepositModalOpen(false)}
+                className="rounded-xl bg-primary px-5 py-2.5 font-bold text-black transition hover:bg-yellow-600"
+              >
+                ঠিক আছে
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

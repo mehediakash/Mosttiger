@@ -173,10 +173,15 @@ const UserManagement = () => {
 
   const handleEditUser = async (values) => {
     try {
+      const updateValues = { ...values };
+      if (updateValues.role === selectedUser?.role) {
+        delete updateValues.role;
+      }
+
       if (isAdmin) {
-        await userAPI.updateUserAdmin(selectedUser._id, values);
+        await userAPI.updateUserAdmin(selectedUser._id, updateValues);
       } else {
-        await userAPI.updateUser(selectedUser._id, values);
+        await userAPI.updateUser(selectedUser._id, updateValues);
       }
       message.success("User updated successfully");
       setEditModalVisible(false);
@@ -362,6 +367,7 @@ const UserManagement = () => {
                     fullName: record.fullName,
                     email: record.email,
                     phone: record.phone,
+                    role: record.role,
                     password: "", // Empty password field - leave blank to keep current
                     walletMainBalance: record.wallet?.main || 0,
                   });
@@ -648,6 +654,21 @@ const UserManagement = () => {
           >
             <Input placeholder="Enter email" />
           </Form.Item>
+
+          {isAdmin && (
+            <Form.Item name="role" label="Role">
+              <Select placeholder="Select role">
+                <Option value="user">User</Option>
+                <Option value="moderator">Moderator</Option>
+                {selectedUser?.role &&
+                  !["user", "moderator"].includes(selectedUser.role) && (
+                    <Option value={selectedUser.role}>
+                      {selectedUser.role}
+                    </Option>
+                  )}
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item
             name="password"

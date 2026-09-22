@@ -8,33 +8,7 @@ import {
 
 import { MdEmail, MdOutlineSupportAgent } from "react-icons/md";
 
-const announcements = [
-  {
-    date: "3/19/27",
-    text: `mosttiger.com 🏏
-আপনি এশিয়ার বিশ্বাসযোগ্য ক্রিকেট ট্রেডিং ও অনলাইন ক্যাসিনো প্ল্যাটফর্মে স্বাগতম!!
-
-আমাদের সাথে মেনুয়ালি & নিজে নিজে একাউন্ট খুলে লেনদেন করতে পারবেন!
-
-📌 প্রতি ডিপোজিটে পাবেন ৫% আনলিমিটেড বোনাস!!
-📌 ২৪ ঘন্টা ডিপোজিট ও উইথড্র`,
-  },
-
-  {
-    date: "4/1/27",
-    text: `mosttiger.com 🏏
-নিজে নিজে একাউন্ট খুলুন এবং ২৪ ঘন্টা ডিপোজিট ও উইথড্র করুন!
-
-📌 প্রতি ডিপোজিটে আনলিমিটেড বোনাস!!`,
-  },
-
-  {
-    date: "5/31/26",
-    text: `🏏 mosttiger.com এখনই জমা করুন এবং এক্সক্লুসিভ বোনাস উপভোগ করুন!!`,
-  },
-];
-
-const NewsTickerModal = ({ open, onClose }) => {
+const NewsTickerModal = ({ open, onClose, announcements = [] }) => {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -307,9 +281,9 @@ const NewsTickerModal = ({ open, onClose }) => {
 
           {/* ANNOUNCEMENTS */}
           <div className="space-y-5">
-            {announcements.map((item, index) => (
+            {announcements.map((item) => (
               <div
-                key={index}
+                key={item._id}
                 className="
                   bg-[#1d1d1d]
 
@@ -341,7 +315,9 @@ const NewsTickerModal = ({ open, onClose }) => {
                     font-bold
                   "
                 >
-                  {item.date}
+                  {item.createdAt
+                    ? new Date(item.createdAt).toLocaleDateString()
+                    : "Announcement"}
                 </div>
 
                 {/* TEXT */}
@@ -356,7 +332,7 @@ const NewsTickerModal = ({ open, onClose }) => {
                     whitespace-pre-line
                   "
                 >
-                  {item.text}
+                  {item.message}
                 </p>
               </div>
             ))}

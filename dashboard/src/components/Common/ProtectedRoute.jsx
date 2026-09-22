@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom";
 import { Spin } from "antd";
 import { hasPermission } from "../../utils/rolePermissions";
 
-const ProtectedRoute = ({ children, requiredPermission }) => {
+const ProtectedRoute = ({ children, requiredPermission, requiredRole }) => {
   const auth = useSelector((state) => state.auth);
   const { user, initialized } = auth;
   const location = useLocation();
@@ -37,6 +37,10 @@ const ProtectedRoute = ({ children, requiredPermission }) => {
     !location.pathname.startsWith("/live-chat")
   ) {
     return <Navigate to="/live-chat/inbox" replace />;
+  }
+
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   // If permission required, check it
