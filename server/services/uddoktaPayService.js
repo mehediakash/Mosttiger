@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const UDDOKTAPAY_BASE_URL = "https://ck369.paymently.io/api";
+const UDDOKTAPAY_BASE_URL = "https://mosttiger.paymently.io/api";
 const UDDOKTAPAY_API_KEY = "eyGLeJm697b0WHpwDFM41y5sr888nuVmgtUD589V";
 
 const client = axios.create({

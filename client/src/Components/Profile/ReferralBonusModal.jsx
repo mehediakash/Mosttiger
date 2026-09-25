@@ -264,7 +264,7 @@ const ReferralBonusModal = ({ open, onClose }) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Join ck369",
+          title: "Join mosttiger",
           text: "Register with my referral link.",
           url: referralUrl,
         });

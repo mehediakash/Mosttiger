@@ -145,7 +145,7 @@ class CloudinaryUploadService {
     validateChatAttachmentFile(file);
 
     const uploaded = await uploadBuffer(file, {
-      folder: options.folder || "ck369/live-chat",
+      folder: options.folder || "mosttiger/live-chat",
       resourceType: getChatAttachmentResourceType(file.mimetype),
     });
 

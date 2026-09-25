@@ -20,6 +20,7 @@ const {
   createPaymentController,
   verifyPaymentController,
   handlePaymentWebhookController,
+  handleUddoktaPayWebhookController,
   cancelPaymentController,
 } = require("../controllers/paymentController");
 
@@ -51,6 +52,7 @@ router.post("/cancel", protect, cancelPaymentController);
 router.post("/create", protect, createPaymentController);
 router.post("/verify", protect, verifyPaymentController);
 router.post("/webhook", handlePaymentWebhookController);
+router.post("/uddoktapay/webhook", handleUddoktaPayWebhookController);
 
 router.get("/withdrawal-methods", protect, getWithdrawalMethods);
 router.post("/withdraw", protect, createWithdrawal);

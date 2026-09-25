@@ -102,7 +102,7 @@ export default function AffiliateSignup() {
         <div className="mb-8">
           <h1 className="text-3xl font-black text-primary">Affiliate Signup</h1>
           <p className="mt-2 text-sm text-slate-500">
-            This application is attached to your existing ck369 account.
+            This application is attached to your existing mosttiger account.
           </p>
         </div>
 
@@ -167,7 +167,7 @@ export default function AffiliateSignup() {
             onChange={(e) => setField("terms", e.target.checked)}
             className="mt-1"
           />
-          I confirm that my affiliate activity will follow ck369 terms and
+          I confirm that my affiliate activity will follow mosttiger terms and
           marketing rules.
         </label>
 

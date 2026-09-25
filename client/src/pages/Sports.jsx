@@ -110,22 +110,24 @@ const Sports = () => {
   return (
     <>
       <Helmet>
-        <title>Sports Betting - ck369 BD | Bet on Your Favorite Sports</title>
+        <title>
+          Sports Betting - mosttiger BD | Bet on Your Favorite Sports
+        </title>
         <meta
           name="description"
-          content="Place bets on football, cricket, basketball, tennis and more at ck369 BD. Competitive odds, live scores, and comprehensive sports coverage."
+          content="Place bets on football, cricket, basketball, tennis and more at mosttiger BD. Competitive odds, live scores, and comprehensive sports coverage."
         />
         <meta
           name="keywords"
-          content="sports betting Bangladesh, football betting, cricket betting, basketball odds, tennis betting, ck369 BD sports"
+          content="sports betting Bangladesh, football betting, cricket betting, basketball odds, tennis betting, mosttiger BD sports"
         />
-        <meta property="og:title" content="Sports Betting - ck369 BD" />
+        <meta property="og:title" content="Sports Betting - mosttiger BD" />
         <meta
           property="og:description"
           content="Bet on your favorite sports with competitive odds and comprehensive coverage."
         />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://ck369bd.com/sports" />
+        <link rel="canonical" href="https://mosttigerbd.com/sports" />
       </Helmet>
 
       <div className="min-h-screen bg-primary from-[#0f2a47] via-[#205583] to-[#0f2a47]">
@@ -372,8 +374,8 @@ const Sports = () => {
               Ready to Start Betting?
             </h2>
             <p className="text-xl text-white/80 mb-8">
-              Join thousands of sports fans who trust ck369 BD for their betting
-              needs.
+              Join thousands of sports fans who trust mosttiger BD for their
+              betting needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a

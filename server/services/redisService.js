@@ -3,7 +3,7 @@ const logger = require("../utils/logger");
 
 class RedisService {
   constructor() {
-    this.client = createRedisConnection({ connectionName: "ck369-cache" });
+    this.client = createRedisConnection({ connectionName: "mosttiger-cache" });
     this.connecting = null;
     this.unavailableUntil = 0;
     this.circuitMs = Number(process.env.REDIS_CIRCUIT_BREAKER_MS || 5000);

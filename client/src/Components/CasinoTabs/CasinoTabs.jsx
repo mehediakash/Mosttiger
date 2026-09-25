@@ -109,7 +109,7 @@ const PROVIDERS_CACHE_KEY = "home:casinoTabs:providers";
 const HOT_GAMES_CACHE_TTL = 4 * 60 * 1000;
 const PROVIDERS_CACHE_TTL = 10 * 60 * 1000;
 const CATEGORY_SCROLL_MARGIN_STYLE = {
-  scrollMarginTop: "calc(var(--ck369-mobile-navbar-height, 84px) + 1px)",
+  scrollMarginTop: "calc(var(--mosttiger-mobile-navbar-height, 84px) + 1px)",
 };
 const TABS_SCROLL_STYLE = {
   WebkitOverflowScrolling: "touch",
@@ -759,7 +759,7 @@ const CasinoTabs = () => {
       <div
         ref={categoryBarRef}
         data-mobile-sticky-tabs
-        className="sticky top-[var(--ck369-mobile-navbar-height,0px)] md:top-[7%] z-90 w-full bg-primary"
+        className="sticky top-[var(--mosttiger-mobile-navbar-height,0px)] md:top-[7%] z-90 w-full bg-primary"
         style={CATEGORY_SCROLL_MARGIN_STYLE}
       >
         <CategoryTabs

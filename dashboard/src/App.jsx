@@ -52,6 +52,7 @@ import PromotionManagement from "./pages/Promotions/PromotionManagement";
 // Settings Components
 import AutoApprovalSettings from "./pages/Settings/AutoApprovalSettings";
 import SEOSettings from "./pages/Settings/SEOSettings";
+import PaymentGatewayRouting from "./pages/Settings/PaymentGatewayRouting";
 
 // CMS Components
 import ContentManagement from "./pages/CMS/ContentManagement";
@@ -310,6 +311,22 @@ function App() {
                   element={
                     <ProtectedRoute requiredRole="admin">
                       <AnnouncementManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="payment-gateways"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <PaymentGatewayRouting />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="payment-gateway"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <PaymentGatewayRouting />
                     </ProtectedRoute>
                   }
                 />

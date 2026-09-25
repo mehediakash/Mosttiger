@@ -3,7 +3,7 @@ import { useEffect } from "react";
 const NAVBAR_SELECTOR = "[data-mobile-sticky-navbar]";
 const TABS_SELECTOR = "[data-mobile-sticky-tabs]";
 const MOBILE_QUERY = "(max-width: 767px)";
-const NAVBAR_HEIGHT_VAR = "--ck369-mobile-navbar-height";
+const NAVBAR_HEIGHT_VAR = "--mosttiger-mobile-navbar-height";
 
 export default function useMobileStickyStackController() {
   useEffect(() => {

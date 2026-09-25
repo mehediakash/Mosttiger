@@ -1,7 +1,15 @@
 const PaymentGatewayRouting = require("../models/PaymentGatewayRouting");
 const logger = require("../utils/logger");
 
-const GATEWAY_KEYS = ["uddoktapay", "payment24x7"];
+const GATEWAY_KEYS = ["payment24x7", "uddoktapay"];
+
+const normalizeGatewayKey = (key) => {
+  if (!key) return null;
+  const lower = String(key).trim().toLowerCase();
+  if (lower === "none" || lower === "null" || lower === "") return null;
+  if (GATEWAY_KEYS.includes(lower)) return lower;
+  return lower;
+};
 
 const getRoutingConfig = async () => {
   let config = await PaymentGatewayRouting.findOne();
@@ -28,11 +36,8 @@ const getRoutingConfig = async () => {
 const getActiveGateway = async () => {
   const config = await getRoutingConfig();
 
-  const active = String(config.activeGateway || "")
-    .toLowerCase()
-    .trim();
-
-  if (!GATEWAY_KEYS.includes(active)) {
+  const active = normalizeGatewayKey(config.activeGateway);
+  if (!active || !GATEWAY_KEYS.includes(active)) {
     return null;
   }
 
@@ -44,76 +49,86 @@ const getActiveGateway = async () => {
   return active;
 };
 
-const updateRoutingConfig = async (payload = {}, adminUserId = null) => {
-  const current = await getRoutingConfig();
+/**
+ * Switch payment gateway atomically with mutual exclusivity.
+ * Only ONE gateway can be active at a time.
+ * If PAYMENT24X7 is ON, UDDOKTAPAY is OFF.
+ * If UDDOKTAPAY is ON, PAYMENT24X7 is OFF.
+ * If target is null/none, both are turned OFF.
+ */
+const switchGateway = async (targetGateway, adminUserId = null) => {
+  const normalized = normalizeGatewayKey(targetGateway);
 
-  const nextActive = payload.activeGateway
-    ? String(payload.activeGateway).toLowerCase().trim()
-    : current.activeGateway;
-
-  if (!GATEWAY_KEYS.includes(nextActive)) {
+  if (normalized !== null && !GATEWAY_KEYS.includes(normalized)) {
     const error = new Error(
-      `Invalid active gateway. Must be one of: ${GATEWAY_KEYS.join(", ")}`,
+      `Invalid payment gateway '${targetGateway}'. Valid values are: PAYMENT24X7, UDDOKTAPAY`,
     );
     error.statusCode = 400;
     throw error;
   }
 
-  const nextGateways = {
-    uddoktapay: {
-      name: "UDDOKTAPAY",
-      enabled:
-        payload.gateways?.uddoktapay?.enabled !== undefined
-          ? Boolean(payload.gateways.uddoktapay.enabled)
-          : (current.gateways?.uddoktapay?.enabled ?? false),
+  const current = await getRoutingConfig();
+  const previousGateway = current.activeGateway;
+
+  const update = {
+    activeGateway: normalized,
+    gateways: {
+      payment24x7: {
+        name: "PAYMENT24X7",
+        enabled: normalized === "payment24x7",
+      },
+      uddoktapay: {
+        name: "UDDOKTAPAY",
+        enabled: normalized === "uddoktapay",
+      },
     },
-    payment24x7: {
-      name: "PAYMENT24X7",
-      enabled:
-        payload.gateways?.payment24x7?.enabled !== undefined
-          ? Boolean(payload.gateways.payment24x7.enabled)
-          : (current.gateways?.payment24x7?.enabled ?? true),
-    },
+    updatedBy: adminUserId || null,
   };
 
-  // Rule 1: Cannot disable both gateways
-  const anyEnabled = Object.values(nextGateways).some((g) => g.enabled);
-  if (!anyEnabled) {
-    const error = new Error(
-      "Cannot disable all gateways. At least one payment gateway must remain enabled.",
-    );
-    error.statusCode = 400;
-    throw error;
-  }
+  const updated = await PaymentGatewayRouting.findOneAndUpdate(
+    {},
+    { $set: update },
+    { new: true, upsert: true, setDefaultsOnInsert: true },
+  );
 
-  // Rule 2: Active gateway must be enabled
-  if (!nextGateways[nextActive]?.enabled) {
-    const error = new Error(
-      `Cannot set '${nextActive.toUpperCase()}' as active because it is disabled. Please enable it first.`,
-    );
-    error.statusCode = 400;
-    throw error;
-  }
-
-  current.activeGateway = nextActive;
-  current.gateways = nextGateways;
-  current.updatedBy = adminUserId || current.updatedBy;
-  current.markModified("gateways");
-
-  await current.save();
-
-  logger.info("Payment gateway routing configuration updated", {
-    activeGateway: current.activeGateway,
-    gateways: current.gateways,
-    adminUserId: adminUserId?.toString?.(),
+  logger.info("Admin changed payment gateway", {
+    previousGateway: previousGateway ? previousGateway.toUpperCase() : "NONE",
+    newGateway: normalized ? normalized.toUpperCase() : "NONE",
+    adminUserId: adminUserId?.toString?.() || "system",
+    time: new Date().toISOString(),
   });
 
-  return current;
+  return updated;
+};
+
+/**
+ * Backward-compatible routing update handler
+ */
+const updateRoutingConfig = async (payload = {}, adminUserId = null) => {
+  const target = payload.gateway || payload.activeGateway;
+
+  if (target !== undefined) {
+    return switchGateway(target, adminUserId);
+  }
+
+  // If specific enabled flags passed
+  const uddoktaRequested = payload.gateways?.uddoktapay?.enabled;
+  const payment24x7Requested = payload.gateways?.payment24x7?.enabled;
+
+  if (uddoktaRequested && !payment24x7Requested) {
+    return switchGateway("uddoktapay", adminUserId);
+  }
+  if (payment24x7Requested && !uddoktaRequested) {
+    return switchGateway("payment24x7", adminUserId);
+  }
+
+  return getRoutingConfig();
 };
 
 module.exports = {
   GATEWAY_KEYS,
   getRoutingConfig,
   getActiveGateway,
+  switchGateway,
   updateRoutingConfig,
 };

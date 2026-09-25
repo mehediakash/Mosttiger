@@ -4,9 +4,8 @@ const paymentGatewayRoutingSchema = new mongoose.Schema(
   {
     activeGateway: {
       type: String,
-      enum: ["uddoktapay", "payment24x7"],
+      enum: ["uddoktapay", "payment24x7", null],
       default: "payment24x7",
-      required: true,
     },
     gateways: {
       uddoktapay: {

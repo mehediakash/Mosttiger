@@ -122,6 +122,7 @@ connectWithRetry();
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/payments", require("./routes/payments"));
+app.use("/api/payment-gateway", require("./routes/paymentGatewayRoutes"));
 app.post(
   "/api/payment24x7/callback",
   require("./controllers/paymentController").handlePaymentWebhookController,

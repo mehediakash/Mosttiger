@@ -13,8 +13,11 @@ export const verifyPayment = (payload) =>
 export const cancelPayment = (payload) =>
   api.post("/api/payments/cancel", payload);
 
+export const getActiveGateway = () => api.get("/api/payment-gateway/active");
+
 export default {
   createPayment,
   verifyPayment,
   cancelPayment,
+  getActiveGateway,
 };

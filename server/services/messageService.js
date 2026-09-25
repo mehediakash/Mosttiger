@@ -243,7 +243,7 @@ class MessageService {
     if (file) {
       uploadedAttachment = await cloudinaryUploadService.uploadChatAttachment(
         file,
-        { folder: "ck369/live-chat" },
+        { folder: "mosttiger/live-chat" },
       );
     }
 

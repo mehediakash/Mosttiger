@@ -18,6 +18,7 @@ import {
   ShareAltOutlined,
   MessageOutlined,
   CloseOutlined,
+  CreditCardOutlined,
 } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { hasPermission, PERMISSIONS } from "../../utils/rolePermissions";
@@ -84,7 +85,19 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
           label: "Agent Balance Control",
           disabled: !hasPermission(user, PERMISSIONS.ADJUST_USER_BALANCE),
         },
+        {
+          key: "/payment-gateways",
+          icon: <CreditCardOutlined />,
+          label: "Payment Gateways",
+          disabled: user?.role !== "admin",
+        },
       ],
+    },
+    {
+      key: "/payment-gateways",
+      icon: <CreditCardOutlined />,
+      label: "Payment Gateway Management",
+      disabled: user?.role !== "admin",
     },
     {
       key: "/ggr-topup",
@@ -258,7 +271,11 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
     <div className="flex flex-col h-full bg-[#0d1e2e]">
       <div className="p-3 bg-[#205583] text-center border-b border-[#1e3a52] flex items-center justify-between">
         <div className="flex-1 flex justify-center">
-          <img src={logo} alt="ck369 live" className="h-12 object-contain" />
+          <img
+            src={logo}
+            alt="mosttiger live"
+            className="h-12 object-contain"
+          />
         </div>
         {mobileOpen && (
           <Button

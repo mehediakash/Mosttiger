@@ -73,7 +73,11 @@ const Header = ({ collapsed, onToggleMenu }) => {
 
         {/* Compact logo visible on mobile/tablet when sidebar is in a drawer */}
         <div className="lg:hidden flex items-center ml-1">
-          <img src={logo} alt="ck369" className="h-8 sm:h-9 object-contain" />
+          <img
+            src={logo}
+            alt="mosttiger"
+            className="h-8 sm:h-9 object-contain"
+          />
         </div>
       </div>
 

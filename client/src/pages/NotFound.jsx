@@ -4,7 +4,7 @@ export default function NotFound() {
   return (
     <>
       <Helmet>
-        <title>404 - Page Not Found | ck369 Live</title>
+        <title>404 - Page Not Found | mosttiger Live</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 

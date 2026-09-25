@@ -23,7 +23,40 @@ const DepositPage = () => {
   const [formStatus, setFormStatus] = useState(null);
   const [maxDepositModalOpen, setMaxDepositModalOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState("");
+  const [gatewayConfig, setGatewayConfig] = useState({
+    activeGateway: "PAYMENT24X7",
+    showProviderSelection: true,
+    loading: true,
+  });
   const token = useSelector((state) => state.auth?.token);
+
+  useEffect(() => {
+    let isMounted = true;
+    paymentService
+      .getActiveGateway()
+      .then((res) => {
+        if (!isMounted) return;
+        const data = res?.data || {};
+        setGatewayConfig({
+          activeGateway: data.activeGateway || null,
+          showProviderSelection: data.showProviderSelection !== false,
+          loading: false,
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to fetch active payment gateway:", err);
+        if (!isMounted) return;
+        setGatewayConfig({
+          activeGateway: "PAYMENT24X7",
+          showProviderSelection: true,
+          loading: false,
+        });
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const paymentProviders = [
     {
       id: "bkash",
@@ -413,6 +446,14 @@ const DepositPage = () => {
       return;
     }
 
+    if (gatewayConfig.activeGateway === null && !gatewayConfig.loading) {
+      setFormStatus({
+        type: "error",
+        text: "Payment service is temporarily unavailable. Please try again later.",
+      });
+      return;
+    }
+
     // Validate deposit amount
     if (!depositAmount) {
       setFormStatus({
@@ -422,7 +463,7 @@ const DepositPage = () => {
       return;
     }
 
-    if (!selectedProvider) {
+    if (gatewayConfig.showProviderSelection && !selectedProvider) {
       setFormStatus({
         type: "error",
         text: "Please select a payment method",
@@ -459,7 +500,9 @@ const DepositPage = () => {
 
       const response = await paymentService.createPayment({
         amount: Number(depositAmount),
-        provider: selectedProvider,
+        provider: gatewayConfig.showProviderSelection
+          ? selectedProvider
+          : "uddoktapay",
         selectedPromotionId: selectedPromotion?._id || null,
       });
 
@@ -524,6 +567,14 @@ const DepositPage = () => {
                 )}
 
                 <form onSubmit={handleDeposit}>
+                  {gatewayConfig.activeGateway === null &&
+                    !gatewayConfig.loading && (
+                      <div className="mb-6 rounded-xl border border-yellow-700 bg-yellow-900/40 px-4 py-3 text-sm text-yellow-200">
+                        Payment service is temporarily unavailable. Please try
+                        again later.
+                      </div>
+                    )}
+
                   {/* Deposit Amount Section */}
                   <div className="mb-8">
                     <label className="text-white font-bold mb-4 flex items-center">
@@ -626,36 +677,40 @@ const DepositPage = () => {
                     </details>
                   </div>
 
-                  <div className="mb-8">
-                    <label className="text-white font-bold mb-4 flex items-center">
-                      <span className="w-1 h-6 bg-primary rounded-full mr-3"></span>
-                      {t("provider")}
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {paymentProviders.map((provider) => (
-                        <button
-                          type="button"
-                          key={provider.id}
-                          onClick={() => setSelectedProvider(provider.id)}
-                          className={`flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-md px-2 py-3 text-sm font-semibold transition-all duration-200 ${
-                            selectedProvider === provider.id
-                              ? "bg-primary text-black shadow-lg shadow-primary/50"
-                              : "bg-gray-700 text-primary hover:bg-gray-600 hover:shadow-lg hover:shadow-primary/20 active:scale-95"
-                          }`}
-                        >
-                          <span className="flex h-10 w-full items-center justify-center rounded bg-white/95 px-2 py-1">
-                            <img
-                              src={provider.image}
-                              alt={`${provider.name} payment`}
-                              className="max-h-8 max-w-full object-contain"
-                              loading="lazy"
-                            />
-                          </span>
-                          <span className="leading-none">{provider.name}</span>
-                        </button>
-                      ))}
+                  {gatewayConfig.showProviderSelection && (
+                    <div className="mb-8">
+                      <label className="text-white font-bold mb-4 flex items-center">
+                        <span className="w-1 h-6 bg-primary rounded-full mr-3"></span>
+                        {t("provider")}
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {paymentProviders.map((provider) => (
+                          <button
+                            type="button"
+                            key={provider.id}
+                            onClick={() => setSelectedProvider(provider.id)}
+                            className={`flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-md px-2 py-3 text-sm font-semibold transition-all duration-200 ${
+                              selectedProvider === provider.id
+                                ? "bg-primary text-black shadow-lg shadow-primary/50"
+                                : "bg-gray-700 text-primary hover:bg-gray-600 hover:shadow-lg hover:shadow-primary/20 active:scale-95"
+                            }`}
+                          >
+                            <span className="flex h-10 w-full items-center justify-center rounded bg-white/95 px-2 py-1">
+                              <img
+                                src={provider.image}
+                                alt={`${provider.name} payment`}
+                                className="max-h-8 max-w-full object-contain"
+                                loading="lazy"
+                              />
+                            </span>
+                            <span className="leading-none">
+                              {provider.name}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Select Promotion */}
                   <div id="promo-section" className="mb-8">
@@ -842,8 +897,11 @@ const DepositPage = () => {
                       submitting ||
                       promotionsLoading ||
                       !depositAmount ||
-                      !selectedProvider ||
-                      !selectedPromotion
+                      (gatewayConfig.showProviderSelection &&
+                        !selectedProvider) ||
+                      !selectedPromotion ||
+                      (gatewayConfig.activeGateway === null &&
+                        !gatewayConfig.loading)
                     }
                   >
                     {submitting ? t("processing") : t("submit")}

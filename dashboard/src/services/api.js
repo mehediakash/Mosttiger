@@ -1000,3 +1000,11 @@ export const adminBetsAPI = {
 };
 
 export const betHistoryAPI = adminBetsAPI;
+
+export const paymentGatewayRoutingAPI = {
+  getRoutingConfig: () => axiosInstance.get("/api/admin/payment-gateway"),
+  switchGateway: (gateway) =>
+    axiosInstance.put("/api/admin/payment-gateway", { gateway }),
+  updateRoutingConfig: (data) =>
+    axiosInstance.put("/api/admin/payment-gateway", data),
+};

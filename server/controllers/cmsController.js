@@ -1,7 +1,7 @@
 const CMSContent = require("../models/CMSContent");
 const cloudinaryUploadService = require("../services/cloudinaryUploadService");
 
-const CMS_CONTENT_IMAGE_FOLDER = "ck369/cms-content";
+const CMS_CONTENT_IMAGE_FOLDER = "mosttiger/cms-content";
 
 const parseJSONField = (value, fallback) => {
   if (value === undefined) return fallback;

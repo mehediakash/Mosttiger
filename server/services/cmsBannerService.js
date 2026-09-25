@@ -61,7 +61,7 @@ class CMSBannerService {
 
     const data = buildBannerPayload(payload);
     const uploaded = await cloudinaryUploadService.uploadImage(file, {
-      folder: `ck369/cms-banners/${data.bannerType}`,
+      folder: `mosttiger/cms-banners/${data.bannerType}`,
     });
 
     try {
@@ -100,7 +100,7 @@ class CMSBannerService {
     if (file) {
       const previousPublicId = banner.cloudinaryPublicId;
       const uploaded = await cloudinaryUploadService.uploadImage(file, {
-        folder: `ck369/cms-banners/${data.bannerType}`,
+        folder: `mosttiger/cms-banners/${data.bannerType}`,
       });
       banner.image = uploaded.secureUrl;
       banner.cloudinaryPublicId = uploaded.publicId;

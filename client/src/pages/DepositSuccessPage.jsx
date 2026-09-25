@@ -74,9 +74,9 @@ const DepositSuccessPage = () => {
   return (
     <>
       <SEO
-        title="Deposit Successful - ck369e"
+        title="Deposit Successful - mosttigere"
         description="Your deposit has been processed successfully"
-        canonical="https://ck369e.com/deposit-success"
+        canonical="https://mosttigere.com/deposit-success"
       />
       <div className="min-h-screen bg-black text-white p-4 md:p-8">
         <div className="max-w-2xl mx-auto">

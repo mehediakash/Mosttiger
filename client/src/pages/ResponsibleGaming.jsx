@@ -28,7 +28,7 @@ const ResponsibleGaming = () => {
           <div className="space-y-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-white mb-4">
-                Responsible Gaming at ck369 BD
+                Responsible Gaming at mosttiger BD
               </h2>
               <p className="text-xl text-white/80 max-w-3xl mx-auto">
                 Gambling should be fun and entertaining. We are committed to
@@ -78,8 +78,8 @@ const ResponsibleGaming = () => {
                 Our Commitment
               </h3>
               <p className="text-white/80 leading-relaxed mb-4">
-                At ck369 BD, responsible gaming is not just a policy—it's a core
-                value. We work with organizations like GamCare and follow
+                At mosttiger BD, responsible gaming is not just a policy—it's a
+                core value. We work with organizations like GamCare and follow
                 industry best practices to ensure our platform promotes safe and
                 enjoyable gaming.
               </p>
@@ -293,7 +293,9 @@ const ResponsibleGaming = () => {
                 </p>
                 <div className="space-y-2">
                   <p className="text-white/60">Phone: +880 1234-567890</p>
-                  <p className="text-white/60">Email: support@ck369bd.com</p>
+                  <p className="text-white/60">
+                    Email: support@mosttigerbd.com
+                  </p>
                   <p className="text-white/60">Live Chat: Available 24/7</p>
                 </div>
               </div>
@@ -366,22 +368,25 @@ const ResponsibleGaming = () => {
   return (
     <>
       <Helmet>
-        <title>Responsible Gaming - ck369 BD | Play Safely</title>
+        <title>Responsible Gaming - mosttiger BD | Play Safely</title>
         <meta
           name="description"
-          content="Learn about responsible gaming at ck369 BD. Access tools for self-control, recognize warning signs, and get help if needed. Gambling should be fun and safe."
+          content="Learn about responsible gaming at mosttiger BD. Access tools for self-control, recognize warning signs, and get help if needed. Gambling should be fun and safe."
         />
         <meta
           name="keywords"
           content="responsible gaming, gambling addiction help, self exclusion, deposit limits, gambling awareness Bangladesh"
         />
-        <meta property="og:title" content="Responsible Gaming - ck369 BD" />
+        <meta property="og:title" content="Responsible Gaming - mosttiger BD" />
         <meta
           property="og:description"
           content="Your safety comes first. Learn about responsible gaming tools and get help when needed."
         />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://ck369bd.com/responsible-gaming" />
+        <link
+          rel="canonical"
+          href="https://mosttigerbd.com/responsible-gaming"
+        />
       </Helmet>
 
       <div className="min-h-screen bg-primary from-[#0f2a47] via-[#205583] to-[#0f2a47]">

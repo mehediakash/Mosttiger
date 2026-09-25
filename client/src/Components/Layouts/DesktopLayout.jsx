@@ -789,7 +789,7 @@ const DesktopLayout = () => {
               {/* Logo */}
               <div className="flex-1 flex ">
                 <Link to={"/"}>
-                  <img src={logo} alt="ck369" className="h-10" />
+                  <img src={logo} alt="mosttiger" className="h-10" />
                 </Link>
               </div>
 

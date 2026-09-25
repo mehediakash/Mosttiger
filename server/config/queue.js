@@ -3,7 +3,7 @@ const { createRedisConnection } = require("./redis");
 const logger = require("../utils/logger");
 
 const connection = createRedisConnection({
-  connectionName: "ck369-bullmq",
+  connectionName: "mosttiger-bullmq",
   bullmq: true,
 });
 
@@ -56,7 +56,7 @@ function createQueue(name) {
 function createEvents(name) {
   return new QueueEvents(name, {
     connection: createRedisConnection({
-      connectionName: `ck369-bullmq-events-${name}`,
+      connectionName: `mosttiger-bullmq-events-${name}`,
       bullmq: true,
     }),
   });

@@ -46,8 +46,8 @@ export default function AffiliateLogin() {
             Access your partner dashboard.
           </h1>
           <p className="mt-3 text-sm leading-6 text-slate-300">
-            Use your existing ck369 account. Dashboard access is available only
-            after affiliate approval.
+            Use your existing mosttiger account. Dashboard access is available
+            only after affiliate approval.
           </p>
         </div>
         <form onSubmit={handleSubmit} className="p-6 sm:p-8">

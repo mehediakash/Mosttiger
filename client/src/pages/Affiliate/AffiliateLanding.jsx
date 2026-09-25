@@ -28,7 +28,7 @@ const sections = [
 const faqs = [
   [
     "Do I need a new account?",
-    "No. Affiliates use the existing ck369 user login.",
+    "No. Affiliates use the existing mosttiger user login.",
   ],
   [
     "When does commission start?",
@@ -47,13 +47,13 @@ export default function AffiliateLanding() {
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <div className="mb-4 inline-flex rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 text-sm text-emerald-200">
-              ck369 Affiliate Program
+              mosttiger Affiliate Program
             </div>
             <h1 className="text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
               Build your player network and earn revenue share.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">
-              Apply as an affiliate, promote ck369 with your unique tracking
+              Apply as an affiliate, promote mosttiger with your unique tracking
               link, and manage players, revenue, settlements and withdrawals
               from one portal.
             </p>
@@ -213,7 +213,7 @@ export default function AffiliateLanding() {
       </section>
 
       <section className="px-4 py-16 text-center sm:px-6 lg:px-8 mb-20">
-        <h2 className="text-3xl font-black">Ready to grow with ck369?</h2>
+        <h2 className="text-3xl font-black">Ready to grow with mosttiger?</h2>
         <div className="mt-6 flex justify-center gap-3">
           <div className="rounded-lg !bg-primary !text-black border border-white/20  px-5 py-3 font-bold ">
             <Link to="/affiliate/signup">Become Affiliate</Link>

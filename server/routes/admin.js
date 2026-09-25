@@ -24,6 +24,7 @@ const {
 
 const adminManagementController = require("../controllers/adminManagementController");
 const adminBetsController = require("../controllers/adminBetsController");
+const paymentGatewayRoutingController = require("../controllers/paymentGatewayRoutingController");
 
 const { protect, authorize } = require("../middleware/auth");
 
@@ -88,6 +89,21 @@ router.delete(
 router.post(
   "/agents/create-with-permissions",
   adminManagementController.createAgentWithPermissions,
+);
+
+// Payment Gateway Management
+router.get(
+  "/payment-gateway",
+  paymentGatewayRoutingController.getRoutingConfig,
+);
+router.put("/payment-gateway", paymentGatewayRoutingController.switchGateway);
+router.get(
+  "/payment-gateways/routing",
+  paymentGatewayRoutingController.getRoutingConfig,
+);
+router.put(
+  "/payment-gateways/routing",
+  paymentGatewayRoutingController.switchGateway,
 );
 
 module.exports = router;

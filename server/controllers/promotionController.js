@@ -2,7 +2,7 @@ const Promotion = require("../models/Promotion");
 const promotionService = require("../services/promotionService");
 const cloudinaryUploadService = require("../services/cloudinaryUploadService");
 
-const PROMOTION_IMAGE_FOLDER = "ck369/promotions";
+const PROMOTION_IMAGE_FOLDER = "mosttiger/promotions";
 
 const parseJsonField = (value, fallback) => {
   if (value === undefined) return fallback;
