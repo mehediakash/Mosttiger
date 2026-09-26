@@ -29,7 +29,10 @@ const timingSafeEqualHex = (left, right) => {
   const leftValue = String(left || "");
   const rightValue = String(right || "");
 
-  if (!/^[a-f0-9]{64}$/i.test(leftValue) || !/^[a-f0-9]{64}$/i.test(rightValue)) {
+  if (
+    !/^[a-f0-9]{64}$/i.test(leftValue) ||
+    !/^[a-f0-9]{64}$/i.test(rightValue)
+  ) {
     return false;
   }
 
@@ -81,10 +84,13 @@ const verifyPayment24x7CallbackSignature = ({
     headers["x-paydesk-signature"] || headers["X-PayDesk-Signature"];
 
   if (!apiKey || !apiSecret) {
-    return { valid: false, reason: "Payment24x7 credentials are not configured" };
+    return {
+      valid: false,
+      reason: "Payment24x7 credentials are not configured",
+    };
   }
 
-  if (receivedKey !== apiKey) {
+  if (String(receivedKey || "").trim() !== String(apiKey || "").trim()) {
     return { valid: false, reason: "Invalid key" };
   }
 
@@ -106,6 +112,23 @@ const verifyPayment24x7CallbackSignature = ({
   });
 
   if (!timingSafeEqualHex(expected, signature)) {
+    // If requestUri has query string or trailing slashes, check stripped URI as well
+    const strippedUri = String(requestUri || "")
+      .split("?")[0]
+      .replace(/\/+$/, "");
+    if (strippedUri && strippedUri !== requestUri) {
+      const strippedExpected = signPayment24x7Request({
+        timestamp: String(timestamp),
+        method,
+        requestUri: strippedUri,
+        rawBody: rawBody || "",
+        apiSecret,
+      });
+      if (timingSafeEqualHex(strippedExpected, signature)) {
+        return { valid: true };
+      }
+    }
+
     return { valid: false, reason: "Invalid signature" };
   }
 

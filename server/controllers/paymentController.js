@@ -76,14 +76,22 @@ const findDepositByReference = (reference, userId = null) => {
   return Deposit.findOne(query);
 };
 
-const findWithdrawalByPayment24x7Payload = (payload) =>
-  Withdrawal.findOne({
-    $or: [
-      { referenceId: payload?.merchant_reference },
-      { "propayDetails.orderNo": payload?.reference },
-      { transactionId: payload?.reference },
-    ].filter((item) => Object.values(item)[0]),
-  });
+const findWithdrawalByPayment24x7Payload = (payload) => {
+  const withdrawalId =
+    payload?.metadata?.withdrawalId || payload?.metadata?.withdrawal_id || null;
+
+  const conditions = [
+    payload?.merchant_reference
+      ? { referenceId: payload.merchant_reference }
+      : null,
+    payload?.reference ? { "propayDetails.orderNo": payload.reference } : null,
+    payload?.reference ? { transactionId: payload.reference } : null,
+    withdrawalId ? { _id: withdrawalId } : null,
+  ].filter(Boolean);
+
+  if (!conditions.length) return null;
+  return Withdrawal.findOne({ $or: conditions });
+};
 
 const markDepositTransactionApproved = async (
   depositId,

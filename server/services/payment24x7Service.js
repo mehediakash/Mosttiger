@@ -9,11 +9,18 @@ const {
   unsignedGet,
 } = require("./payment24x7Client");
 
-const SUPPORTED_METHODS = new Set(["bkash", "nagad", "rocket"]);
+const METHOD_MAP = {
+  bkash: "bkash",
+  nagad: "nagad",
+  nogod: "nagad",
+  rocket: "rocket",
+};
 
 const normalizeMethod = (method) => {
-  const value = String(method || "").toLowerCase().trim();
-  return SUPPORTED_METHODS.has(value) ? value : "";
+  const value = String(method || "")
+    .toLowerCase()
+    .trim();
+  return METHOD_MAP[value] || "";
 };
 
 const removeUndefined = (payload) =>
@@ -80,14 +87,18 @@ const createWithdrawal = async ({
   const normalizedMethod = assertSupportedMethod(method, "withdrawal");
   const { callbackUrl: defaultCallbackUrl } = getPayment24x7Config();
 
+  const safeCustomerName = String(customerName || "").trim() || "Customer";
+  const safeCustomerMobile =
+    String(customerMobile || "").trim() || String(accountNumber || "").trim();
+
   const payload = removeUndefined({
     merchant_reference: merchantReference,
     amount: Number(amount),
     currency: "BDT",
     method: normalizedMethod,
-    account_number: accountNumber,
-    customer_name: customerName || undefined,
-    customer_mobile: customerMobile || undefined,
+    account_number: String(accountNumber || "").trim(),
+    customer_name: safeCustomerName,
+    customer_mobile: safeCustomerMobile,
     callback_url: callbackUrl || defaultCallbackUrl,
     metadata: metadata || undefined,
   });

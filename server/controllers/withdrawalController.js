@@ -14,14 +14,15 @@ const {
 
 const buildCallbackUrl = () =>
   process.env.PAYMENT24X7_CALLBACK_URL ||
-  `${process.env.BASE_URL || "http://localhost:5000"}/api/payments/webhook`;
+  process.env.PAYDESK_CALLBACK_URL ||
+  `${process.env.BASE_URL || "http://localhost:5000"}/api/payment24x7/callback`;
 
 const toGatewayHttpStatus = (error) => {
   if (!String(error?.code || "").startsWith("PAYMENT24X7")) return 500;
   if (error?.status === 422) return 422;
   if (error?.status === 504) return 504;
   if (error?.status === 503) return 503;
-  if (error?.status >= 400 && error?.status < 500) return 502;
+  if (error?.status >= 400 && error?.status < 500) return error.status;
   return 502;
 };
 
@@ -229,6 +230,16 @@ exports.createWithdrawal = async (req, res) => {
       });
     }
 
+    if (activeGateway === "payment24x7" && withdrawAmount < 500) {
+      await session.abortTransaction();
+      session.endSession();
+
+      return res.status(400).json({
+        success: false,
+        message: "Minimum withdrawal amount for Payment24X7 is 500 BDT",
+      });
+    }
+
     // ✅ CHECK WITHDRAWAL LOCK - Reject if user has active turnover
     const withdrawalCheck =
       await withdrawalValidationService.checkWithdrawalLock(req.user.id);
@@ -245,7 +256,7 @@ exports.createWithdrawal = async (req, res) => {
       });
     }
 
-    const paymentMethodDoc = await PaymentMethod.findOne({
+    let paymentMethodDoc = await PaymentMethod.findOne({
       $or: [
         { provider: normalizedProvider },
         { name: new RegExp("^" + normalizedProvider + "$", "i") },
@@ -257,6 +268,16 @@ exports.createWithdrawal = async (req, res) => {
       isActive: true,
     }).session(session);
 
+    if (!paymentMethodDoc && activeGateway === "payment24x7") {
+      paymentMethodDoc = {
+        name: normalizedProvider,
+        minWithdraw: 500,
+        maxWithdraw: 50000,
+        processingFee: 0,
+        processingFeeType: "fixed",
+      };
+    }
+
     if (!paymentMethodDoc) {
       await session.abortTransaction();
       session.endSession();
@@ -267,13 +288,18 @@ exports.createWithdrawal = async (req, res) => {
       });
     }
 
-    if (withdrawAmount < paymentMethodDoc.minWithdraw) {
+    const minAllowed =
+      activeGateway === "payment24x7"
+        ? Math.max(500, paymentMethodDoc.minWithdraw || 0)
+        : paymentMethodDoc.minWithdraw || 0;
+
+    if (withdrawAmount < minAllowed) {
       await session.abortTransaction();
       session.endSession();
 
       return res.status(400).json({
         success: false,
-        message: `Minimum withdrawal amount is ${paymentMethodDoc.minWithdraw}`,
+        message: `Minimum withdrawal amount is ${minAllowed}`,
       });
     }
 
@@ -330,9 +356,14 @@ exports.createWithdrawal = async (req, res) => {
     const withdrawalProvider =
       activeGateway === "uddoktapay" ? "uddoktapay" : "payment24x7";
 
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2, 7);
+    const referenceId = `WD${timestamp}${random}`.toUpperCase();
+
     const withdrawal = await Withdrawal.create(
       [
         {
+          referenceId,
           user: req.user.id,
           amount: withdrawAmount,
           netAmount,
@@ -368,7 +399,7 @@ exports.createWithdrawal = async (req, res) => {
           paymentMethod: withdrawalProvider,
           metadata: {
             withdrawalId: withdrawal[0]._id.toString(),
-            merchantReference: withdrawal[0].referenceId,
+            merchantReference: referenceId,
             payment24x7Reference: null,
             paymentMethod: normalizedProvider,
             provider: withdrawalProvider,
@@ -387,7 +418,7 @@ exports.createWithdrawal = async (req, res) => {
         "UddoktaPay withdrawal request created (pending admin approval)",
         {
           withdrawalId: withdrawal[0]._id.toString(),
-          merchantReference: withdrawal[0].referenceId,
+          merchantReference: referenceId,
           amount: withdrawAmount,
         },
       );
@@ -397,7 +428,7 @@ exports.createWithdrawal = async (req, res) => {
         message: "Withdrawal request submitted successfully",
         data: {
           withdrawalId: withdrawal[0]._id,
-          referenceId: withdrawal[0].referenceId,
+          referenceId,
           amount: withdrawal[0].amount,
           netAmount: withdrawal[0].netAmount,
           processingFee: withdrawal[0].processingFee,
@@ -407,13 +438,20 @@ exports.createWithdrawal = async (req, res) => {
     }
 
     try {
+      const customerName =
+        String(user?.fullName || "").trim() ||
+        String(user?.username || "").trim() ||
+        "Customer";
+      const customerMobile =
+        trimmedAccountNumber || String(user?.phone || "").trim();
+
       const payment24x7Withdrawal = await createPayment24x7Withdrawal({
-        merchantReference: withdrawal[0].referenceId,
+        merchantReference: referenceId,
         amount: withdrawAmount,
         method: normalizedProvider,
         accountNumber: trimmedAccountNumber,
-        customerName: user?.fullName,
-        customerMobile: trimmedAccountNumber,
+        customerName,
+        customerMobile,
         callbackUrl: buildCallbackUrl(),
         metadata: {
           user_id: req.user.id,

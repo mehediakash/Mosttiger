@@ -1,24 +1,33 @@
-const REQUIRED_ENV_KEYS = [
-  "PAYMENT24X7_BASE_URL",
-  "PAYMENT24X7_API_KEY",
-  "PAYMENT24X7_API_SECRET",
-  "PAYMENT24X7_CALLBACK_URL",
-];
+const getEnv = (key1, key2) =>
+  String(process.env[key1] || process.env[key2] || "").trim();
 
-const normalizeBaseUrl = (value) => String(value || "").trim().replace(/\/+$/, "");
+const normalizeBaseUrl = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/\/+$/, "");
 
 const getPayment24x7Config = () => ({
-  baseUrl: normalizeBaseUrl(process.env.PAYMENT24X7_BASE_URL),
-  apiKey: String(process.env.PAYMENT24X7_API_KEY || "").trim(),
-  apiSecret: String(process.env.PAYMENT24X7_API_SECRET || "").trim(),
-  callbackUrl: String(process.env.PAYMENT24X7_CALLBACK_URL || "").trim(),
-  timeoutMs: Number(process.env.PAYMENT24X7_TIMEOUT_MS || 30000),
+  baseUrl: normalizeBaseUrl(getEnv("PAYMENT24X7_BASE_URL", "PAYDESK_BASE_URL")),
+  apiKey: getEnv("PAYMENT24X7_API_KEY", "PAYDESK_API_KEY"),
+  apiSecret: getEnv("PAYMENT24X7_API_SECRET", "PAYDESK_API_SECRET"),
+  callbackUrl: getEnv("PAYMENT24X7_CALLBACK_URL", "PAYDESK_CALLBACK_URL"),
+  timeoutMs: Number(
+    process.env.PAYMENT24X7_TIMEOUT_MS ||
+      process.env.PAYDESK_TIMEOUT_MS ||
+      30000,
+  ),
 });
 
 const validatePayment24x7Config = () => {
-  const missing = REQUIRED_ENV_KEYS.filter(
-    (key) => !String(process.env[key] || "").trim(),
-  );
+  const config = getPayment24x7Config();
+  const missing = [];
+  if (!config.baseUrl)
+    missing.push("PAYMENT24X7_BASE_URL (or PAYDESK_BASE_URL)");
+  if (!config.apiKey) missing.push("PAYMENT24X7_API_KEY (or PAYDESK_API_KEY)");
+  if (!config.apiSecret)
+    missing.push("PAYMENT24X7_API_SECRET (or PAYDESK_API_SECRET)");
+  if (!config.callbackUrl)
+    missing.push("PAYMENT24X7_CALLBACK_URL (or PAYDESK_CALLBACK_URL)");
 
   if (missing.length) {
     const error = new Error(
@@ -28,8 +37,6 @@ const validatePayment24x7Config = () => {
     error.missing = missing;
     throw error;
   }
-
-  const config = getPayment24x7Config();
 
   try {
     const parsed = new URL(config.baseUrl);
