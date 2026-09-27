@@ -110,6 +110,7 @@ const connectWithRetry = () => {
     .then(async () => {
       logger.info("MongoDB Connected");
       await ensureUserPromotionIndexes();
+      await require("./services/GGRService").ensureInitialized();
     })
     .catch((err) => {
       logger.error("MongoDB connection error", { message: err.message });

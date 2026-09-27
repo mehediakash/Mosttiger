@@ -5,6 +5,6 @@ const sideEffects = require("../services/callbackSideEffectsService");
 
 createCallbackWorker({
   queueName: "ggrQueue",
-  concurrency: Number(process.env.GGR_WORKER_CONCURRENCY || 10),
+  concurrency: Number(process.env.GGR_WORKER_CONCURRENCY || 1),
   processor: (job) => sideEffects.processGGR(job.data),
 });
