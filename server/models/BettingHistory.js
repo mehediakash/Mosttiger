@@ -6,12 +6,12 @@ const bettingHistorySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     gameSession: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "GameSession",
-      required: true,
+      required: false,
+      default: null,
     },
     game: {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +20,6 @@ const bettingHistorySchema = new mongoose.Schema(
     provider: {
       type: String,
       required: true,
-      index: true,
     },
     category: {
       type: String,
@@ -113,6 +112,12 @@ bettingHistorySchema.index(
 bettingHistorySchema.index({
   user: 1,
   status: 1,
+});
+
+bettingHistorySchema.index({
+  user: 1,
+  status: 1,
+  playedAt: -1,
 });
 
 bettingHistorySchema.index({

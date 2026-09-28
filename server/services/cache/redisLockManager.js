@@ -1,45 +1,66 @@
-const crypto = require("crypto");
+const BettingHistory = require("../../models/BettingHistory");
 const redis = require("../redisService");
 
-const DEFAULT_LOCK_TTL_MS = Number(process.env.CALLBACK_ROUND_LOCK_TTL_MS || 5000);
-const RELEASE_SCRIPT = `
-if redis.call("GET", KEYS[1]) == ARGV[1] then
-  return redis.call("DEL", KEYS[1])
-end
-return 0
-`;
+const DUPLICATE_TTL_SECONDS = Number(
+  process.env.CALLBACK_DUPLICATE_TTL_SECONDS || 86400,
+);
 
-function lockKey(gameRound) {
-  return `lock:round:${String(gameRound || "")}`;
+function duplicateKey({ serialNumber, userId, gameRound, bet, win }) {
+  if (serialNumber) {
+    return userId
+      ? `callback:sn:${String(userId)}:${String(serialNumber)}`
+      : `callback:sn:${String(serialNumber)}`;
+  }
+  return userId
+    ? `callback:${String(userId)}:${String(gameRound || "")}:${Number(bet || 0)}:${Number(win || 0)}`
+    : `callback:${String(gameRound || "")}:${Number(bet || 0)}:${Number(win || 0)}`;
 }
 
-async function acquireRoundLock(gameRound, ttlMs = DEFAULT_LOCK_TTL_MS) {
-  if (!gameRound) {
-    return { acquired: true, token: null, key: null, redisAvailable: true };
-  }
-
-  const key = lockKey(gameRound);
-  const token = crypto.randomUUID();
-  const acquired = await redis.safe(async (client) => {
-    const result = await client.set(key, token, "PX", ttlMs, "NX");
-    return result === "OK";
-  }, null);
-
+async function acquire({ serialNumber, userId, gameRound, bet, win }) {
+  const key = duplicateKey({ serialNumber, userId, gameRound, bet, win });
+  const acquired = await redis.setNX(key, "1", DUPLICATE_TTL_SECONDS);
   return {
-    acquired: acquired === null ? true : acquired,
-    token,
     key,
+    acquired,
     redisAvailable: acquired !== null,
   };
 }
 
-async function release(lock) {
-  if (!lock?.key || !lock?.token) return;
-  await redis.eval(RELEASE_SCRIPT, [lock.key], [lock.token]);
+async function release(key) {
+  if (key) await redis.del(key);
+}
+
+async function existsInMongo({ serialNumber, userId, gameRound, bet, win }) {
+  if (serialNumber) {
+    const existing = await BettingHistory.findOne({
+      user: userId,
+      $or: [
+        { "metadata.serialNumber": String(serialNumber) },
+        { "metadata.serial_number": String(serialNumber) },
+      ],
+    })
+      .select("_id")
+      .lean();
+
+    if (existing) return true;
+  }
+
+  const existing = await BettingHistory.findOne({
+    user: userId,
+    gameRound,
+    betAmount: bet,
+    winAmount: win,
+  })
+    .select("_id")
+    .lean();
+
+  return Boolean(existing);
 }
 
 module.exports = {
-  DEFAULT_LOCK_TTL_MS,
-  acquireRoundLock,
+  DUPLICATE_TTL_SECONDS,
+  acquire,
   release,
+  duplicateKey,
+  existsInMongo,
 };

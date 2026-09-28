@@ -2,17 +2,26 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const EncryptionUtil = require("../utils/encryption");
 const GameSession = require("../models/GameSession");
+const User = require("../models/User");
 const WalletService = require("./walletService");
 const https = require("https");
 const SessionCache = require("./cache/sessionCacheManager");
 const WalletCache = require("./cache/walletCacheManager");
+const UserIdentityCache = require("./cache/userIdentityCacheManager");
 const DuplicateCallback = require("./cache/duplicateCallbackManager");
 const RedisLock = require("./cache/redisLockManager");
+const Transaction = require("../models/Transaction");
+const WalletReconciliationService = require("./walletReconciliationService");
 const { enqueueCallbackJobs } = require("../queues/callbackQueues");
+const { retryTransientTransaction } = require("../utils/mongoTransientRetry");
 const logger = require("../utils/logger");
 
+const PROVIDER_LAUNCH_TIMEOUT_MS = Number(
+  process.env.IGAMING_LAUNCH_TIMEOUT_MS || 15000,
+);
+
 const providerClient = axios.create({
-  timeout: 5000,
+  timeout: PROVIDER_LAUNCH_TIMEOUT_MS,
   httpsAgent: new https.Agent({
     keepAlive: true,
     maxSockets: 100,
@@ -24,8 +33,116 @@ const providerClient = axios.create({
   },
 });
 
-// Round to 2 decimal places — prevents float drift (e.g. 44.44999999999999)
-const r2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+function isTransientNetworkError(error) {
+  if (!error) return false;
+
+  // Never retry if a server response was received (e.g. 4xx, 5xx, or provider business response)
+  if (error.response) return false;
+
+  const code = error.code;
+  const message = String(error.message || "").toLowerCase();
+
+  // Axios/Node timeout errors
+  if (code === "ECONNABORTED" || code === "ETIMEDOUT") return true;
+  // Connection drops / DNS / reset errors
+  if (code === "ECONNRESET" || code === "ENOTFOUND" || code === "EAI_AGAIN")
+    return true;
+  // Axios timeout message pattern
+  if (message.includes("timeout")) return true;
+  if (message.includes("network error") || message.includes("socket hang up"))
+    return true;
+
+  return false;
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function fetchProviderLaunchWithRetry(client, launchUrl, context = {}) {
+  const { gameCode, provider, userId } = context;
+  const maxAttempts = 2;
+  const retryDelayMs = 500;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const startedAt = Date.now();
+
+    if (attempt === 1) {
+      logger.info("[GAME_PROVIDER] launch request started", {
+        gameCode,
+        provider,
+        attempt,
+        userId,
+      });
+    } else {
+      logger.info("[GAME_PROVIDER] retrying launch request", {
+        gameCode,
+        provider,
+        attempt,
+        userId,
+        delayMs: retryDelayMs,
+      });
+    }
+
+    try {
+      const response = await client.get(launchUrl);
+      const elapsedMs = Date.now() - startedAt;
+
+      logger.info("[GAME_PROVIDER] launch request succeeded", {
+        gameCode,
+        provider,
+        attempt,
+        elapsedMs,
+      });
+
+      return response;
+    } catch (error) {
+      const elapsedMs = Date.now() - startedAt;
+      const errorCode =
+        error.code ||
+        (error.response ? `HTTP_${error.response.status}` : "NETWORK_ERROR");
+      const isTransient = isTransientNetworkError(error);
+
+      if (attempt < maxAttempts && isTransient) {
+        logger.warn("[GAME_PROVIDER] launch request timeout", {
+          gameCode,
+          provider,
+          attempt,
+          elapsedMs,
+          errorCode,
+          message: error.message,
+        });
+
+        await sleep(retryDelayMs);
+        continue;
+      }
+
+      if (attempt > 1) {
+        logger.error("[GAME_PROVIDER] launch request failed after retry", {
+          gameCode,
+          provider,
+          attempts: attempt,
+          elapsedMs,
+          errorCode,
+          message: error.message,
+        });
+      } else {
+        logger.error("[GAME_PROVIDER] launch request failed", {
+          gameCode,
+          provider,
+          attempt,
+          elapsedMs,
+          errorCode,
+          message: error.message,
+        });
+      }
+
+      throw error;
+    }
+  }
+}
+
+// Round to 2 decimal places using central BDT poisha standard
+const { roundBDT } = require("../utils/money");
+const r2 = roundBDT;
 
 class IGamingService {
   constructor() {
@@ -88,7 +205,15 @@ class IGamingService {
       const launchUrl = `${this.baseUrl}?payload=${encodeURIComponent(encrypted)}&token=${this.apiToken}`;
 
       // 4. CALL PROVIDER API
-      const response = await providerClient.get(launchUrl);
+      const response = await fetchProviderLaunchWithRetry(
+        providerClient,
+        launchUrl,
+        {
+          gameCode: providerGameCode,
+          provider: game.brand || "Unknown",
+          userId: String(user.userId || user._id),
+        },
+      );
 
       if (response.data.code !== 0) {
         throw new Error(response.data.msg || "Launch failed");
@@ -148,7 +273,8 @@ class IGamingService {
   async handleGameCallback(callbackData) {
     let gameSession = null;
     let duplicateReservation = null;
-    let roundLock = null;
+    let userWalletLock = null;
+    let userId = null;
     const startedAt = process.hrtime.bigint();
     let lastMark = startedAt;
     const perfEnabled = process.env.CALLBACK_PERF_LOG !== "false";
@@ -159,7 +285,9 @@ class IGamingService {
     const mark = (label) => {
       if (!perfEnabled) return;
       const now = process.hrtime.bigint();
-      logger.info(`[CALLBACK_PERF] ${label}: ${Number(now - lastMark) / 1e6}ms`);
+      logger.info(
+        `[CALLBACK_PERF] ${label}: ${Number(now - lastMark) / 1e6}ms`,
+      );
       lastMark = now;
     };
 
@@ -171,13 +299,12 @@ class IGamingService {
         };
       }
 
-      if (!gameSession?.userId && !gameSession?.user) {
-        return { credit_amount: -1, error: "Failed" };
+      const targetUserId = userId || gameSession?.userId || gameSession?.user;
+      if (!targetUserId) {
+        return { credit_amount: -1, error: "Failed", timestamp: Date.now() };
       }
 
-      const wallet = await WalletCache.getBalance(
-        gameSession.userId || gameSession.user,
-      );
+      const wallet = await WalletCache.getBalance(targetUserId);
       return {
         credit_amount: r2(wallet?.main || 0),
         timestamp: Date.now(),
@@ -198,66 +325,187 @@ class IGamingService {
         callbackData.data?.sessionId ||
         null;
 
-      const memberAccount = callbackData.member_account || null;
+      const rawMember =
+        callbackData.member_account ??
+        callbackData.memberAccount ??
+        callbackData.data?.member_account ??
+        callbackData.data?.memberAccount ??
+        null;
+      const memberAccount =
+        rawMember !== null &&
+        rawMember !== undefined &&
+        String(rawMember).trim() !== ""
+          ? String(rawMember).trim()
+          : null;
+
+      const serialNumber =
+        callbackData.serial_number ||
+        callbackData.serialNumber ||
+        callbackData.data?.serial_number ||
+        callbackData.data?.serialNumber ||
+        null;
+
+      const effectiveGameUid =
+        game_uid ||
+        callbackData.game_code ||
+        callbackData.gameCode ||
+        callbackData.gameUid ||
+        callbackData.game_id ||
+        callbackData.data?.game_uid ||
+        callbackData.data?.game_code ||
+        null;
+
+      const providerCreditAmount =
+        WalletReconciliationService.extractProviderCreditAmount(callbackData);
 
       // Round immediately - prevents float drift in all downstream math.
       const bet = r2(Number(bet_amount) || 0);
       const win = r2(Number(win_amount) || 0);
 
+      // If callback explicitly provides a session ID, validate that it matches
+      if (callbackSessionId) {
+        const sessionById = await GameSession.findOne({
+          providerSessionId: String(callbackSessionId).trim(),
+        }).lean();
+        if (sessionById) {
+          if (
+            (effectiveGameUid &&
+              sessionById.providerGameCode &&
+              sessionById.providerGameCode !== effectiveGameUid) ||
+            (memberAccount &&
+              sessionById.memberAccount &&
+              sessionById.memberAccount !== memberAccount)
+          ) {
+            logger.warn(
+              "[SESSION_LOOKUP] providerSessionId matched but providerGameCode or memberAccount mismatched",
+              {
+                expectedGame: sessionById.providerGameCode,
+                actualGame: effectiveGameUid,
+                expectedMember: sessionById.memberAccount,
+                actualMember: memberAccount,
+              },
+            );
+            throw new Error("Game session not found");
+          }
+        }
+      }
+
+      // 1. Resolve player identity directly from member_account (SoftAPI standard)
+      let user = null;
+      if (memberAccount) {
+        user = await UserIdentityCache.resolveUserIdentity(memberAccount);
+      }
+
+      // 2. Optional GameSession lookup - contextual enrichment only.
+      // A missing, closed, or ambiguous GameSession MUST NOT block wallet callback execution.
       gameSession = await SessionCache.findActiveSession({
         providerSessionId: callbackSessionId,
-        providerGameCode: game_uid,
-        memberAccount: memberAccount ? String(memberAccount) : null,
+        providerGameCode: effectiveGameUid || game_uid,
+        memberAccount: memberAccount,
+        gameRound: game_round ? String(game_round) : null,
+      }).catch((sessionErr) => {
+        logger.warn("[IGAMING] Optional session lookup failed", {
+          message: sessionErr.message,
+          memberAccount,
+          gameRound: game_round,
+        });
+        return null;
       });
       mark("Session lookup");
 
-      if (!gameSession) throw new Error("Game session not found");
+      // Fallback: If user was not resolved by memberAccount alone, check if session was resolved deterministically
+      if (!user && gameSession) {
+        const sessionUserId = gameSession.userId || gameSession.user;
+        if (sessionUserId) {
+          user = await User.findById(sessionUserId).lean();
+        }
+      }
 
-      const userId = gameSession.userId || gameSession.user;
+      // If player cannot be identified, fail safely without wallet mutation
+      if (!user) {
+        throw new Error("Game session not found");
+      }
+
+      userId = user._id;
       const effectiveGameRound = game_round
         ? String(game_round)
-        : gameSession.gameRound;
+        : gameSession?.gameRound || null;
 
-      roundLock = await RedisLock.acquireRoundLock(effectiveGameRound);
-      if (!roundLock.acquired) {
-        mark("Redis round lock");
-        const response = await buildProviderBalanceResponse();
-        mark("Response build");
-        logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
-        return response;
+      logger.info("[CALLBACK_SESSION_OPTIONAL]", {
+        userId: String(userId),
+        memberAccount,
+        sessionResolved: Boolean(gameSession),
+        sessionId: gameSession
+          ? String(gameSession.gameSessionId || gameSession._id)
+          : null,
+        sessionStatus: gameSession?.status || null,
+        providerGameCode: effectiveGameUid || game_uid,
+        gameRound: effectiveGameRound,
+        serialNumber: serialNumber ? String(serialNumber) : null,
+      });
+
+      userWalletLock = await RedisLock.acquireUserWalletLock({
+        userId,
+      });
+
+      logger.info("[CALLBACK_WALLET_LOCK]", {
+        userId: String(userId),
+        gameRound: effectiveGameRound,
+        serialNumber: serialNumber ? String(serialNumber) : null,
+        lockKey: userWalletLock?.key,
+        acquired: userWalletLock?.acquired,
+        redisAvailable: userWalletLock?.redisAvailable,
+      });
+
+      if (!userWalletLock?.acquired) {
+        mark("User wallet lock timeout");
+        logger.error("[CALLBACK_LOCK] User wallet lock acquisition timed out", {
+          userId: String(userId),
+          gameRound: effectiveGameRound,
+          serialNumber: serialNumber ? String(serialNumber) : null,
+        });
+        return { credit_amount: -1, error: "Failed", timestamp: Date.now() };
       }
-      mark("Redis round lock");
+      mark("User wallet lock");
 
       duplicateReservation = await DuplicateCallback.acquire({
+        serialNumber,
+        userId,
         gameRound: game_round,
         bet,
         win,
       });
       mark("Duplicate lock");
 
-      if (duplicateReservation.redisAvailable && !duplicateReservation.acquired) {
-        const response = await buildProviderBalanceResponse();
-        mark("Response build");
-        logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
-        return response;
-      }
+      const isRedisDuplicate =
+        duplicateReservation.redisAvailable && !duplicateReservation.acquired;
 
+      let isMongoDuplicate = false;
       if (!duplicateReservation.redisAvailable) {
-        const exists = await DuplicateCallback.existsInMongo({
+        isMongoDuplicate = await DuplicateCallback.existsInMongo({
+          serialNumber,
           userId,
           gameRound: game_round,
           bet,
           win,
         });
-
-        if (exists) {
-          mark("Duplicate Mongo fallback");
-          const response = await buildProviderBalanceResponse();
-          mark("Response build");
-          logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
-          return response;
-        }
         mark("Duplicate Mongo fallback");
+      }
+
+      const isDuplicate = isRedisDuplicate || isMongoDuplicate;
+
+      logger.info("[CALLBACK_IDEMPOTENCY]", {
+        userId: String(userId),
+        gameRound: game_round ? String(game_round) : null,
+        serialNumber: serialNumber ? String(serialNumber) : null,
+        duplicate: isDuplicate,
+      });
+
+      if (isDuplicate) {
+        const response = await buildProviderBalanceResponse();
+        mark("Response build");
+        logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
+        return response;
       }
 
       const netChange = r2(win - bet);
@@ -265,36 +513,45 @@ class IGamingService {
       let realBalance = null;
 
       if (netChange !== 0) {
-        const walletSession = await mongoose.startSession();
-        try {
-          walletSession.startTransaction();
-          walletUpdateResult = await WalletService.updateWallet(
-            userId,
-            netChange,
-            "main",
-            netChange > 0 ? "win" : "bet",
-            {
-              gameRound: game_round,
-              gameName: game_name,
-              betAmount: bet,
-              winAmount: win,
-            },
-            walletSession,
-          );
-          await walletSession.commitTransaction();
-          realBalance = r2(walletUpdateResult.newBalance);
-          mark("Wallet update");
-          await WalletCache.setBalance(userId, { main: realBalance });
-          mark("Redis update");
-        } catch (error) {
-          await walletSession.abortTransaction();
-          if (duplicateReservation?.key) {
-            await DuplicateCallback.release(duplicateReservation.key);
-          }
-          throw error;
-        } finally {
-          walletSession.endSession();
-        }
+        walletUpdateResult = await retryTransientTransaction(
+          async () => {
+            const walletSession = await mongoose.startSession();
+            try {
+              walletSession.startTransaction();
+              const updateResult = await WalletService.updateWallet(
+                userId,
+                netChange,
+                "main",
+                netChange > 0 ? "win" : "bet",
+                {
+                  gameRound: game_round,
+                  gameName: game_name,
+                  betAmount: bet,
+                  winAmount: win,
+                  serialNumber,
+                },
+                walletSession,
+              );
+              await walletSession.commitTransaction();
+              return updateResult;
+            } catch (error) {
+              if (walletSession.inTransaction()) {
+                await walletSession.abortTransaction().catch(() => {});
+              }
+              throw error;
+            } finally {
+              await walletSession.endSession();
+            }
+          },
+          {
+            label: `wallet-update:${userId}`,
+          },
+        );
+
+        realBalance = r2(walletUpdateResult.newBalance);
+        mark("Wallet update");
+        await WalletCache.setBalance(userId, { main: realBalance });
+        mark("Redis update");
       } else {
         const wallet = await WalletCache.getBalance(userId);
         realBalance = r2(wallet.main || 0);
@@ -302,59 +559,108 @@ class IGamingService {
         mark("Redis update");
       }
 
-      const sessionPatch = {
-        endBalance: realBalance,
-        updatedAt: new Date(),
-      };
+      const walletBefore = walletUpdateResult
+        ? walletUpdateResult.previousBalance
+        : realBalance;
+      const walletAfter = realBalance;
 
-      if (game_round && gameSession.gameRound !== String(game_round)) {
-        sessionPatch.gameRound = String(game_round);
-        gameSession.gameRound = String(game_round);
+      const reconciliationReport = await WalletReconciliationService.reconcile({
+        userId,
+        gameRound: effectiveGameRound,
+        serialNumber,
+        providerCreditAmount,
+        walletBefore,
+        walletAfter,
+        transactionId: walletUpdateResult?.transactionId || null,
+        sessionStartTime: gameSession?.createdAt || null,
+      });
+
+      if (walletUpdateResult?.transactionId) {
+        Transaction.updateOne(
+          { _id: walletUpdateResult.transactionId },
+          { $set: { "metadata.reconciliation": reconciliationReport } },
+        ).catch((err) => {
+          logger.warn(
+            "[WALLET_RECONCILIATION] Failed to update transaction metadata",
+            {
+              transactionId: walletUpdateResult.transactionId,
+              message: err.message,
+            },
+          );
+        });
       }
 
-      gameSession.endBalance = realBalance;
+      if (gameSession) {
+        const sessionPatch = {
+          endBalance: realBalance,
+          updatedAt: new Date(),
+        };
 
-      GameSession.updateOne(
-        { _id: gameSession.gameSessionId || gameSession._id },
-        { $set: sessionPatch },
-      ).catch((error) => {
-        logger.error("[IGAMING] session balance update failed", {
-          sessionId: gameSession.gameSessionId || gameSession._id,
-          message: error.message,
-        });
-      });
+        if (game_round && gameSession.gameRound !== String(game_round)) {
+          sessionPatch.gameRound = String(game_round);
+          gameSession.gameRound = String(game_round);
+        }
 
-      SessionCache.updateCachedSession(
-        gameSession.providerSessionId || callbackSessionId,
-        sessionPatch,
-      ).catch((error) => {
-        logger.warn("[IGAMING] session cache refresh failed", {
-          sessionId: gameSession.gameSessionId || gameSession._id,
-          message: error.message,
+        gameSession.endBalance = realBalance;
+
+        GameSession.updateOne(
+          { _id: gameSession.gameSessionId || gameSession._id },
+          { $set: sessionPatch },
+        ).catch((error) => {
+          logger.error("[IGAMING] session balance update failed", {
+            sessionId: gameSession.gameSessionId || gameSession._id,
+            message: error.message,
+          });
         });
-      });
+
+        SessionCache.updateCachedSession(
+          gameSession.providerSessionId || callbackSessionId,
+          sessionPatch,
+        ).catch((error) => {
+          logger.warn("[IGAMING] session cache refresh failed", {
+            sessionId: gameSession.gameSessionId || gameSession._id,
+            message: error.message,
+          });
+        });
+      }
 
       const idempotencyKey =
         duplicateReservation?.key ||
-        DuplicateCallback.duplicateKey({ gameRound: game_round, bet, win });
+        DuplicateCallback.duplicateKey({
+          serialNumber,
+          userId,
+          gameRound: effectiveGameRound,
+          bet,
+          win,
+        });
 
       const sideEffectPayload = {
         idempotencyKey,
         userId,
-        gameSessionId: gameSession.gameSessionId || gameSession._id,
-        gameId: gameSession.gameId || gameSession.game,
-        providerGameCode: gameSession.providerGameCode,
-        providerSessionId: gameSession.providerSessionId || callbackSessionId,
-        gameRound: gameSession.gameRound,
-        gameName: game_name,
+        gameSessionId: gameSession
+          ? gameSession.gameSessionId || gameSession._id
+          : null,
+        gameId: gameSession?.gameId || gameSession?.game || null,
+        providerGameCode:
+          effectiveGameUid || game_uid || gameSession?.providerGameCode || null,
+        providerSessionId:
+          gameSession?.providerSessionId || callbackSessionId || null,
+        gameRound: effectiveGameRound,
+        gameName: game_name || null,
         bet,
         win,
-        currency: gameSession.currency || "BDT",
-        startBalance: gameSession.startBalance,
+        currency: gameSession?.currency || "BDT",
+        startBalance: gameSession?.startBalance ?? walletBefore,
         endBalance: realBalance,
-        isFreeSpin: gameSession.isFreeSpin || false,
-        isBonusBet: gameSession.isBonusBet || false,
+        isFreeSpin: gameSession?.isFreeSpin || false,
+        isBonusBet: gameSession?.isBonusBet || false,
+        status: "settled",
+        settledAt: callbackReceivedAt.toISOString(),
         playedAt: callbackReceivedAt.toISOString(),
+        metadata: {
+          serialNumber: serialNumber ? String(serialNumber) : null,
+          reconciliation: reconciliationReport,
+        },
       };
 
       const enqueueStartedAt = process.hrtime.bigint();
@@ -366,14 +672,18 @@ class IGamingService {
           if (!queued) {
             logger.warn("[IGAMING] callback side-effect enqueue incomplete", {
               gameRound: sideEffectPayload.gameRound,
-              gameSessionId: String(sideEffectPayload.gameSessionId),
+              gameSessionId: sideEffectPayload.gameSessionId
+                ? String(sideEffectPayload.gameSessionId)
+                : null,
             });
           }
         })
         .catch((error) => {
           logger.warn("[IGAMING] callback side-effect enqueue failed", {
             gameRound: sideEffectPayload.gameRound,
-            gameSessionId: String(sideEffectPayload.gameSessionId),
+            gameSessionId: sideEffectPayload.gameSessionId
+              ? String(sideEffectPayload.gameSessionId)
+              : null,
             message: error.message,
           });
         });
@@ -384,34 +694,61 @@ class IGamingService {
       logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
       return response;
     } catch (err) {
-      if (duplicateReservation?.key) {
-        DuplicateCallback.release(duplicateReservation.key).catch((error) => {
+      if (duplicateReservation?.key && duplicateReservation?.acquired) {
+        try {
+          await DuplicateCallback.release(duplicateReservation.key);
+        } catch (releaseErr) {
           logger.warn("[IGAMING] duplicate callback release failed", {
             key: duplicateReservation.key,
+            message: releaseErr.message,
+          });
+        }
+      }
+
+      const effectiveUserId =
+        userId || gameSession?.userId || gameSession?.user || null;
+      const effectiveGameRound = callbackData?.game_round
+        ? String(callbackData.game_round)
+        : gameSession?.gameRound || null;
+      const effectiveSerialNumber =
+        callbackData?.serial_number ||
+        callbackData?.serialNumber ||
+        callbackData?.data?.serial_number ||
+        callbackData?.data?.serialNumber ||
+        null;
+
+      logger.error(
+        "[IGAMING_CALLBACK_FAILED] Wallet callback processing failed",
+        {
+          userId: effectiveUserId ? String(effectiveUserId) : null,
+          gameRound: effectiveGameRound,
+          serialNumber: effectiveSerialNumber
+            ? String(effectiveSerialNumber)
+            : null,
+          error: err.message,
+          providerNotified: true,
+        },
+      );
+
+      logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
+      return {
+        credit_amount: -1,
+        error: err.message || "Failed",
+        timestamp: Date.now(),
+      };
+    } finally {
+      if (userWalletLock) {
+        try {
+          await RedisLock.releaseUserWalletLock(userWalletLock);
+        } catch (error) {
+          logger.warn("[IGAMING] user wallet lock release failed", {
+            key: userWalletLock?.key,
             message: error.message,
           });
-        });
+        }
       }
-
-      if (gameSession?.userId || gameSession?.user) {
-        try {
-          const response = await buildProviderBalanceResponse();
-          logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
-          return response;
-        } catch {}
-      }
-      logger.info(`[CALLBACK_PERF] TOTAL CALLBACK: ${elapsedMs()}ms`);
-      return { credit_amount: -1, error: "Failed" }; // original: no timestamp
-    } finally {
-      RedisLock.release(roundLock).catch((error) => {
-        logger.warn("[IGAMING] round lock release failed", {
-          key: roundLock?.key,
-          message: error.message,
-        });
-      });
     }
   }
-
 
   // ── User game history ──────────────────────────────────────────────────────
   async getUserGameHistory(userId, options = {}) {
@@ -461,4 +798,9 @@ class IGamingService {
   }
 }
 
-module.exports = new IGamingService();
+const igamingService = new IGamingService();
+igamingService._isTransientNetworkError = isTransientNetworkError;
+igamingService._fetchProviderLaunchWithRetry = fetchProviderLaunchWithRetry;
+igamingService._providerClient = providerClient;
+
+module.exports = igamingService;

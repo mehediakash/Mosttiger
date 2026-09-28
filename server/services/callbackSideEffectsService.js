@@ -58,7 +58,7 @@ function buildHistoryDocument(payload, fullGame) {
 
   return {
     user: payload.userId,
-    gameSession: payload.gameSessionId,
+    gameSession: payload.gameSessionId || null,
     game: payload.gameId || fullGame?._id,
     provider: fullGame?.brand || payload.provider || "Unknown",
     category: fullGame?.category || payload.category || "Slot",
@@ -85,7 +85,7 @@ function buildHistoryDocument(payload, fullGame) {
     settledAt,
     metadata: {
       providerSessionId: payload.providerSessionId,
-      sessionId: String(payload.gameSessionId),
+      sessionId: payload.gameSessionId ? String(payload.gameSessionId) : null,
       symbol: payload.symbol,
       gameUid: payload.gameUid || payload.providerGameCode,
       ...(payload.metadata || {}),
@@ -129,11 +129,28 @@ async function createBettingHistory(payload) {
 async function recordTurnover(payload) {
   if (!(payload.bet > 0)) return { skipped: true };
 
+  logger.info("[TURNOVER_TRACE] recordTurnover invoked", {
+    userId: String(payload.userId),
+    bet: payload.bet,
+    gameId: String(payload.gameId),
+    providerGameCode: payload.providerGameCode,
+    gameRound: payload.gameRound,
+    idempotencyKey: payload.idempotencyKey,
+  });
+
   const alreadyDone = !(await markCompletedOnce(
     "turnoverQueue",
     `turnover:${payload.idempotencyKey}`,
   ));
-  if (alreadyDone) return { duplicate: true };
+  if (alreadyDone) {
+    logger.warn(
+      "[TURNOVER_TRACE] recordTurnover duplicate idempotencyKey skipped",
+      {
+        idempotencyKey: payload.idempotencyKey,
+      },
+    );
+    return { duplicate: true };
+  }
 
   const fullGame = (await getGame(
     payload.gameId,
@@ -144,11 +161,26 @@ async function recordTurnover(payload) {
     game_name: "9Wicket",
     game_code: payload.providerGameCode || "11539",
   };
+
+  logger.info("[TURNOVER_TRACE] getGame resolved", {
+    gameId: fullGame._id ? String(fullGame._id) : null,
+    brand: fullGame.brand,
+    brand_id: fullGame.brand_id,
+    category: fullGame.category,
+    game_name: fullGame.game_name,
+    game_code: fullGame.game_code,
+  });
+
   const result = await TurnoverTrackingService.recordBet(
     payload.userId,
     fullGame,
     payload.bet,
   );
+
+  logger.info("[TURNOVER_TRACE] recordBet actual return value", {
+    userId: String(payload.userId),
+    result,
+  });
 
   affiliateTrackingService
     .recordTurnoverChanged(payload.userId)

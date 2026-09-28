@@ -1,5 +1,6 @@
 const PromotionTurnover = require("../models/PromotionTurnover");
 const Game = require("../models/Game");
+const logger = require("../utils/logger");
 
 class TurnoverTrackingService {
   /**
@@ -13,12 +14,20 @@ class TurnoverTrackingService {
    */
   async recordBet(userId, gameInput, betAmount) {
     try {
+      logger.info("[TURNOVER_TRACE] recordBet invoked", {
+        userId: String(userId),
+        betAmount,
+        gameInputType: typeof gameInput,
+      });
+
       // Validation
       if (!userId || !gameInput || !betAmount || betAmount <= 0) {
-        return {
+        const res = {
           success: false,
           message: "userId, gameInput, and betAmount (> 0) are required",
         };
+        logger.warn("[TURNOVER_TRACE] recordBet validation failed", res);
+        return res;
       }
 
       // 1. Fetch game details
@@ -27,11 +36,37 @@ class TurnoverTrackingService {
           ? gameInput
           : await Game.findById(gameInput).lean();
       if (!game) {
-        return {
+        const res = {
           success: false,
           message: "Game not found",
         };
+        logger.warn("[TURNOVER_TRACE] game not found", { gameInput, ...res });
+        return res;
       }
+
+      // Inspect ALL PromotionTurnover records for this user (to see pending vs active, expired, etc.)
+      const allTurnovers = await PromotionTurnover.find({ user: userId })
+        .select(
+          "_id status promotion turnoverRequired turnoverCompleted allowedProviders allowedCategories expiresAt claimed",
+        )
+        .lean();
+
+      logger.info("[TURNOVER_TRACE] All PromotionTurnover records for user", {
+        userId: String(userId),
+        count: allTurnovers.length,
+        turnovers: allTurnovers.map((t) => ({
+          id: String(t._id),
+          status: t.status,
+          promotion: String(t.promotion),
+          turnoverRequired: t.turnoverRequired,
+          turnoverCompleted: t.turnoverCompleted,
+          allowedProviders: t.allowedProviders,
+          allowedCategories: t.allowedCategories,
+          expiresAt: t.expiresAt ? t.expiresAt.toISOString() : null,
+          isExpired: t.expiresAt ? new Date(t.expiresAt) <= new Date() : null,
+          claimed: t.claimed,
+        })),
+      });
 
       // 2. Find the active turnover record for user (queue model: only one active at a time)
       const activeTurnover = await PromotionTurnover.findOne({
@@ -41,12 +76,31 @@ class TurnoverTrackingService {
       }).sort({ createdAt: 1 });
 
       if (!activeTurnover) {
-        return {
+        const res = {
           success: false,
           message: "No active turnover records found for user",
           betTracked: false,
         };
+        logger.warn(
+          "[TURNOVER_TRACE] No active turnover record found for user",
+          {
+            userId: String(userId),
+            now: new Date().toISOString(),
+            ...res,
+          },
+        );
+        return res;
       }
+
+      logger.info("[TURNOVER_TRACE] Active PromotionTurnover selected", {
+        turnoverId: String(activeTurnover._id),
+        status: activeTurnover.status,
+        turnoverRequired: activeTurnover.turnoverRequired,
+        turnoverCompleted: activeTurnover.turnoverCompleted,
+        allowedProviders: activeTurnover.allowedProviders,
+        allowedCategories: activeTurnover.allowedCategories,
+        expiresAt: activeTurnover.expiresAt,
+      });
 
       const results = [];
 
@@ -55,6 +109,13 @@ class TurnoverTrackingService {
         activeTurnover,
         game.brand,
       );
+      logger.info("[TURNOVER_TRACE] Provider validation result", {
+        gameBrand: game.brand,
+        gameBrandId: game.brand_id,
+        allowedProviders: activeTurnover.allowedProviders,
+        valid: providerValid.valid,
+        reason: providerValid.reason || null,
+      });
       if (!providerValid.valid) {
         return {
           success: false,
@@ -81,8 +142,16 @@ class TurnoverTrackingService {
         activeTurnover,
         game.category,
       );
+      logger.info("[TURNOVER_TRACE] Category validation result", {
+        gameCategory: game.category,
+        allowedCategories: activeTurnover.allowedCategories,
+        allCategoriesAllowed: Boolean(categoryValid.allCategoriesAllowed),
+        valid: categoryValid.valid,
+        reason: categoryValid.reason || null,
+      });
+
       if (!categoryValid.valid) {
-        return {
+        const res = {
           success: false,
           message: categoryValid.reason,
           betAmount,
@@ -101,11 +170,19 @@ class TurnoverTrackingService {
           ],
           totalUpdated: 0,
         };
+        logger.warn("[TURNOVER_TRACE] Category validation rejected bet", res);
+        return res;
       }
 
       const expiryValid = this.validateExpiry(activeTurnover);
+      logger.info("[TURNOVER_TRACE] Expiry validation result", {
+        expiresAt: activeTurnover.expiresAt,
+        valid: expiryValid.valid,
+        reason: expiryValid.reason || null,
+      });
+
       if (!expiryValid.valid) {
-        return {
+        const res = {
           success: false,
           message: expiryValid.reason,
           betAmount,
@@ -124,11 +201,21 @@ class TurnoverTrackingService {
           ],
           totalUpdated: 0,
         };
+        logger.warn("[TURNOVER_TRACE] Expiry validation rejected bet", res);
+        return res;
       }
 
       const completionValid = this.validateCompletion(activeTurnover);
+      logger.info("[TURNOVER_TRACE] Completion validation result", {
+        status: activeTurnover.status,
+        turnoverCompleted: activeTurnover.turnoverCompleted,
+        turnoverRequired: activeTurnover.turnoverRequired,
+        valid: completionValid.valid,
+        reason: completionValid.reason || null,
+      });
+
       if (!completionValid.valid) {
-        return {
+        const res = {
           success: false,
           message: completionValid.reason,
           betAmount,
@@ -147,9 +234,19 @@ class TurnoverTrackingService {
           ],
           totalUpdated: 0,
         };
+        logger.warn("[TURNOVER_TRACE] Completion validation rejected bet", res);
+        return res;
       }
 
       // 4. All validations passed - update the active turnover only
+      logger.info(
+        "[TURNOVER_TRACE] All validations passed. Calling updateTurnoverProgress",
+        {
+          turnoverId: String(activeTurnover._id),
+          betAmount,
+        },
+      );
+
       const updateResult = await this.updateTurnoverProgress(
         activeTurnover._id,
         betAmount,
@@ -164,7 +261,7 @@ class TurnoverTrackingService {
       // Return results
       const successCount = results.filter((r) => r.success).length;
 
-      return {
+      const finalResult = {
         success: successCount > 0,
         message: `Processed ${results.length} turnover records, ${successCount} successful`,
         betAmount,
@@ -177,11 +274,17 @@ class TurnoverTrackingService {
         turnovers: results,
         totalUpdated: successCount,
       };
+
+      logger.info(
+        "[TURNOVER_TRACE] recordBet final return result",
+        finalResult,
+      );
+      return finalResult;
     } catch (error) {
-      console.error("Record bet error:", {
+      logger.error("[TURNOVER_TRACE] recordBet caught error", {
         message: error.message,
-        userId,
-        gameId,
+        stack: error.stack,
+        userId: String(userId),
         betAmount,
       });
 
@@ -239,29 +342,43 @@ class TurnoverTrackingService {
    * @returns {Object} - Validation result
    */
   async validateCategory(turnover, gameCategory) {
-    // If "ALL" is in categories, allow all
+    // If no category restrictions, allow all
     if (
       !turnover.allowedCategories ||
-      turnover.allowedCategories.includes("ALL")
+      turnover.allowedCategories.length === 0
     ) {
-      return { valid: true };
+      return { valid: true, allCategoriesAllowed: true };
     }
 
-    // Check if game category is in allowed list
-    const isAllowed = turnover.allowedCategories.some(
-      (cat) =>
-        cat === gameCategory ||
-        String(cat).toLowerCase() === String(gameCategory).toLowerCase(),
+    const normalizedCategories = (turnover.allowedCategories || []).map((cat) =>
+      String(cat || "")
+        .trim()
+        .toLowerCase(),
     );
+
+    const allCategoriesAllowed = normalizedCategories.includes("all");
+
+    // If "ALL" (case-insensitive, whitespace-trimmed) is in categories, allow all game categories immediately
+    if (allCategoriesAllowed) {
+      return { valid: true, allCategoriesAllowed: true };
+    }
+
+    const normalizedGameCategory = String(gameCategory || "")
+      .trim()
+      .toLowerCase();
+
+    // Check if game category is in allowed list
+    const isAllowed = normalizedCategories.includes(normalizedGameCategory);
 
     if (!isAllowed) {
       return {
         valid: false,
+        allCategoriesAllowed: false,
         reason: `Game category "${gameCategory}" is not allowed for this turnover`,
       };
     }
 
-    return { valid: true };
+    return { valid: true, allCategoriesAllowed: false };
   }
 
   /**
@@ -323,11 +440,26 @@ class TurnoverTrackingService {
       const turnover = await PromotionTurnover.findById(turnoverId);
 
       if (!turnover) {
+        logger.warn(
+          "[TURNOVER_TRACE] updateTurnoverProgress: turnover record not found",
+          {
+            turnoverId: String(turnoverId),
+          },
+        );
         return {
           success: false,
           message: "Turnover record not found",
         };
       }
+
+      // Record before state
+      const beforeState = {
+        turnoverCompleted: turnover.turnoverCompleted,
+        turnoverRequired: turnover.turnoverRequired,
+        turnoverPercentage: turnover.turnoverPercentage,
+        status: turnover.status,
+        withdrawLocked: turnover.withdrawLocked,
+      };
 
       // Calculate new completed amount (capped at requirement)
       const previousCompleted = turnover.turnoverCompleted;
@@ -349,7 +481,39 @@ class TurnoverTrackingService {
         turnover.completedAt = new Date();
       }
 
-      await turnover.save();
+      // Perform update with updateOne to verify matchedCount and modifiedCount
+      const updateResult = await PromotionTurnover.updateOne(
+        { _id: turnover._id },
+        {
+          $set: {
+            turnoverCompleted: turnover.turnoverCompleted,
+            turnoverPercentage: turnover.turnoverPercentage,
+            status: turnover.status,
+            withdrawLocked: turnover.withdrawLocked,
+            ...(isComplete ? { completedAt: turnover.completedAt } : {}),
+          },
+        },
+      );
+
+      // Verify persisted state in MongoDB directly
+      const afterTurnover = await PromotionTurnover.findById(turnoverId).lean();
+      const afterState = {
+        turnoverCompleted: afterTurnover?.turnoverCompleted,
+        turnoverRequired: afterTurnover?.turnoverRequired,
+        turnoverPercentage: afterTurnover?.turnoverPercentage,
+        status: afterTurnover?.status,
+        withdrawLocked: afterTurnover?.withdrawLocked,
+      };
+
+      logger.info("[TURNOVER_TRACE] MongoDB updateTurnoverProgress result", {
+        turnoverId: String(turnoverId),
+        betAmount,
+        mongoMatchedCount: updateResult.matchedCount,
+        mongoModifiedCount: updateResult.modifiedCount,
+        mongoAcknowledged: updateResult.acknowledged,
+        before: beforeState,
+        after: afterState,
+      });
 
       if (isComplete) {
         // Mark as complete and activate next pending turnover.
@@ -367,19 +531,28 @@ class TurnoverTrackingService {
         turnoverId,
         betAmount,
         previousCompleted,
-        turnoverCompleted: turnover.turnoverCompleted,
-        turnoverRequired: turnover.turnoverRequired,
+        turnoverCompleted: afterState.turnoverCompleted,
+        turnoverRequired: afterState.turnoverRequired,
         remainingTurnover: Math.max(
           0,
-          turnover.turnoverRequired - turnover.turnoverCompleted,
+          afterState.turnoverRequired - afterState.turnoverCompleted,
         ),
-        turnoverPercentage: turnover.turnoverPercentage.toFixed(2),
+        turnoverPercentage: Number(afterState.turnoverPercentage || 0).toFixed(
+          2,
+        ),
         isComplete,
-        withdrawLocked: turnover.withdrawLocked,
-        status: turnover.status,
+        withdrawLocked: afterState.withdrawLocked,
+        status: afterState.status,
+        mongoMatchedCount: updateResult.matchedCount,
+        mongoModifiedCount: updateResult.modifiedCount,
       };
     } catch (error) {
-      console.error("Update turnover progress error:", error);
+      logger.error("[TURNOVER_TRACE] updateTurnoverProgress error", {
+        message: error.message,
+        stack: error.stack,
+        turnoverId: String(turnoverId),
+        betAmount,
+      });
       return {
         success: false,
         message: error.message || "Failed to update turnover",

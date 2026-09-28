@@ -1,6 +1,7 @@
 const User = require("../../models/User");
 const redis = require("../redisService");
 const logger = require("../../utils/logger");
+const { roundBDT } = require("../../utils/money");
 
 const WALLET_TTL_SECONDS = Number(process.env.WALLET_CACHE_TTL_SECONDS || 3600);
 
@@ -13,19 +14,19 @@ function normalizeBalance(balance) {
 
   if (balance && typeof balance === "object") {
     if (balance.main !== undefined) {
-      normalized.main = Math.round(Number(balance.main || 0) * 100) / 100;
+      normalized.main = roundBDT(balance.main);
     }
     if (balance.bonus !== undefined) {
-      normalized.bonus = Math.round(Number(balance.bonus || 0) * 100) / 100;
+      normalized.bonus = roundBDT(balance.bonus);
     }
     if (balance.freeBets !== undefined) {
-      normalized.freeBets = Math.round(Number(balance.freeBets || 0) * 100) / 100;
+      normalized.freeBets = roundBDT(balance.freeBets);
     }
     return normalized;
   }
 
   return {
-    main: Math.round(Number(balance || 0) * 100) / 100,
+    main: roundBDT(balance),
   };
 }
 
@@ -33,16 +34,8 @@ async function setBalance(userId, balance) {
   if (!userId) return;
   const key = walletKey(userId);
   const normalized = normalizeBalance(balance);
-  const cached = await redis.getJSON(key);
 
-  await redis.setJSON(
-    key,
-    {
-      ...(cached && typeof cached === "object" ? cached : {}),
-      ...normalized,
-    },
-    WALLET_TTL_SECONDS,
-  );
+  await redis.setJSON(key, normalized, WALLET_TTL_SECONDS);
 }
 
 async function getCachedBalance(userId) {
