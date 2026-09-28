@@ -106,6 +106,7 @@ async function loadFromMongo({
   providerGameCode,
   memberAccount,
   gameRound,
+  gameName,
 }) {
   const projection =
     "_id user game memberAccount providerGameCode providerSessionId gameRound currency startBalance endBalance isFreeSpin isBonusBet status";
@@ -115,6 +116,7 @@ async function loadFromMongo({
     : null;
   const safeMember = memberAccount ? String(memberAccount).trim() : null;
   const safeRound = gameRound ? String(gameRound).trim() : null;
+  const safeGameName = gameName ? String(gameName).trim() : null;
 
   // PRIORITY A: Exact providerSessionId match (validated against available fields)
   if (providerSessionId) {
@@ -248,6 +250,52 @@ async function loadFromMongo({
     return null;
   }
 
+  // PRIORITY C.2: Safe user + gameName resolution ONLY if exactly ONE valid active session exists for this user
+  // Handles cases where provider callback transmits an alternate providerGameCode
+  if (safeMember && safeGameName) {
+    const memberActiveSessions = await GameSession.find({
+      memberAccount: safeMember,
+      status: "active",
+    })
+      .select(projection)
+      .lean();
+
+    if (memberActiveSessions.length === 1) {
+      const candidate = memberActiveSessions[0];
+      if (candidate.game) {
+        const Game = require("../../models/Game");
+        const gameDoc = await Game.findById(candidate.game)
+          .select("game_name brand category game_code")
+          .lean();
+
+        if (
+          gameDoc &&
+          gameDoc.game_name &&
+          gameDoc.game_name.trim().toLowerCase() === safeGameName.toLowerCase()
+        ) {
+          logger.info("[SESSION_LOOKUP] Resolved session via single active session and game verification", {
+            sessionId: candidate._id,
+            memberAccount: safeMember,
+            sessionGameCode: candidate.providerGameCode,
+            callbackGameCode: safeGameCode,
+            gameName: safeGameName,
+          });
+          await storeSession(candidate);
+          return normalizeSession(candidate);
+        }
+      }
+    } else if (memberActiveSessions.length > 1) {
+      logger.warn(
+        "[SESSION_LOOKUP] Ambiguous multiple active sessions for member; skipping gameName fallback",
+        {
+          safeMember,
+          safeGameName,
+          count: memberActiveSessions.length,
+        },
+      );
+    }
+  }
+
   // PRIORITY D: Closed/completed session only when identity is deterministic.
   // If safeRound was NOT matched above, check if there is exactly ONE closed session for this user and game
   // with no conflicting gameRound.
@@ -296,6 +344,7 @@ async function findActiveSession({
   providerGameCode,
   memberAccount,
   gameRound,
+  gameName,
 }) {
   let session = null;
 
@@ -328,6 +377,7 @@ async function findActiveSession({
       providerGameCode,
       memberAccount,
       gameRound,
+      gameName,
     });
   } catch (error) {
     logger.error("[SESSION_CACHE] Mongo session fallback failed", {

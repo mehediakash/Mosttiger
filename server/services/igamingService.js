@@ -403,6 +403,7 @@ class IGamingService {
         providerGameCode: effectiveGameUid || game_uid,
         memberAccount: memberAccount,
         gameRound: game_round ? String(game_round) : null,
+        gameName: game_name || null,
       }).catch((sessionErr) => {
         logger.warn("[IGAMING] Optional session lookup failed", {
           message: sessionErr.message,
@@ -634,19 +635,36 @@ class IGamingService {
           win,
         });
 
+      let trustedGame = null;
+      const trustedGameId = gameSession?.gameId || gameSession?.game || null;
+      if (trustedGameId) {
+        try {
+          const Game = require("../models/Game");
+          trustedGame = await Game.findById(trustedGameId)
+            .select("brand category game_name game_code")
+            .lean();
+        } catch {}
+      }
+
       const sideEffectPayload = {
         idempotencyKey,
         userId,
         gameSessionId: gameSession
           ? gameSession.gameSessionId || gameSession._id
           : null,
-        gameId: gameSession?.gameId || gameSession?.game || null,
+        gameId: trustedGameId,
+        provider: trustedGame?.brand || null,
+        category: trustedGame?.category || null,
         providerGameCode:
-          effectiveGameUid || game_uid || gameSession?.providerGameCode || null,
+          trustedGame?.game_code ||
+          effectiveGameUid ||
+          game_uid ||
+          gameSession?.providerGameCode ||
+          null,
         providerSessionId:
           gameSession?.providerSessionId || callbackSessionId || null,
         gameRound: effectiveGameRound,
-        gameName: game_name || null,
+        gameName: trustedGame?.game_name || game_name || null,
         bet,
         win,
         currency: gameSession?.currency || "BDT",

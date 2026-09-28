@@ -96,7 +96,46 @@ function buildHistoryDocument(payload, fullGame) {
 async function createBettingHistory(payload) {
   if (!payload.gameRound) return { skipped: true };
 
-  const fullGame = await getGame(payload.gameId, payload.providerGameCode);
+  let fullGame = await getGame(payload.gameId, payload.providerGameCode);
+
+  if (!fullGame && payload.gameRound && payload.userId) {
+    try {
+      const prev = await BettingHistory.findOne({
+        user: payload.userId,
+        gameRound: payload.gameRound,
+        provider: { $ne: "Unknown" },
+      })
+        .select("game provider category gameName providerGameCode")
+        .lean();
+
+      if (prev?.game) {
+        fullGame = await getGame(prev.game);
+      } else if (prev?.provider && prev.provider !== "Unknown") {
+        if (!payload.provider) payload.provider = prev.provider;
+        if (!payload.category) payload.category = prev.category;
+        if (!payload.gameName) payload.gameName = prev.gameName;
+      }
+    } catch (err) {
+      logger.warn("[BETTING_HISTORY] Previous round metadata lookup failed", {
+        gameRound: payload.gameRound,
+        userId: String(payload.userId),
+        error: err.message,
+      });
+    }
+  }
+
+  if (!fullGame && (!payload.provider || payload.provider === "Unknown")) {
+    logger.warn(
+      "[BETTING_HISTORY] Game metadata could not be resolved safely; using default fallback",
+      {
+        userId: String(payload.userId),
+        gameRound: payload.gameRound,
+        providerGameCode: payload.providerGameCode,
+        gameName: payload.gameName,
+      },
+    );
+  }
+
   const doc = buildHistoryDocument(payload, fullGame);
   const session = await mongoose.startSession();
 
