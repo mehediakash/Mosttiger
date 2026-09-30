@@ -184,50 +184,36 @@ exports.getPlatformTurnoverStats = async (req, res) => {
 
     const query = { betStatus: { $in: ["won", "lost", "pending"] } };
 
-    // Total all-time turnover
-    const totalTurnover = await Turnover.aggregate([
+    const stats = await Turnover.aggregate([
       { $match: query },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
-
-    // Today's turnover
-    const todayTurnover = await Turnover.aggregate([
       {
-        $match: {
-          ...query,
-          createdAt: { $gte: today },
+        $group: {
+          _id: null,
+          totalPlatformTurnover: { $sum: "$amount" },
+          todayTurnover: {
+            $sum: {
+              $cond: [{ $gte: ["$createdAt", today] }, "$amount", 0],
+            },
+          },
+          weeklyTurnover: {
+            $sum: {
+              $cond: [{ $gte: ["$createdAt", weekStart] }, "$amount", 0],
+            },
+          },
+          monthlyTurnover: {
+            $sum: {
+              $cond: [{ $gte: ["$createdAt", monthStart] }, "$amount", 0],
+            },
+          },
         },
       },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
-
-    // Weekly turnover
-    const weeklyTurnover = await Turnover.aggregate([
-      {
-        $match: {
-          ...query,
-          createdAt: { $gte: weekStart },
-        },
-      },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
-
-    // Monthly turnover
-    const monthlyTurnover = await Turnover.aggregate([
-      {
-        $match: {
-          ...query,
-          createdAt: { $gte: monthStart },
-        },
-      },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
     res.json({
-      totalPlatformTurnover: totalTurnover?.[0]?.total ?? 0,
-      todayTurnover: todayTurnover?.[0]?.total ?? 0,
-      weeklyTurnover: weeklyTurnover?.[0]?.total ?? 0,
-      monthlyTurnover: monthlyTurnover?.[0]?.total ?? 0,
+      totalPlatformTurnover: stats?.[0]?.totalPlatformTurnover ?? 0,
+      todayTurnover: stats?.[0]?.todayTurnover ?? 0,
+      weeklyTurnover: stats?.[0]?.weeklyTurnover ?? 0,
+      monthlyTurnover: stats?.[0]?.monthlyTurnover ?? 0,
       timestamp: new Date(),
     });
   } catch (error) {

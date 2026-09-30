@@ -68,6 +68,18 @@ class TurnoverTrackingService {
         })),
       });
 
+      // Reconcile expired promotions if an active turnover has expired
+      const expiredActiveTurnover = allTurnovers.find(
+        (t) =>
+          t.status === "active" &&
+          t.expiresAt &&
+          new Date(t.expiresAt) <= new Date(),
+      );
+      if (expiredActiveTurnover) {
+        const promotionExpiryService = require("./promotionExpiryService");
+        await promotionExpiryService.reconcileUserExpiredPromotions(userId);
+      }
+
       // 2. Find the active turnover record for user (queue model: only one active at a time)
       const activeTurnover = await PromotionTurnover.findOne({
         user: userId,
