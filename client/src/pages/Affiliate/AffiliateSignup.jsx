@@ -85,7 +85,7 @@ export default function AffiliateSignup() {
         {label}
       </label>
       <input
-        className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+        className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-emerald-500"
         value={form[key]}
         onChange={(e) => setField(key, e.target.value)}
         {...props}
@@ -94,10 +94,10 @@ export default function AffiliateSignup() {
   );
 
   return (
-    <div className="bg-slate-50 px-4 py-10 mb-10">
+    <div className="min-h-screen bg-slate-50 px-4 py-10 pb-28 text-slate-900 md:mb-10 md:pb-10">
       <form
         onSubmit={submit}
-        className="mx-auto max-w-5xl rounded-2xl bg-white p-6 shadow-xl sm:p-8"
+        className="mx-auto min-w-0 max-w-5xl rounded-2xl bg-white p-6 text-slate-900 shadow-xl sm:p-8"
       >
         <div className="mb-8">
           <h1 className="text-3xl font-black text-primary">Affiliate Signup</h1>
@@ -126,7 +126,7 @@ export default function AffiliateSignup() {
               Preferred Payment Method
             </label>
             <select
-              className="w-full rounded-lg border border-slate-300 px-4 py-3"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900"
               value={form.preferredPaymentMethod}
               onChange={(e) =>
                 setField("preferredPaymentMethod", e.target.value)
