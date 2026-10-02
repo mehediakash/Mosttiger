@@ -114,7 +114,13 @@ export default function AffiliateSignup() {
 
         <Section title="Basic Information">
           {input("fullName", "Full Name", { required: true })}
-          {input("username", "Username", { required: true })}
+          {input("username", "Username", {
+            required: true,
+            disabled: true,
+            readOnly: true,
+            className:
+              "w-full cursor-not-allowed rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-slate-500 outline-none",
+          })}
           {input("email", "Email", { required: true, type: "email" })}
           {input("phone", "Phone", { required: true })}
           {input("country", "Country", { required: true })}
@@ -142,10 +148,9 @@ export default function AffiliateSignup() {
         </Section>
 
         <Section title="Marketing Information">
-          {input("promotionMethod", "Promotion Method", { required: true })}
-          {input("trafficSource", "Traffic Source", { required: true })}
+          {input("promotionMethod", "Promotion Method")}
+          {input("trafficSource", "Traffic Source")}
           {input("estimatedMonthlyPlayers", "Estimated Monthly Players", {
-            required: true,
             type: "number",
             min: 0,
           })}

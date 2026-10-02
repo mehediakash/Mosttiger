@@ -104,6 +104,9 @@ class AffiliateService {
   }
 
   validateApplicationPayload(payload) {
+    const estimatedMonthlyPlayers =
+      payload.estimatedMonthlyPlayers ??
+      payload.marketing?.estimatedMonthlyPlayers;
     const basicInfo = {
       fullName: toCleanString(payload.fullName || payload.basicInfo?.fullName),
       username: toLowerString(payload.username || payload.basicInfo?.username),
@@ -140,11 +143,13 @@ class AffiliateService {
       trafficSource: toCleanString(
         payload.trafficSource || payload.marketing?.trafficSource,
       ),
-      estimatedMonthlyPlayers: toPositiveNumber(
-        payload.estimatedMonthlyPlayers ??
-          payload.marketing?.estimatedMonthlyPlayers,
-        "Estimated monthly players",
-      ),
+      estimatedMonthlyPlayers:
+        estimatedMonthlyPlayers == null || estimatedMonthlyPlayers === ""
+          ? 0
+          : toPositiveNumber(
+              estimatedMonthlyPlayers,
+              "Estimated monthly players",
+            ),
       previousExperience: toCleanString(
         payload.previousExperience || payload.marketing?.previousExperience,
       ),
@@ -193,13 +198,6 @@ class AffiliateService {
       !phoneRegex.test(payment.paymentNumber)
     ) {
       throw new AffiliateError("Valid payment number is required");
-    }
-
-    if (!marketing.promotionMethod) {
-      throw new AffiliateError("Promotion method is required");
-    }
-    if (!marketing.trafficSource) {
-      throw new AffiliateError("Traffic source is required");
     }
 
     return {
@@ -341,7 +339,10 @@ class AffiliateService {
       );
     }
 
-    const applicationData = this.validateApplicationPayload(payload);
+    const applicationData = this.validateApplicationPayload({
+      ...payload,
+      username: user.username,
+    });
 
     let application;
     try {
