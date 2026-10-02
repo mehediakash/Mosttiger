@@ -50,7 +50,10 @@ export default function AffiliateLogin() {
             only after affiliate approval.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+        <form
+          onSubmit={handleSubmit}
+          className="min-w-0 p-6 text-slate-900 sm:p-8"
+        >
           {message && (
             <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               {message}
@@ -60,8 +63,9 @@ export default function AffiliateLogin() {
             Username
           </label>
           <input
-            className="mb-4 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
             value={form.username}
+            placeholder="Enter your username"
             onChange={(e) => setForm({ ...form, username: e.target.value })}
             required
           />
@@ -70,8 +74,9 @@ export default function AffiliateLogin() {
           </label>
           <input
             type="password"
-            className="mb-4 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500"
+            className="mb-4 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
             value={form.password}
+            placeholder="Enter your password"
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
