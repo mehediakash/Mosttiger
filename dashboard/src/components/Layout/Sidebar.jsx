@@ -135,6 +135,10 @@ const Sidebar = ({ collapsed, mobileOpen, onCloseMobile }) => {
           key: "/game-config",
           label: "Game Configuration",
         },
+        {
+          key: "/providers",
+          label: "Providers",
+        },
       ],
     },
 

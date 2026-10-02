@@ -1008,3 +1008,14 @@ export const paymentGatewayRoutingAPI = {
   updateRoutingConfig: (data) =>
     axiosInstance.put("/api/admin/payment-gateway", data),
 };
+
+export const providerAPI = {
+  getProviders: (params) => axiosInstance.get("/api/providers", { params }),
+  getAdminProviders: (params) =>
+    axiosInstance.get("/api/providers/admin", { params }),
+  createProvider: (data) => axiosInstance.post("/api/providers", data),
+  updateProvider: (id, data) =>
+    axiosInstance.patch(`/api/providers/${id}`, data),
+  deleteProvider: (id) => axiosInstance.delete(`/api/providers/${id}`),
+};
+

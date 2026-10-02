@@ -168,7 +168,7 @@ export const ProviderGrid = ({
     // ignore normalization errors and continue
   }
 
-  // Process, deduplicate, and sort providers alphabetically from Z to A
+  // Process, deduplicate, and sort providers: custom displayOrder first (1, 2, 3...), then Z -> A
   const sortedProviders = useMemo(() => {
     const seen = new Set();
     const list = [];
@@ -183,16 +183,48 @@ export const ProviderGrid = ({
         rawName,
         shortName,
         logo: provider.logo || "",
+        displayOrder: provider.displayOrder ?? null,
       });
     });
 
-    // Dynamic alphabetical sorting from Z to A based on shortName
-    return list.sort((a, b) =>
-      b.shortName.localeCompare(a.shortName, undefined, {
+    return list.sort((a, b) => {
+      const hasOrderA =
+        a.displayOrder !== null &&
+        a.displayOrder !== undefined &&
+        a.displayOrder !== "" &&
+        Number.isInteger(Number(a.displayOrder)) &&
+        Number(a.displayOrder) >= 1;
+
+      const hasOrderB =
+        b.displayOrder !== null &&
+        b.displayOrder !== undefined &&
+        b.displayOrder !== "" &&
+        Number.isInteger(Number(b.displayOrder)) &&
+        Number(b.displayOrder) >= 1;
+
+      // 1. Both have custom order -> Ascending (1, 2, 3...)
+      if (hasOrderA && hasOrderB) {
+        const orderDiff = Number(a.displayOrder) - Number(b.displayOrder);
+        if (orderDiff !== 0) return orderDiff;
+        // Duplicate tie-breaker -> Z to A
+        return b.shortName.localeCompare(a.shortName, undefined, {
+          numeric: true,
+          sensitivity: "base",
+        });
+      }
+
+      // 2. Only A has custom order -> A comes first
+      if (hasOrderA && !hasOrderB) return -1;
+
+      // 3. Only B has custom order -> B comes first
+      if (!hasOrderA && hasOrderB) return 1;
+
+      // 4. Neither has custom order -> Z to A
+      return b.shortName.localeCompare(a.shortName, undefined, {
         numeric: true,
         sensitivity: "base",
-      })
-    );
+      });
+    });
   }, [providers]);
 
   if (!sortedProviders || sortedProviders.length === 0) {

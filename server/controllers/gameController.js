@@ -164,18 +164,20 @@ exports.getGameCategories = async (req, res) => {
 // @access  Public
 exports.getProviders = async (req, res) => {
   try {
-    // Pull distinct brand names from Game collection
-    const brands = await Game.distinct("brand");
-
-    // Defensive: filter falsy, sort
-    const providers = Array.from(
-      new Set((brands || []).filter(Boolean)),
-    ).sort();
+    const providerService = require("../services/providerService");
+    const sorted = await providerService.getActiveSortedProviders();
 
     res.status(200).json({
       success: true,
       data: {
-        providers,
+        providers: sorted.map((p) => ({
+          _id: p._id,
+          name: p.name,
+          brand: p.name,
+          displayOrder: p.displayOrder,
+          status: p.status,
+          logo: p.logo,
+        })),
       },
     });
   } catch (error) {

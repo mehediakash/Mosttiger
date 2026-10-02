@@ -42,6 +42,7 @@ import CommissionDashboard from "./pages/Commission/CommissionDashboard";
 // Game Components
 import GameLauncher from "./pages/Games/GameLauncher";
 import GameConfig from "./pages/Games/GameConfig";
+import ProviderManagement from "./pages/Games/ProviderManagement";
 
 // Sports Components
 import RealTimeEvents from "./pages/Sports/RealTimeEvents";
@@ -201,6 +202,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <GameConfig />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="providers"
+                  element={
+                    <ProtectedRoute>
+                      <ProviderManagement />
                     </ProtectedRoute>
                   }
                 />

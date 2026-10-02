@@ -131,6 +131,7 @@ app.post(
 app.use("/api/wallet", require("./routes/wallet"));
 app.use("/api/wallet-transactions", require("./routes/walletTransactions"));
 app.use("/api/games", require("./routes/games"));
+app.use("/api/providers", require("./routes/providers"));
 app.use("/api/9wicket", require("./routes/nineWicket"));
 app.use("/api/sports", require("./routes/sports"));
 app.use("/api/agents", require("./routes/agents"));

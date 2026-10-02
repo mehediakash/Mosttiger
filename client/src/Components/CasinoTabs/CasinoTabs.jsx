@@ -577,6 +577,41 @@ const CasinoTabs = () => {
           );
         }
 
+        // ================= MERGE CUSTOM DISPLAY ORDER FROM DATABASE =================
+        try {
+          const dbOrderResponse = await cachedGet(
+            "/api/providers",
+            {},
+            {
+              ttl: 30 * 1000,
+              key: "providers:custom-order",
+              signal: controller.signal,
+            },
+          );
+          const dbList = Array.isArray(dbOrderResponse.data?.data)
+            ? dbOrderResponse.data.data
+            : [];
+          if (dbList.length > 0) {
+            const orderMap = new Map();
+            dbList.forEach((item) => {
+              if (item.name) {
+                const key = item.name.toLowerCase().trim();
+                orderMap.set(key, item.displayOrder ?? null);
+              }
+            });
+
+            allProviders = allProviders.map((p) => {
+              const nameKey = (p.brand_title || p.name || "").toLowerCase().trim();
+              const customOrder = orderMap.has(nameKey)
+                ? orderMap.get(nameKey)
+                : (p.displayOrder ?? null);
+              return { ...p, displayOrder: customOrder };
+            });
+          }
+        } catch (orderError) {
+          // Graceful fallback to default ordering
+        }
+
         if (!mounted) return;
 
         setProviders(allProviders);

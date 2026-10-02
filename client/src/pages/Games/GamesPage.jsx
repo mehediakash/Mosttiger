@@ -70,12 +70,18 @@ export default function GamesPage() {
           typeof p === "string" ? p : p.brand || p,
         );
 
-        // Deduplicate and sort
-        providers = Array.from(new Set(providers))
-          .filter((p) => p && p.trim())
-          .sort();
+        // Deduplicate while strictly preserving server display order
+        const seen = new Set();
+        const orderedProviders = [];
+        providers.forEach((p) => {
+          const val = typeof p === "string" ? p.trim() : "";
+          if (val && !seen.has(val)) {
+            seen.add(val);
+            orderedProviders.push(val);
+          }
+        });
 
-        setAllProviders(providers);
+        setAllProviders(orderedProviders);
 
         // If URL has provider query param, map param values to actual provider names
         if (providerParam) {
