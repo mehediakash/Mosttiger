@@ -16,17 +16,21 @@ const statusMessages = {
   suspended: "Your affiliate account has been suspended.",
 };
 
-export default function AffiliateRequireAuth({ children, approvedOnly = false }) {
+export default function AffiliateRequireAuth({
+  children,
+  approvedOnly = false,
+  signupOnly = false,
+}) {
   const { token } = useSelector((state) => state.auth);
   const location = useLocation();
   const [statusState, setStatusState] = useState({
-    loading: approvedOnly,
+    loading: approvedOnly || signupOnly,
     status: "",
     error: "",
   });
 
   useEffect(() => {
-    if (!token || !approvedOnly) return;
+    if (!token || (!approvedOnly && !signupOnly)) return;
 
     let mounted = true;
     setStatusState({ loading: true, status: "", error: "" });
@@ -55,7 +59,7 @@ export default function AffiliateRequireAuth({ children, approvedOnly = false })
     return () => {
       mounted = false;
     };
-  }, [approvedOnly, token]);
+  }, [approvedOnly, signupOnly, token]);
 
   if (!token) {
     return (
@@ -67,13 +71,43 @@ export default function AffiliateRequireAuth({ children, approvedOnly = false })
     );
   }
 
-  if (approvedOnly) {
+  if (approvedOnly || signupOnly) {
     if (statusState.loading) {
       return (
         <div className="flex min-h-screen items-center justify-center bg-[#050505] px-4 text-white">
           Verifying affiliate access...
         </div>
       );
+    }
+
+    if (signupOnly && statusState.status === "approved") {
+      return <Navigate to="/affiliate/dashboard" replace />;
+    }
+
+    if (signupOnly && statusState.status === "pending") {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-[#050505] px-4 text-white">
+          <div className="w-full max-w-md rounded-2xl border border-[#ffcc33]/20 bg-[#111111] p-6 text-center shadow-2xl shadow-black/40">
+            <h1 className="text-2xl font-black text-[#ffcc33]">
+              Affiliate Application Pending
+            </h1>
+            <p className="mt-3 text-sm text-white/75">
+              Your affiliate application is pending approval. You cannot submit
+              another application right now.
+            </p>
+            <Link
+              to="/affiliate"
+              className="mt-6 inline-block rounded-xl border border-[#ffcc33]/30 px-5 py-3 text-sm font-bold text-[#ffcc33]"
+            >
+              Affiliate Home
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    if (signupOnly) {
+      return children;
     }
 
     if (statusState.status !== "approved") {

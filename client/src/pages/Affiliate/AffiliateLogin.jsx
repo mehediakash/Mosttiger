@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../Components/store/authSlice";
 import { getAffiliateAccessMessage } from "./affiliateUtils";
@@ -7,7 +7,6 @@ import { getAffiliateAccessMessage } from "./affiliateUtils";
 export default function AffiliateLogin() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
   const { loading } = useSelector((state) => state.auth);
   const [form, setForm] = useState({
     username: "",
@@ -24,9 +23,7 @@ export default function AffiliateLogin() {
       const data = await dispatch(loginUser(form)).unwrap();
       const access = data.affiliateDashboard;
       if (access?.allowed) {
-        navigate(location.state?.returnTo || "/affiliate/dashboard", {
-          replace: true,
-        });
+        navigate("/affiliate/dashboard", { replace: true });
         return;
       }
       setMessage(getAffiliateAccessMessage(access));
